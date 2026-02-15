@@ -1,15 +1,18 @@
 package com.adaptor.deadrecall.item;
 
 import com.adaptor.deadrecall.screen.BackpackScreenHandler;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.List;
 
@@ -23,12 +26,23 @@ public class DeathBackpackItem extends Item {
         ItemStack stack = user.getStackInHand(hand);
 
         if (!world.isClient) {
-            // 在伺服器端開啟死亡背包介面
-            user.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                (syncId, playerInventory, player) ->
-                    new BackpackScreenHandler(syncId, playerInventory, player, hand, TieredBackpackItem.BackpackTier.ADVANCED),
-                Text.translatable("container.deadrecall.death_backpack")
-            ));
+            // 在伺服器端開啟死亡背包介面，使用 ExtendedScreenHandlerFactory
+            user.openHandledScreen(new ExtendedScreenHandlerFactory() {
+                @Override
+                public Text getDisplayName() {
+                    return Text.translatable("container.deadrecall.death_backpack");
+                }
+
+                @Override
+                public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+                    return new BackpackScreenHandler(syncId, playerInventory, player, hand, TieredBackpackItem.BackpackTier.ADVANCED);
+                }
+
+                @Override
+                public Object getScreenOpeningData(ServerPlayerEntity player) {
+                    return TieredBackpackItem.BackpackTier.ADVANCED.ordinal();
+                }
+            });
         }
 
         return TypedActionResult.success(stack, world.isClient());

@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall;
 
+import com.adaptor.deadrecall.entity.DeathBackpackEntity;
 import com.adaptor.deadrecall.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -11,13 +12,11 @@ import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,13 +118,14 @@ public class Deadrecall implements ModInitializer {
                         deathBackpack.set(DataComponentTypes.CONTAINER, container);
 
                         // 在死亡地點生成背包實體
-                        ItemEntity backpackEntity = new ItemEntity(world,
+                        DeathBackpackEntity backpackEntity = new DeathBackpackEntity(world,
                             deathPos.getX() + 0.5, deathPos.getY() + 0.5, deathPos.getZ() + 0.5,
                             deathBackpack);
 
                         // 設置物品所有者，防止立即消失
                         backpackEntity.setOwner(player.getUuid());
                         backpackEntity.setPickupDelay(40); // 2 秒拾取延遲
+                        // lifespan已在DeathBackpackEntity構造函數中設置為永久
 
                         world.spawnEntity(backpackEntity);
 
