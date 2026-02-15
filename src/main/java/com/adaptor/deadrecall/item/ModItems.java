@@ -40,6 +40,13 @@ public class ModItems {
             content.add(BACKPACK_ADVANCED);
             content.add(BACKPACK_NETHERITE);
         });
+
+        // 同時添加到功能性物品組，讓創造模式更容易找到
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
+            content.add(BACKPACK_BASIC);
+            content.add(BACKPACK_STANDARD);
+            content.add(BACKPACK_ADVANCED);
+            content.add(BACKPACK_NETHERITE);
+        });
     }
 }
-
