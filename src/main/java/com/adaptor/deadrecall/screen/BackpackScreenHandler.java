@@ -110,11 +110,6 @@ public class BackpackScreenHandler extends ScreenHandler {
             ItemStack originalStack = slotObj.getStack();
             newStack = originalStack.copy();
 
-            // 防止背包套娃
-            if (originalStack.getItem() instanceof TieredBackpackItem) {
-                return ItemStack.EMPTY;
-            }
-
             int backpackSlots = tier.getSlots();
 
             // 檢查是否是死亡背包
@@ -128,7 +123,7 @@ public class BackpackScreenHandler extends ScreenHandler {
             }
 
             if (slot < backpackSlots) {
-                // 從背包移動到玩家背包 - 總是允許
+                // 從背包移動到玩家背包 - 總是允許（包括死亡背包裡的背包物品）
                 if (!this.insertItem(originalStack, backpackSlots, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
@@ -136,6 +131,10 @@ public class BackpackScreenHandler extends ScreenHandler {
                 // 從玩家背包移動到背包 - 死亡背包不允許
                 if (isDeathBackpack) {
                     return ItemStack.EMPTY; // 死亡背包不能放入物品
+                }
+                // 防止背包套娃（只在放入背包時檢查，取出時不限制）
+                if (originalStack.getItem() instanceof TieredBackpackItem) {
+                    return ItemStack.EMPTY;
                 }
                 if (!this.insertItem(originalStack, 0, backpackSlots, false)) {
                     return ItemStack.EMPTY;
