@@ -18,7 +18,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 
 public class BackpackScreenHandler extends ScreenHandler {
-    private static final int MAX_VISIBLE_ROWS = 6;
+    private static final int MAX_VISIBLE_ROWS = 4;
 
     private final Inventory inventory;
     private final int totalRows;
