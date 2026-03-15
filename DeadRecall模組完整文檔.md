@@ -14,7 +14,7 @@
 ### 📊 技術資訊
 - **Minecraft 版本**：1.21.1
 - **模組載入器**：Fabric
-- **當前版本**：v1.6.0
+- **當前版本**：v1.7.2
 - **開發日期**：2026年2月15日
 
 ---
@@ -92,7 +92,7 @@
    ```
 
 3. **安裝到遊戲**
-   - 將 `build/libs/deadrecall-1.6.0.jar` 複製到 `.minecraft/mods/` 文件夹
+   - 將 `build/libs/deadrecall-1.7.2.jar` 複製到 `.minecraft/mods/` 文件夹
 
 4. **啟動遊戲**
    ```bash
@@ -365,7 +365,7 @@ backpackStack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(it
 - ✅ 添加升級機制
 - ✅ 4種不同容量背包
 
-### v1.6.0 - 網路同步與創造模式優化
+-### v1.7.2 - 網路同步與創造模式優化
 - ✅ 修復 IndexOutOfBoundsException
 - ✅ 實現 ExtendedScreenHandlerType 同步
 - ✅ 優化創造模式物品欄註冊
@@ -491,5 +491,5 @@ backpackStack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(it
 **DeadRecall 模組文檔 - 完整整合版**
 
 *最後更新：2026年2月15日*  
-*版本：v1.6.0*  
+*版本：v1.7.2*
 *狀態：✅ 完整*
