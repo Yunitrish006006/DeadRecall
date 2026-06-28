@@ -12,7 +12,7 @@
 - ✅ **死亡背包系統**：死亡時自動收集物品到背包實體
 
 ### 📊 技術資訊
-- **Minecraft 版本**：1.21.1
+- **Minecraft 版本**：26.2
 - **模組載入器**：Fabric
 - **當前版本**：v1.7.2
 - **開發日期**：2026年2月15日
@@ -110,9 +110,9 @@
 ```
 
 **手動解決**：
-1. 確保安裝了 JDK 21
+1. 確保安裝了 JDK 25
 2. 設定環境變數：
-   - `JAVA_HOME` = `C:\Program Files\Java\jdk-21`
+   - `JAVA_HOME` = `C:\Program Files\Java\jdk-25`
    - `PATH` 包含 `%JAVA_HOME%\bin`
 
 #### 常用腳本
@@ -365,7 +365,7 @@ backpackStack.set(DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(it
 - ✅ 添加升級機制
 - ✅ 4種不同容量背包
 
--### v1.7.2 - 網路同步與創造模式優化
+### v1.7.2 - 網路同步與創造模式優化
 - ✅ 修復 IndexOutOfBoundsException
 - ✅ 實現 ExtendedScreenHandlerType 同步
 - ✅ 優化創造模式物品欄註冊
