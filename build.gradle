@@ -3,7 +3,18 @@ plugins {
     id 'maven-publish'
 }
 
-version = project.mod_version
+def buildIteration = System.getenv("BUILD_NUMBER") ?: System.getenv("GITHUB_RUN_NUMBER")
+if (!buildIteration) {
+    try {
+        buildIteration = ["git", "rev-list", "--count", "HEAD"].execute(null, rootDir).text.trim()
+    } catch (Exception ignored) {
+    }
+}
+if (!buildIteration) {
+    buildIteration = new Date().format("yyyyMMddHHmmss")
+}
+
+version = "${project.mod_version}.${buildIteration}"
 group = project.maven_group
 
 base {

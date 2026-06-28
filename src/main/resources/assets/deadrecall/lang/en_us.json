@@ -12,5 +12,9 @@
   "item.deadrecall.backpack_netherite": "Netherite Backpack",
   "container.deadrecall.backpack.netherite": "Netherite Backpack",
   "item.deadrecall.death_backpack": "Death Backpack",
-  "container.deadrecall.death_backpack": "Death Backpack"
+  "container.deadrecall.death_backpack": "Death Backpack",
+  "item.deadrecall.sulfur": "Sulfur",
+  "item.deadrecall.saltpeter": "Saltpeter",
+  "item.deadrecall.sulfur_powder": "Sulfur Powder",
+  "item.deadrecall.wooden_bowl": "Wooden Bowl"
 }

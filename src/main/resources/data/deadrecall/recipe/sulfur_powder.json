@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    " B ",
+    "   "
+  ],
+  "key": {
+    "S": {
+      "item": "deadrecall:sulfur"
+    },
+    "B": {
+      "item": "deadrecall:wooden_bowl"
+    }
+  },
+  "result": {
+    "id": "deadrecall:sulfur_powder",
+    "count": 1
+  }
+}

@@ -7,6 +7,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 import java.util.function.Function;
 
@@ -27,6 +28,18 @@ public class ModItems {
     // 死亡背包 - 特殊的死亡掉落物品收集器
     public static final Item DEATH_BACKPACK = registerItem("death_backpack",
         props -> new DeathBackpackItem(props.stacksTo(1).fireResistant()));
+
+    public static final Item SULFUR = registerItem("sulfur",
+        props -> new Item(props));
+
+    public static final Item SALTPETER = registerItem("saltpeter",
+        props -> new Item(props));
+
+    public static final Item SULFUR_POWDER = registerItem("sulfur_powder",
+        props -> new Item(props));
+
+    public static final Item WOODEN_BOWL = registerItem("wooden_bowl",
+        props -> new Item(props.stacksTo(16).craftRemainder(Items.BOWL)));
 
     // 舊版物品 ID 相容（deadrecall:backpack）
     @Deprecated
