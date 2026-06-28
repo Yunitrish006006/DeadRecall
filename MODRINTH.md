@@ -39,6 +39,11 @@ macOS 使用時可以先執行 `./setup-java.sh ./gradlew runClient`，它會自
 
 如果還是出現 `Minecraft 26.2 requires Java 25 but Gradle is using 21`，請到 IDE 設定把 **Gradle JVM** 改成 **Java 25**。
 
+如果你遇到：
+`ClassTweakerFormatException: Namespace (official) does not match current runtime namespace (named)`  
+專案已內建 `normalizeFabricApiTweakers` 修正流程，直接執行 `./gradlew runClient` 即可自動處理；  
+也可以手動先跑 `./gradlew normalizeFabricApiTweakers` 再啟動。
+
 ---
 
 **DeadRecall** 讓你的生存與冒險更輕鬆，也讓物品管理更直覺。
