@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall;
 
 import com.adaptor.deadrecall.item.ModItems;
+import com.adaptor.deadrecall.recipe.ModRecipes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -30,6 +31,7 @@ public class Deadrecall implements ModInitializer {
     public void onInitialize() {
         // 註冊物品
         ModItems.registerModItems();
+        ModRecipes.registerModRecipes();
 
         // 初始化 Discord 橋接
         DiscordBridge.init(FabricLoader.getInstance().getConfigDir());

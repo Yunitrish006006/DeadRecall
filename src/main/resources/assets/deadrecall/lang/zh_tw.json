@@ -13,8 +13,7 @@
   "container.deadrecall.backpack.netherite": "獄髓背包",
   "item.deadrecall.death_backpack": "死亡背包",
   "container.deadrecall.death_backpack": "死亡背包",
-  "item.deadrecall.sulfur": "硫磺",
+  "item.deadrecall.stone_bowl": "缽",
   "item.deadrecall.saltpeter": "硝石",
-  "item.deadrecall.sulfur_powder": "硫磺粉末",
-  "item.deadrecall.wooden_bowl": "木碗"
+  "item.deadrecall.sulfur_bowl": "帶硫磺的缽"
 }

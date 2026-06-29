@@ -6,15 +6,12 @@
     "GGG"
   ],
   "key": {
-    "G": {
-      "item": "minecraft:gravel"
-    },
-    "C": {
-      "tag": "minecraft:coals"
-    },
-    "B": {
-      "item": "minecraft:bone_meal"
-    }
+    "G": "minecraft:gravel",
+    "C": [
+      "minecraft:coal",
+      "minecraft:charcoal"
+    ],
+    "B": "minecraft:bone_meal"
   },
   "result": {
     "id": "deadrecall:saltpeter",

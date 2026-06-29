@@ -1,15 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "deadrecall:sulfur_powder"
-    },
-    {
-      "item": "deadrecall:saltpeter"
-    },
-    {
-      "tag": "minecraft:coals"
-    }
+    "deadrecall:sulfur_bowl",
+    "deadrecall:saltpeter",
+    [
+      "minecraft:coal",
+      "minecraft:charcoal"
+    ]
   ],
   "result": {
     "id": "minecraft:gunpowder",

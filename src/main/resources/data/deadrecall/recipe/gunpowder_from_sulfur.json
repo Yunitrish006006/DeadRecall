@@ -6,15 +6,12 @@
     "SCS"
   ],
   "key": {
-    "S": {
-      "item": "deadrecall:sulfur"
-    },
-    "C": {
-      "tag": "minecraft:coals"
-    },
-    "P": {
-      "item": "deadrecall:saltpeter"
-    }
+    "S": "minecraft:sulfur",
+    "C": [
+      "minecraft:coal",
+      "minecraft:charcoal"
+    ],
+    "P": "deadrecall:saltpeter"
   },
   "result": {
     "id": "minecraft:gunpowder",
