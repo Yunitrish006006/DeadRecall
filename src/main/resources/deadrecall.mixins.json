@@ -6,7 +6,6 @@
     "EnchantmentHelperMixin",
     "EnchantmentMenuMixin",
     "EnchantingTableBlockMixin",
-    "ItemStackMixin",
     "RecipeManagerMixin",
     "StructureTemplateMixin"
   ],

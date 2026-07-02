@@ -1,11 +1,19 @@
 package com.adaptor.deadrecall;
 
 import com.adaptor.deadrecall.item.ModItems;
+import com.adaptor.deadrecall.network.DiscordConfigSyncPayload;
+import com.adaptor.deadrecall.network.RequestDiscordConfigPayload;
+import com.adaptor.deadrecall.network.SaveDiscordConfigPayload;
 import com.adaptor.deadrecall.recipe.ModRecipes;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -13,9 +21,11 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
@@ -26,6 +36,8 @@ import java.util.List;
 
 public class Deadrecall implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("DeadRecall");
+    private static final int BOOKSHELF_REPLACE_INTERVAL_TICKS = 20;
+    private static int bookshelfReplaceTicker = 0;
 
     @Override
     public void onInitialize() {
@@ -35,6 +47,39 @@ public class Deadrecall implements ModInitializer {
 
         // 初始化 Discord 橋接
         DiscordBridge.init(FabricLoader.getInstance().getConfigDir());
+
+        // 註冊自定義封包
+        PayloadTypeRegistry.serverboundPlay().register(
+                RequestDiscordConfigPayload.TYPE, RequestDiscordConfigPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                SaveDiscordConfigPayload.TYPE, SaveDiscordConfigPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(
+                DiscordConfigSyncPayload.TYPE, DiscordConfigSyncPayload.CODEC);
+
+        // 收到客戶端請求時，回傳目前設定
+        ServerPlayNetworking.registerGlobalReceiver(RequestDiscordConfigPayload.TYPE,
+                (payload, context) -> {
+                    ServerPlayer player = context.player();
+                    ServerPlayNetworking.send(player, new DiscordConfigSyncPayload(
+                            DiscordBridge.isEnabled(),
+                            DiscordBridge.getWorkerUrl(),
+                            DiscordBridge.getApiKey()
+                    ));
+                });
+
+        // 收到客戶端儲存請求時，更新設定
+        ServerPlayNetworking.registerGlobalReceiver(SaveDiscordConfigPayload.TYPE,
+                (payload, context) -> {
+                    try {
+                        DiscordBridge.updateConfig(payload.enabled(), payload.workerUrl(), payload.apiKey());
+                        context.player().sendSystemMessage(Component.literal("§aDiscord Bridge 設定已更新"));
+                    } catch (IllegalArgumentException e) {
+                        context.player().sendSystemMessage(Component.literal("§c" + e.getMessage()));
+                    } catch (Exception e) {
+                        context.player().sendSystemMessage(Component.literal("§c更新失敗：" + e.getMessage()));
+                        LOGGER.error("[DiscordBridge] 更新設定失敗", e);
+                    }
+                });
 
         // 註冊死亡背包功能 - 當玩家死亡時收集掉落物品
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
@@ -49,6 +94,22 @@ public class Deadrecall implements ModInitializer {
             String username = sender.getName().getString();
             String content = message.decoratedContent().getString();
             DiscordBridge.sendChatMessage(username, content);
+        });
+
+        // 生存模式不允許持有一般書櫃：統一替換為書本（每個書櫃 3 本）
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            bookshelfReplaceTicker++;
+            if (bookshelfReplaceTicker < BOOKSHELF_REPLACE_INTERVAL_TICKS) {
+                return;
+            }
+            bookshelfReplaceTicker = 0;
+
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                if (player.getAbilities().instabuild) {
+                    continue;
+                }
+                replaceVanillaBookshelfInInventory(player);
+            }
         });
 
         // 註冊 /back 指令
@@ -72,6 +133,38 @@ public class Deadrecall implements ModInitializer {
                     DeathLocationManager.clearDeathLocation(player);
                     return 1;
                 })
+            );
+
+            dispatcher.register(
+                    Commands.literal("discordbridge")
+                            .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
+                            .then(Commands.literal("reload")
+                                    .executes(context -> {
+                                        DiscordBridge.reload();
+                                        context.getSource().sendSuccess(() -> Component.literal("§aDiscord Bridge 設定已重新載入"), true);
+                                        return 1;
+                                    }))
+                            .then(Commands.literal("set")
+                                    .then(Commands.argument("enabled", BoolArgumentType.bool())
+                                            .then(Commands.argument("workerUrl", StringArgumentType.string())
+                                                    .then(Commands.argument("apiKey", StringArgumentType.string())
+                                                            .executes(context -> {
+                                                                boolean enabled = BoolArgumentType.getBool(context, "enabled");
+                                                                String workerUrl = StringArgumentType.getString(context, "workerUrl");
+                                                                String apiKey = StringArgumentType.getString(context, "apiKey");
+                                                                try {
+                                                                    DiscordBridge.updateConfig(enabled, workerUrl, apiKey);
+                                                                    context.getSource().sendSuccess(() -> Component.literal("§aDiscord Bridge 設定已更新"), true);
+                                                                    return 1;
+                                                                } catch (IllegalArgumentException e) {
+                                                                    context.getSource().sendFailure(Component.literal("§c" + e.getMessage()));
+                                                                    return 0;
+                                                                } catch (Exception e) {
+                                                                    context.getSource().sendFailure(Component.literal("§c更新失敗：" + e.getMessage()));
+                                                                    LOGGER.error("[DiscordBridge] 更新設定失敗", e);
+                                                                    return 0;
+                                                                }
+                                                            })))))
             );
         });
     }
@@ -131,5 +224,29 @@ public class Deadrecall implements ModInitializer {
                 }
             });
         });
+    }
+
+    private void replaceVanillaBookshelfInInventory(ServerPlayer player) {
+        boolean changed = false;
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (!stack.is(Items.BOOKSHELF)) {
+                continue;
+            }
+            int booksToGive = stack.getCount() * 3;
+            player.getInventory().setItem(slot, ItemStack.EMPTY);
+            while (booksToGive > 0) {
+                int batch = Math.min(booksToGive, Items.BOOK.getDefaultMaxStackSize());
+                ItemStack books = new ItemStack(Items.BOOK, batch);
+                if (!player.getInventory().add(books)) {
+                    player.drop(books, false);
+                }
+                booksToGive -= batch;
+            }
+            changed = true;
+        }
+        if (changed) {
+            player.getInventory().setChanged();
+        }
     }
 }
