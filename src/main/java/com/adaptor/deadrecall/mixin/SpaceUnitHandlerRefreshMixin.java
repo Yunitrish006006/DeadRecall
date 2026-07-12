@@ -21,7 +21,7 @@ public abstract class SpaceUnitHandlerRefreshMixin {
             UUID sourceUnitId,
             CallbackInfo ci
     ) {
-        SpaceUnitStructureRefresh.refresh(player.getServer(), sourceUnitId);
+        SpaceUnitStructureRefresh.refresh(player.level().getServer(), sourceUnitId);
     }
 
     @Inject(
@@ -36,8 +36,8 @@ public abstract class SpaceUnitHandlerRefreshMixin {
             CallbackInfo ci
     ) {
         if (SpaceUnitHandler.SOURCE_TYPE_LODESTONE.equals(sourceType)) {
-            SpaceUnitStructureRefresh.refresh(player.getServer(), sourceUnitId);
+            SpaceUnitStructureRefresh.refresh(player.level().getServer(), sourceUnitId);
         }
-        SpaceUnitStructureRefresh.refresh(player.getServer(), targetUnitId);
+        SpaceUnitStructureRefresh.refresh(player.level().getServer(), targetUnitId);
     }
 }
