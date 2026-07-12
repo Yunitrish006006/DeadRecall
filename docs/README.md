@@ -15,6 +15,7 @@
   - [採集模式](copper-golem/gather-mode.md)
   - [LLM 設定](copper-golem/llm.md)
   - [故障排除](copper-golem/troubleshooting.md)
+- [附魔台與雕紋書櫃](enchanting/README.md)
 - [煉金系統](alchemy/README.md)
   - [材料](alchemy/materials.md)
   - [配方](alchemy/recipes.md)
