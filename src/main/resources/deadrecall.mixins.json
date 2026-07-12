@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AbstractFurnaceBlockEntityAccessor",
+    "DeadRecallSpaceUnitSavedDataAccessor",
     "EnchantmentHelperMixin",
     "EnchantmentMenuMixin",
     "EnchantingTableBlockMixin",
@@ -14,6 +15,7 @@
     "PigMixin",
     "RecipeManagerMixin",
     "SnowballMixin",
+    "SpaceUnitHandlerRefreshMixin",
     "StructureTemplateMixin",
     "TransportItemsBetweenContainersMixin",
     "VillagerEntityMixin"
