@@ -4,6 +4,7 @@ import com.adaptor.deadrecall.network.DiscordConfigSyncPayload;
 import com.adaptor.deadrecall.network.CopperWrenchBindingsPayload;
 import com.adaptor.deadrecall.network.RequestDiscordConfigPayload;
 import com.adaptor.deadrecall.network.SortBackpackPayload;
+import com.adaptor.deadrecall.network.SpaceUnitMapPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -19,7 +20,6 @@ import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class DeadrecallClient implements ClientModInitializer {
-
     public static KeyMapping openDiscordConfigKey;
     public static KeyMapping sortBackpackKey;
 
@@ -74,6 +74,19 @@ public class DeadrecallClient implements ClientModInitializer {
                             screen.applyPayload(payload);
                         } else {
                             mc.setScreenAndShow(new CopperWrenchBindingsScreen(payload));
+                        }
+                    });
+                });
+
+        ClientPlayNetworking.registerGlobalReceiver(SpaceUnitMapPayload.TYPE,
+                (payload, context) -> {
+                    net.minecraft.client.Minecraft mc = context.client();
+                    mc.execute(() -> {
+                        SpaceUnitMapScreen screen = SpaceUnitMapScreen.CURRENT;
+                        if (screen != null && screen.isFor(payload.sourceType(), payload.sourceUnitId())) {
+                            screen.applyPayload(payload);
+                        } else {
+                            mc.setScreenAndShow(new SpaceUnitMapScreen(payload));
                         }
                     });
                 });

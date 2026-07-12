@@ -23,14 +23,18 @@ import com.adaptor.deadrecall.network.DiscordConfigSyncPayload;
 import com.adaptor.deadrecall.network.ManageDiscordChannelPayload;
 import com.adaptor.deadrecall.network.RequestDiscordConfigPayload;
 import com.adaptor.deadrecall.network.RequestCopperGolemVisualizationPayload;
+import com.adaptor.deadrecall.network.RequestSpaceUnitMapPayload;
 import com.adaptor.deadrecall.network.SaveCopperGolemLlmConfigPayload;
 import com.adaptor.deadrecall.network.SortBackpackPayload;
 import com.adaptor.deadrecall.network.SaveDiscordConfigPayload;
+import com.adaptor.deadrecall.network.SpaceUnitMapPayload;
+import com.adaptor.deadrecall.network.StartSpaceUnitTeleportPayload;
 import com.adaptor.deadrecall.network.TestCopperGolemLlmConnectionPayload;
 import com.adaptor.deadrecall.network.UpdateCopperGolemBindingCachePayload;
 import com.adaptor.deadrecall.network.UpdateCopperGolemBindingLlmPayload;
 import com.adaptor.deadrecall.network.UpdateCopperGolemGatheringLlmPayload;
 import com.adaptor.deadrecall.recipe.ModRecipes;
+import com.adaptor.deadrecall.space.SpaceUnitHandler;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
@@ -97,6 +101,7 @@ public class Deadrecall implements ModInitializer {
         CherryBrewInteractions.register();
         PigManureInteractions.register();
         CopperGolemWrenchHandler.register();
+        SpaceUnitHandler.register();
         ModRecipes.registerModRecipes();
 
         // 初始化 Discord 橋接
@@ -133,12 +138,18 @@ public class Deadrecall implements ModInitializer {
                 UpdateCopperGolemGatheringLlmPayload.TYPE, UpdateCopperGolemGatheringLlmPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(
                 RequestCopperGolemVisualizationPayload.TYPE, RequestCopperGolemVisualizationPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                RequestSpaceUnitMapPayload.TYPE, RequestSpaceUnitMapPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                StartSpaceUnitTeleportPayload.TYPE, StartSpaceUnitTeleportPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(
                 DiscordConfigSyncPayload.TYPE, DiscordConfigSyncPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(
                 CopperWrenchBindingsPayload.TYPE, CopperWrenchBindingsPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(
                 CopperGolemVisualizationPayload.TYPE, CopperGolemVisualizationPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(
+                SpaceUnitMapPayload.TYPE, SpaceUnitMapPayload.CODEC);
 
         // 收到客戶端請求時，回傳目前設定
         ServerPlayNetworking.registerGlobalReceiver(RequestDiscordConfigPayload.TYPE,
@@ -314,6 +325,14 @@ public class Deadrecall implements ModInitializer {
                 (payload, context) -> context.server().execute(() ->
                         CopperGolemWrenchHandler.sendVisualization(context.player(), payload.golemId())));
 
+        ServerPlayNetworking.registerGlobalReceiver(RequestSpaceUnitMapPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.sendSpaceUnitMap(context.player(), payload.sourceType(), payload.sourceUnitId())));
+
+        ServerPlayNetworking.registerGlobalReceiver(StartSpaceUnitTeleportPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.startTeleport(context.player(), payload.sourceType(), payload.sourceUnitId(), payload.targetUnitId())));
+
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
             if (entity instanceof ServerPlayer player) {
                 rememberExistingDropsBeforeDeath(player);
@@ -330,6 +349,12 @@ public class Deadrecall implements ModInitializer {
                 handlePlayerDeath(player);
             } else if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
                 CopperGolemWrenchHandler.dropGatheringInventory(golem);
+            }
+        });
+
+        ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, damageSource, baseDamageTaken, damageTaken, blocked) -> {
+            if (entity instanceof ServerPlayer player && damageTaken > 0.0F) {
+                SpaceUnitHandler.cancelTeleport(player, Component.translatable("message.deadrecall.space_unit.teleport_cancelled.damage"));
             }
         });
 
@@ -350,6 +375,7 @@ public class Deadrecall implements ModInitializer {
 
         // 清理銅魁儡失效綁定，並在整箱都無法分類時維持原地跳躍
         ServerTickEvents.END_SERVER_TICK.register(CopperGolemWrenchHandler::tickCopperGolemWrenchState);
+        ServerTickEvents.END_SERVER_TICK.register(SpaceUnitHandler::tickTeleportSessions);
 
         // 生存模式不允許持有一般書櫃：統一替換為書本（每個書櫃 3 本）
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -588,6 +614,7 @@ public class Deadrecall implements ModInitializer {
 
                             LOGGER.info("Created death backpack for player {} with {} items at {}",
                                 player.getName().getString(), collectedItems.size(), deathPos);
+                            SpaceUnitHandler.createDeathNode(player, world, deathPos);
 
                             // 通知玩家
                             player.sendSystemMessage(Component.literal("§e你的物品已被收集到死亡背包中！"));
