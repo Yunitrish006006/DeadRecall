@@ -1,10 +1,14 @@
 # 開發者文件
 
-本區說明程式碼入口與維護原則。正式需求、資料模型與驗收條件以 `openspec/` 為準。
+本區說明程式碼入口、資料安全、網路與渲染維護原則。正式需求、資料模型與驗收條件以 `openspec/` 為準。
 
-## 入口
+## 文件
 
-- [現有開發參考](../development.md)
+- [專案結構](project-structure.md)
+- [Data Components 與背包資料](data-components.md)
+- [網路與執行緒](networking.md)
+- [Mixin 參考](mixins.md)
+- [Client Rendering](rendering.md)
 - [OpenSpec 索引](../../OPENSPEC_INDEX.md)
 - [系統架構](../../openspec/architecture.md)
 - [開發路線圖](../../openspec/roadmap.md)
