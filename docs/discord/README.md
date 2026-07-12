@@ -13,9 +13,9 @@ Minecraft Server
 
 ## 文件
 
-目前完整部署、設定、API 端點、指令與故障排除請見：
-
-- [Discord Bridge 部署指南](../discord-bridge-setup.md)
+- [伺服器設定](server-setup.md)
+- [Cloudflare Worker 部署](worker.md)
+- [故障排除](troubleshooting.md)
 - [指令參考](../commands.md)
 
 ## 安全原則
