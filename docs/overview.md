@@ -10,7 +10,7 @@ DeadRecall 是 Minecraft Fabric 模組，整合攜帶式儲存、死亡物品保
 | 死亡背包 | 收集玩家死亡後產生的一般掉落物，並在死亡地點生成可取回的背包 |
 | `/back` | 記錄死亡維度與座標，支援跨維度返回死亡地點 |
 | 銅魁儡 | 透過銅板手管理分類與採集模式，可選配 LLM 判斷 |
-| Discord Bridge | 將遊戲聊天及伺服器狀態經 Cloudflare Worker 傳送到 Discord |
+| Discord Bridge | 將遊戲聊天、玩家動態、管理稽核、公開事件及伺服器狀態經 Cloudflare Worker 傳送到 Discord |
 | 生存煉金 | 包含豬糞、木灰、硝石、缽與煉藥鍋配方流程 |
 | 背包整理 | 預設使用滑鼠中鍵整理目前開啟的物品介面 |
 

@@ -27,6 +27,8 @@ public record SpaceUnitMapPayload(
             UUID id,
             String type,
             String name,
+            String visibility,
+            boolean friendShared,
             String dimension,
             int x,
             int y,
@@ -43,6 +45,11 @@ public record SpaceUnitMapPayload(
             int prepareTicks,
             int maxHorizontalDeviation,
             int damageChancePercent,
+            boolean favorite,
+            boolean manageable,
+            boolean owned,
+            int administratorCount,
+            int allowedPlayerCount,
             boolean canTeleport,
             String blockedReason) {
     }
@@ -92,6 +99,8 @@ public record SpaceUnitMapPayload(
         buf.writeUUID(entry.id());
         buf.writeUtf(entry.type(), 32);
         buf.writeUtf(entry.name(), 128);
+        buf.writeUtf(entry.visibility(), 32);
+        buf.writeBoolean(entry.friendShared());
         buf.writeUtf(entry.dimension(), 128);
         buf.writeInt(entry.x());
         buf.writeInt(entry.y());
@@ -108,6 +117,11 @@ public record SpaceUnitMapPayload(
         buf.writeInt(entry.prepareTicks());
         buf.writeInt(entry.maxHorizontalDeviation());
         buf.writeInt(entry.damageChancePercent());
+        buf.writeBoolean(entry.favorite());
+        buf.writeBoolean(entry.manageable());
+        buf.writeBoolean(entry.owned());
+        buf.writeInt(entry.administratorCount());
+        buf.writeInt(entry.allowedPlayerCount());
         buf.writeBoolean(entry.canTeleport());
         buf.writeUtf(entry.blockedReason(), 128);
     }
@@ -117,6 +131,8 @@ public record SpaceUnitMapPayload(
                 buf.readUUID(),
                 buf.readUtf(32),
                 buf.readUtf(128),
+                buf.readUtf(32),
+                buf.readBoolean(),
                 buf.readUtf(128),
                 buf.readInt(),
                 buf.readInt(),
@@ -131,6 +147,11 @@ public record SpaceUnitMapPayload(
                 buf.readInt(),
                 buf.readInt(),
                 buf.readInt(),
+                buf.readInt(),
+                buf.readInt(),
+                buf.readBoolean(),
+                buf.readBoolean(),
+                buf.readBoolean(),
                 buf.readInt(),
                 buf.readInt(),
                 buf.readBoolean(),

@@ -1,6 +1,6 @@
 # Discord Bridge
 
-DeadRecall 可將 Minecraft 聊天、死亡訊息與伺服器狀態經 Cloudflare Worker 傳送到 Discord。
+DeadRecall 可將 Minecraft 聊天、玩家動態、管理稽核、公開事件與伺服器狀態經 Cloudflare Worker 傳送到 Discord。
 
 ## 架構
 
@@ -23,4 +23,5 @@ Minecraft Server
 - 只有 OP 可以修改 Bridge 設定。
 - `MC_API_KEY` 應使用 Cloudflare Secret，不應提交到 Git。
 - 不要在 issue、log 或截圖中公開完整 Webhook URL、Bot Token 或 API Key。
+- 管理稽核不轉播完整指令原文；死亡背包與 Space Unit 通知不轉播座標或物品內容。
 - 聊天與一般狀態通知應非同步送出，避免阻塞伺服器 tick。

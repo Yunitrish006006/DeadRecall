@@ -29,7 +29,29 @@
 - 相對位置 Space Unit 地圖 GUI 基礎。
 - Space Unit 地圖資訊面板的 server-side 傳送報價基礎。
 - Space Unit 基礎傳送 session：啟動、倒數、移動／受傷／離線條件取消、成本扣除及安全落點。
+- Space Unit 傳送偏差、抵達風險傷害及石碑結構磨損／方塊退化基礎。
+- Space Unit 地圖 GUI 搜尋、類型篩選及排序基礎。
+- Space Unit 地圖收藏持久化、收藏標記與收藏切換封包基礎。
+- Space Unit 石碑結構掃描、磨損判斷及退化候選方塊 tag 化基礎。
+- Space Unit 石碑退化替換映射 data pack 化基礎。
+- Space Unit 石碑退化規則補上 Nether Bricks 與 Polished Blackstone Bricks。
+- Space Unit 石碑退化規則補上 Copper Grates 與 Copper Bulbs。
+- 固定磁石方塊被破壞或替換後停用對應 Space Unit，並避免同座標重放磁石沿用舊 Owner／權限。
+- Space Unit 未註冊磁石的石碑預覽與二次右鍵確認註冊基礎。
+- Space Unit 地圖資訊面板的磁石校準按鈕與 server-side 重新掃描基礎。
+- Space Unit 地圖資訊面板的固定磁石公開／私人可見性切換基礎。
+- Space Unit 地圖資訊面板顯示可見性、結構階級與可管理狀態。
+- Space Unit 地圖資訊面板的傳送成本與風險摘要圖示化基礎。
+- Space Unit 地圖資訊面板的固定磁石重新命名基礎。
+- Space Unit 好友 SavedData、羅盤右鍵玩家邀請／接受及好友可見性過濾基礎。
+- Space Unit 地圖 GUI 好友篩選與資訊面板進階細節基礎：距離、成本、風險圖示及好友共享標示。
 - DeadRecall 死亡背包成功建立後建立死亡節點基礎。
+- 死亡背包清空回收後停用對應死亡節點並從 Space Unit 地圖隱藏。
+- Space Unit 分散重生 Gamerule、持久個人重生點與密度加權有限採樣基礎。
+- Space Unit 線上好友 `PLAYER` 目的地、粗略位置地圖顯示與每次傳送確認基礎。
+- Space Unit 地圖資訊面板的線上玩家 Administrator／允許名單調整基礎。
+- Space Unit 未註冊磁石的石碑預覽 GUI 與 Server-side pending 確認封包基礎。
+- Space Unit 好友管理 GUI 名單瀏覽、邀請狀態顯示與移除／取消關係基礎。
 
 ### 共用基礎
 
@@ -38,6 +60,7 @@
 - 世界及設定資料存取。
 - ItemStack 自訂資料處理。
 - OpenSpec 銅傀儡文件。
+- Discord Bridge OpenSpec、玩家／管理／公開事件轉播、健康告警及伺服器狀態 Bot Token 頻道路由修正。
 
 ## 進行中
 
@@ -46,7 +69,7 @@
 - 死亡背包資料安全、複製及物品回注問題修正。
 - OpenSpec 統一與平台架構整理。
 - DeadRecall 向 Totem 模組化架構過渡。
-- Nexus 進階地圖功能、傳送偏差／磨損與好友權限模型。
+- Nexus 進階地圖功能、石碑管理與好友權限模型。
 
 ## 尚未完成
 
@@ -61,13 +84,10 @@
 
 ### Totem Nexus
 
-- 磁石註冊確認流程與管理介面。
-- 地圖 GUI 搜尋、分類、好友篩選與資訊面板細節。
-- 傳送偏差隨機化、抵達傷害與石碑磨損實際效果。
-- 石碑磨損與方塊退化。
-- 好友邀請、好友磁石及人體磁石。
-- 分散重生 Gamerule 及密度加權分配。
-- 死亡節點回收、隱藏與傳送成本整合。
+- 磁石完整管理介面整合與 UX 打磨。
+- 石碑完整管理介面的離線玩家查詢、名單瀏覽與批次調整。
+- 好友／人體磁石進階設定（同意偏好、通知、黑名單與完整互動流程）。
+- 死亡節點傳送成本細節與回收後歷史紀錄介面。
 
 ### Totem Excavation
 

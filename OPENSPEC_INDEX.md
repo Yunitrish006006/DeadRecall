@@ -51,6 +51,20 @@ openspec/
 - 範圍與路徑顯示由 Client 渲染。
 - 受傷銅傀儡可用銅錠右鍵修復。
 
+### DeadRecall / Discord Bridge
+
+- [`openspec/specs/discord-bridge/spec.md`](openspec/specs/discord-bridge/spec.md)
+
+內容包括：
+
+- Minecraft 聊天轉播。
+- 玩家死亡訊息轉播。
+- 玩家首次加入、加入／離開通知。
+- 重要 advancement、管理稽核、健康告警、死亡背包、公開 Space Unit、Boss 與 raid 通知。
+- 村民升級通知。
+- 伺服器開啟／關閉狀態通知。
+- Cloudflare Worker、Webhook 與 Bot Token 頻道路由。
+
 ## 模組命名方向
 
 | 模組 | 內容 |

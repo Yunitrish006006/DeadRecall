@@ -36,6 +36,7 @@ Totem Core
 - [`roadmap.md`](roadmap.md)：已完成、進行中及未完成項目。
 - [`specs/space-unit-lodestone/spec.md`](specs/space-unit-lodestone/spec.md)：Totem Nexus 的磁石傳送與分散重生規格。
 - [`specs/copper-golem/spec.md`](specs/copper-golem/spec.md)：現有銅傀儡目標規格。
+- [`specs/discord-bridge/spec.md`](specs/discord-bridge/spec.md)：Discord Bridge 的事件轉播、Worker 路由與安全規格。
 
 ## 目前專案名稱
 

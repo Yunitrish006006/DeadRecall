@@ -12,6 +12,8 @@ import com.adaptor.deadrecall.item.ModItemGroups;
 import com.adaptor.deadrecall.item.ModItems;
 import com.adaptor.deadrecall.item.copper.CopperGolemLlmService;
 import com.adaptor.deadrecall.item.copper.CopperGolemWrenchHandler;
+import com.adaptor.deadrecall.network.CalibrateSpaceUnitPayload;
+import com.adaptor.deadrecall.network.ConfirmSpaceUnitRegistrationPayload;
 import com.adaptor.deadrecall.network.CopperGolemOperationPayload;
 import com.adaptor.deadrecall.network.CopperGolemFuelSlotPayload;
 import com.adaptor.deadrecall.network.CopperGolemGatheringSlotPayload;
@@ -21,19 +23,28 @@ import com.adaptor.deadrecall.network.CopperGolemVisualizationPayload;
 import com.adaptor.deadrecall.network.CopperWrenchBindingsPayload;
 import com.adaptor.deadrecall.network.DiscordConfigSyncPayload;
 import com.adaptor.deadrecall.network.ManageDiscordChannelPayload;
+import com.adaptor.deadrecall.network.RenameSpaceUnitPayload;
+import com.adaptor.deadrecall.network.RemoveSpaceUnitFriendPayload;
 import com.adaptor.deadrecall.network.RequestDiscordConfigPayload;
 import com.adaptor.deadrecall.network.RequestCopperGolemVisualizationPayload;
+import com.adaptor.deadrecall.network.RequestSpaceUnitFriendsPayload;
 import com.adaptor.deadrecall.network.RequestSpaceUnitMapPayload;
 import com.adaptor.deadrecall.network.SaveCopperGolemLlmConfigPayload;
 import com.adaptor.deadrecall.network.SortBackpackPayload;
 import com.adaptor.deadrecall.network.SaveDiscordConfigPayload;
+import com.adaptor.deadrecall.network.SpaceUnitFriendsPayload;
 import com.adaptor.deadrecall.network.SpaceUnitMapPayload;
+import com.adaptor.deadrecall.network.SpaceUnitRegistrationPreviewPayload;
 import com.adaptor.deadrecall.network.StartSpaceUnitTeleportPayload;
 import com.adaptor.deadrecall.network.TestCopperGolemLlmConnectionPayload;
+import com.adaptor.deadrecall.network.ToggleSpaceUnitFavoritePayload;
+import com.adaptor.deadrecall.network.UpdateSpaceUnitAccessPayload;
+import com.adaptor.deadrecall.network.UpdateSpaceUnitVisibilityPayload;
 import com.adaptor.deadrecall.network.UpdateCopperGolemBindingCachePayload;
 import com.adaptor.deadrecall.network.UpdateCopperGolemBindingLlmPayload;
 import com.adaptor.deadrecall.network.UpdateCopperGolemGatheringLlmPayload;
 import com.adaptor.deadrecall.recipe.ModRecipes;
+import com.adaptor.deadrecall.space.DistributedSpawnHandler;
 import com.adaptor.deadrecall.space.SpaceUnitHandler;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -44,6 +55,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.Commands;
@@ -56,7 +68,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 import net.minecraft.server.players.NameAndId;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -73,6 +89,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -83,10 +100,19 @@ public class Deadrecall implements ModInitializer {
     private static final int PLAYER_HOTBAR_SLOT_COUNT = 9;
     private static final double DEATH_BACKPACK_COLLECTION_RADIUS = 10.0D;
     private static final String TAG_DEATH_BACKPACK_ID = "deadrecall_death_backpack_id";
+    private static final int DISCORD_HEALTH_SAMPLE_INTERVAL_TICKS = 20 * 10;
+    private static final int DISCORD_LOW_TPS_REQUIRED_SAMPLES = 3;
+    private static final double DISCORD_LOW_TPS_THRESHOLD = 15.0D;
+    private static final double DISCORD_RECOVERED_TPS_THRESHOLD = 18.0D;
     private static final Map<UUID, PendingDeathCollection> pendingDeathCollections = new HashMap<>();
     private static final Set<UUID> scheduledDeathBackpackCollections = new HashSet<>();
     private static int bookshelfReplaceTicker = 0;
     private static MinecraftServer discordStatusOpenServer = null;
+    private static long discordHealthTickStartNanos = 0L;
+    private static int discordHealthSampleTicker = 0;
+    private static int discordLowTpsSamples = 0;
+    private static double discordAverageTickMillis = 50.0D;
+    private static boolean discordLowTpsAlertActive = false;
 
     @Override
     public void onInitialize() {
@@ -101,6 +127,7 @@ public class Deadrecall implements ModInitializer {
         CherryBrewInteractions.register();
         PigManureInteractions.register();
         CopperGolemWrenchHandler.register();
+        DistributedSpawnHandler.register();
         SpaceUnitHandler.register();
         ModRecipes.registerModRecipes();
 
@@ -141,7 +168,23 @@ public class Deadrecall implements ModInitializer {
         PayloadTypeRegistry.serverboundPlay().register(
                 RequestSpaceUnitMapPayload.TYPE, RequestSpaceUnitMapPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(
+                RequestSpaceUnitFriendsPayload.TYPE, RequestSpaceUnitFriendsPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                RemoveSpaceUnitFriendPayload.TYPE, RemoveSpaceUnitFriendPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
                 StartSpaceUnitTeleportPayload.TYPE, StartSpaceUnitTeleportPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                ToggleSpaceUnitFavoritePayload.TYPE, ToggleSpaceUnitFavoritePayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                CalibrateSpaceUnitPayload.TYPE, CalibrateSpaceUnitPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateSpaceUnitVisibilityPayload.TYPE, UpdateSpaceUnitVisibilityPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                RenameSpaceUnitPayload.TYPE, RenameSpaceUnitPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateSpaceUnitAccessPayload.TYPE, UpdateSpaceUnitAccessPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(
+                ConfirmSpaceUnitRegistrationPayload.TYPE, ConfirmSpaceUnitRegistrationPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(
                 DiscordConfigSyncPayload.TYPE, DiscordConfigSyncPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(
@@ -150,6 +193,10 @@ public class Deadrecall implements ModInitializer {
                 CopperGolemVisualizationPayload.TYPE, CopperGolemVisualizationPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(
                 SpaceUnitMapPayload.TYPE, SpaceUnitMapPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(
+                SpaceUnitFriendsPayload.TYPE, SpaceUnitFriendsPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(
+                SpaceUnitRegistrationPreviewPayload.TYPE, SpaceUnitRegistrationPreviewPayload.CODEC);
 
         // 收到客戶端請求時，回傳目前設定
         ServerPlayNetworking.registerGlobalReceiver(RequestDiscordConfigPayload.TYPE,
@@ -329,9 +376,78 @@ public class Deadrecall implements ModInitializer {
                 (payload, context) -> context.server().execute(() ->
                         SpaceUnitHandler.sendSpaceUnitMap(context.player(), payload.sourceType(), payload.sourceUnitId())));
 
+        ServerPlayNetworking.registerGlobalReceiver(RequestSpaceUnitFriendsPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.sendFriendList(context.player())));
+
+        ServerPlayNetworking.registerGlobalReceiver(RemoveSpaceUnitFriendPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.removeFriend(context.player(), payload.friendId())));
+
         ServerPlayNetworking.registerGlobalReceiver(StartSpaceUnitTeleportPayload.TYPE,
                 (payload, context) -> context.server().execute(() ->
                         SpaceUnitHandler.startTeleport(context.player(), payload.sourceType(), payload.sourceUnitId(), payload.targetUnitId())));
+
+        ServerPlayNetworking.registerGlobalReceiver(ToggleSpaceUnitFavoritePayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.setFavorite(
+                                context.player(),
+                                payload.sourceType(),
+                                payload.sourceUnitId(),
+                                payload.targetUnitId(),
+                                payload.favorite()
+                        )));
+
+        ServerPlayNetworking.registerGlobalReceiver(CalibrateSpaceUnitPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.calibrateLodestone(
+                                context.player(),
+                                payload.sourceType(),
+                                payload.sourceUnitId(),
+                                payload.targetUnitId()
+                        )));
+
+        ServerPlayNetworking.registerGlobalReceiver(UpdateSpaceUnitVisibilityPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.setLodestoneVisibility(
+                                context.player(),
+                                payload.sourceType(),
+                                payload.sourceUnitId(),
+                                payload.targetUnitId(),
+                                payload.visibility()
+                        )));
+
+        ServerPlayNetworking.registerGlobalReceiver(RenameSpaceUnitPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.setLodestoneName(
+                                context.player(),
+                                payload.sourceType(),
+                                payload.sourceUnitId(),
+                                payload.targetUnitId(),
+                                payload.name()
+                        )));
+
+        ServerPlayNetworking.registerGlobalReceiver(UpdateSpaceUnitAccessPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.setLodestoneAccess(
+                                context.player(),
+                                payload.sourceType(),
+                                payload.sourceUnitId(),
+                                payload.targetUnitId(),
+                                payload.role(),
+                                payload.playerName(),
+                                payload.enabled()
+                        )));
+
+        ServerPlayNetworking.registerGlobalReceiver(ConfirmSpaceUnitRegistrationPayload.TYPE,
+                (payload, context) -> context.server().execute(() ->
+                        SpaceUnitHandler.confirmLodestoneRegistration(
+                                context.player(),
+                                payload.dimension(),
+                                payload.x(),
+                                payload.y(),
+                                payload.z()
+                        )));
 
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
             if (entity instanceof ServerPlayer player) {
@@ -345,8 +461,13 @@ public class Deadrecall implements ModInitializer {
         // 註冊死亡背包功能 - 當玩家死亡時收集掉落物品
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
             if (entity instanceof ServerPlayer player) {
+                DiscordBridge.sendDeathMessage(damageSource.getLocalizedDeathMessage(player).getString());
                 DeathLocationManager.setDeathLocation(player, player.blockPosition(), player.level());
                 handlePlayerDeath(player);
+            } else if (entity instanceof EnderDragon) {
+                DiscordBridge.sendBossDefeated("終界龍", damageSourcePlayerName(damageSource.getEntity()));
+            } else if (entity instanceof WitherBoss) {
+                DiscordBridge.sendBossDefeated("凋零", damageSourcePlayerName(damageSource.getEntity()));
             } else if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
                 CopperGolemWrenchHandler.dropGatheringInventory(golem);
             }
@@ -365,6 +486,17 @@ public class Deadrecall implements ModInitializer {
             DiscordBridge.sendChatMessage(username, content);
         });
 
+        ServerPlayConnectionEvents.JOIN.register((listener, sender, server) -> {
+            ServerPlayer player = listener.getPlayer();
+            if (isFirstJoin(player)) {
+                DiscordBridge.sendPlayerFirstJoined(player.getName().getString());
+            } else {
+                DiscordBridge.sendPlayerJoined(player.getName().getString());
+            }
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register((listener, server) ->
+                DiscordBridge.sendPlayerLeft(listener.getPlayer().getName().getString()));
+
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             if (server.isDedicatedServer()) {
                 notifyServerOpened(server, false);
@@ -374,8 +506,11 @@ public class Deadrecall implements ModInitializer {
                 notifyServerClosed(server, true));
 
         // 清理銅魁儡失效綁定，並在整箱都無法分類時維持原地跳躍
+        ServerTickEvents.START_SERVER_TICK.register(Deadrecall::trackDiscordHealthTickStart);
+        ServerTickEvents.END_SERVER_TICK.register(Deadrecall::trackDiscordHealthTickEnd);
         ServerTickEvents.END_SERVER_TICK.register(CopperGolemWrenchHandler::tickCopperGolemWrenchState);
         ServerTickEvents.END_SERVER_TICK.register(SpaceUnitHandler::tickTeleportSessions);
+        ServerTickEvents.END_SERVER_TICK.register(SpaceUnitHandler::tickLodestoneIntegrity);
 
         // 生存模式不允許持有一般書櫃：統一替換為書本（每個書櫃 3 本）
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -600,6 +735,8 @@ public class Deadrecall implements ModInitializer {
                         // 將物品存儲到背包中
                         if (!collectedItems.isEmpty()) {
                             deathBackpack.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(collectedItems));
+                            UUID deathNodeId = SpaceUnitHandler.createDeathNode(player, world, deathPos);
+                            SpaceUnitHandler.writeDeathNodeBinding(deathBackpack, deathNodeId);
 
                             // 在死亡地點生成背包實體
                             ItemEntity backpackEntity = new ItemEntity(world,
@@ -614,7 +751,7 @@ public class Deadrecall implements ModInitializer {
 
                             LOGGER.info("Created death backpack for player {} with {} items at {}",
                                 player.getName().getString(), collectedItems.size(), deathPos);
-                            SpaceUnitHandler.createDeathNode(player, world, deathPos);
+                            DiscordBridge.sendDeathBackpackCreated(player.getName().getString());
 
                             // 通知玩家
                             player.sendSystemMessage(Component.literal("§e你的物品已被收集到死亡背包中！"));
@@ -644,6 +781,49 @@ public class Deadrecall implements ModInitializer {
         CompoundTag tag = new CompoundTag();
         tag.putString(TAG_DEATH_BACKPACK_ID, UUID.randomUUID().toString());
         deathBackpack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+    }
+
+    private static boolean isFirstJoin(ServerPlayer player) {
+        return player.getStats().getValue(Stats.CUSTOM, Stats.PLAY_TIME) <= 0;
+    }
+
+    private static String damageSourcePlayerName(Entity sourceEntity) {
+        return sourceEntity instanceof ServerPlayer player ? player.getName().getString() : "";
+    }
+
+    private static void trackDiscordHealthTickStart(MinecraftServer server) {
+        discordHealthTickStartNanos = System.nanoTime();
+    }
+
+    private static void trackDiscordHealthTickEnd(MinecraftServer server) {
+        if (discordHealthTickStartNanos <= 0L) {
+            return;
+        }
+
+        long elapsedNanos = System.nanoTime() - discordHealthTickStartNanos;
+        double elapsedMillis = elapsedNanos / 1_000_000.0D;
+        discordAverageTickMillis = (discordAverageTickMillis * 0.95D) + (elapsedMillis * 0.05D);
+        discordHealthSampleTicker++;
+        if (discordHealthSampleTicker < DISCORD_HEALTH_SAMPLE_INTERVAL_TICKS) {
+            return;
+        }
+
+        discordHealthSampleTicker = 0;
+        double tps = Math.min(20.0D, 1000.0D / Math.max(1.0D, discordAverageTickMillis));
+        if (tps < DISCORD_LOW_TPS_THRESHOLD) {
+            discordLowTpsSamples++;
+            if (!discordLowTpsAlertActive && discordLowTpsSamples >= DISCORD_LOW_TPS_REQUIRED_SAMPLES) {
+                discordLowTpsAlertActive = true;
+                DiscordBridge.sendServerHealthAlert(String.format(Locale.ROOT, "TPS 持續偏低：%.1f TPS", tps));
+            }
+            return;
+        }
+
+        discordLowTpsSamples = 0;
+        if (discordLowTpsAlertActive && tps >= DISCORD_RECOVERED_TPS_THRESHOLD) {
+            discordLowTpsAlertActive = false;
+            DiscordBridge.sendServerHealthAlert(String.format(Locale.ROOT, "TPS 已恢復：%.1f TPS", tps));
+        }
     }
 
     private record PendingDeathCollection(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, Set<UUID> existingDropIds) {

@@ -4,6 +4,7 @@
 
 ## 玩家文件
 
+- [Release Notes](releases/README.md)
 - [模組概覽](overview.md)
 - [背包系統](backpacks/README.md)
   - [背包等級與防護](backpacks/tiers.md)
