@@ -6,7 +6,7 @@
 
 - [`openspec/README.md`](openspec/README.md)：Totem 平台定位、模組名稱與依賴關係。
 - [`openspec/architecture.md`](openspec/architecture.md)：所有模組必須遵守的開發架構與安全規範。
-- [`openspec/roadmap.md`](openspec/roadmap.md)：已完成、進行中、尚未完成及建議開發順序。
+- [`openspec/roadmap.md`](openspec/roadmap.md)：已完成、進行中、待排程、尚未完成及建議開發順序。
 
 ## 系統規格
 
@@ -86,6 +86,24 @@ openspec/
 - 玩家重新登入時接回仍存活身體；身體死亡時執行一次死亡流程。
 - 死亡背包、死亡紀錄、Nexus 死亡節點與 Discord Bridge 死亡事件整合。
 - Server restart、crash recovery、管理員修復與資料不一致處理。
+
+### DeadRecall Gameplay QoL / Concrete Powder Item Hardening
+
+```text
+openspec/changes/concrete-powder-item-hardening/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/item-entity-transformations/spec.md
+```
+
+待排程功能：
+
+- 16 種混凝土粉末掉落物浸入水中後，1:1 轉成同色混凝土。
+- 只由 Server 替換同一個 ItemEntity 的 ItemStack。
+- 保留數量、可相容 Components 與實體狀態。
+- 不掃描全世界，不影響原版方塊硬化。
+- 不需要世界資料 migration。
 
 ## 模組命名方向
 
