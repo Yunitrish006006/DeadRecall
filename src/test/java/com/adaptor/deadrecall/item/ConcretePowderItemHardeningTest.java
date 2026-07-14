@@ -49,15 +49,15 @@ class ConcretePowderItemHardeningTest {
     }
 
     @Test
-    void preservesCountAndCompatibleComponents() {
-        ItemStack powder = new ItemStack(Items.CYAN_CONCRETE_POWDER, 37);
+    void preservesFullStackCountAndCompatibleComponents() {
+        ItemStack powder = new ItemStack(Items.CYAN_CONCRETE_POWDER, 64);
         Component customName = Component.literal("Construction batch");
         powder.set(DataComponents.CUSTOM_NAME, customName);
 
         ItemStack hardened = ConcretePowderItemHardening.harden(powder);
 
         assertTrue(hardened.is(Items.CYAN_CONCRETE));
-        assertEquals(37, hardened.getCount());
+        assertEquals(64, hardened.getCount());
         assertEquals(customName, hardened.get(DataComponents.CUSTOM_NAME));
     }
 
