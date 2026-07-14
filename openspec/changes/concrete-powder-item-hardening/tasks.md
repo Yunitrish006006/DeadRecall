@@ -40,8 +40,9 @@
 - [ ] 5.3 自訂名稱與可相容 Components 保存 GameTest／遊戲內測試。
 - [ ] 5.4 水源、流動水、非接觸水與雨天 GameTest／遊戲內測試。
 - [ ] 5.5 ItemEntity identity／位置／速度／pickup delay 遊戲內測試。
-- [ ] 5.6 Dedicated server 啟動與多人丟入水流測試。
-- [ ] 5.7 大量 ItemEntity 壓力測試，確認沒有全世界 entity 掃描。
+- [x] 5.6 Dedicated Server 可成功啟動到 `Done`，`ItemEntityMixin` 沒有啟動期套用錯誤。
+- [ ] 5.7 多人丟入水流測試。
+- [ ] 5.8 大量 ItemEntity 壓力測試，確認沒有全世界 entity 掃描。
 
 ## 6. Documentation and release
 
@@ -49,5 +50,5 @@
 - [ ] 6.2 更新 changelog／版本變更清單。
 - [x] 6.3 記錄水鍋不在第一版範圍內。
 - [x] 6.4 執行 `./gradlew build`；Java 25 CI 通過。
-- [ ] 6.5 執行可行的 GameTest／Dedicated Server 回歸測試。
+- [x] 6.5 執行 Dedicated Server 啟動回歸測試；實際水流與多人行為仍未驗證。
 - [x] 6.6 將核心完成與待驗證狀態同步到 `openspec/roadmap.md`。
