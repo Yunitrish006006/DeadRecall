@@ -45,6 +45,14 @@ public class BackpackInventory implements Container {
         return isTrackedBackpackStack() ? backpackStack : ItemStack.EMPTY;
     }
 
+    /**
+     * Uses reference identity intentionally. The menu must lock the exact ItemStack
+     * that was opened, not another backpack with equal components.
+     */
+    public boolean isTrackedStackReference(ItemStack stack) {
+        return stack == this.backpackStack;
+    }
+
     @Override
     public int getContainerSize() {
         return size;
