@@ -23,6 +23,7 @@ import java.util.List;
 
 @Mixin(StructureTemplate.class)
 public abstract class StructureTemplateMixin {
+    private static final int CHISELED_BOOKSHELF_SLOT_COUNT = 6;
 
     @Inject(
             method = "processBlockInfos",
@@ -41,7 +42,9 @@ public abstract class StructureTemplateMixin {
         List<StructureTemplate.StructureBlockInfo> replaced = new ArrayList<>(original.size());
 
         for (StructureTemplate.StructureBlockInfo info : original) {
-            if (!info.state().is(Blocks.BOOKSHELF)) {
+            boolean convertedBookshelf = info.state().is(Blocks.BOOKSHELF);
+            boolean emptyGeneratedChiseledBookshelf = info.state().is(Blocks.CHISELED_BOOKSHELF) && info.nbt() == null;
+            if (!convertedBookshelf && !emptyGeneratedChiseledBookshelf) {
                 replaced.add(info);
                 continue;
             }
@@ -72,10 +75,10 @@ public abstract class StructureTemplateMixin {
             BlockState state
     ) {
         ChiseledBookShelfBlockEntity shelf = new ChiseledBookShelfBlockEntity(pos, state);
-        int slotCount = Math.min(ChiseledBookShelfBlockEntity.MAX_BOOKS_IN_STORAGE, shelf.getItems().size());
+        int slotCount = Math.min(CHISELED_BOOKSHELF_SLOT_COUNT, shelf.getItems().size());
         for (int slot = 0; slot < slotCount; slot++) {
-            // Mutate only the detached block entity's backing list. Calling setItem here would
-            // invoke updateState and require a live Level, which is unsafe during worldgen.
+            // This BlockEntity is detached from the world. Mutating its backing list is safe;
+            // setItem() is deliberately avoided because it calls updateState() and requires a live Level.
             shelf.getItems().set(slot, new ItemStack(Items.BOOK));
         }
 
