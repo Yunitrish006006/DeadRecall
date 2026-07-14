@@ -1,6 +1,8 @@
 package com.adaptor.deadrecall.item;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -43,7 +45,7 @@ class ConcretePowderItemHardeningTest {
 
     @Test
     void preservesFullStackCountAndCompatibleComponents() {
-        ItemStack powder = new ItemStack(item("cyan_concrete_powder"), 64);
+        ItemStack powder = stack(item("cyan_concrete_powder"), 64);
         Component customName = Component.literal("Construction batch");
         powder.set(DataComponents.CUSTOM_NAME, customName);
 
@@ -56,9 +58,15 @@ class ConcretePowderItemHardeningTest {
 
     @Test
     void leavesUnsupportedItemsUntouched() {
-        ItemStack stone = new ItemStack(item("stone"), 5);
+        ItemStack stone = stack(item("stone"), 5);
 
         assertSame(stone, ConcretePowderItemHardening.harden(stone));
+    }
+
+    private static ItemStack stack(Item item, int count) {
+        return new ItemStack(Holder.direct(item, DataComponentMap.builder()
+                .set(DataComponents.MAX_STACK_SIZE, 64)
+                .build()), count);
     }
 
     private static Item item(String path) {
