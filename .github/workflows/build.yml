@@ -30,4 +30,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build --no-daemon --stacktrace
+        shell: bash
+        run: |
+          set +e
+          ./gradlew build --no-daemon --stacktrace --console=plain > gradle-build.log 2>&1
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            tail -n 180 gradle-build.log
+            exit "$status"
+          fi
+          tail -n 40 gradle-build.log
