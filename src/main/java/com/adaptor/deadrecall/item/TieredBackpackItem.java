@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.item;
 
 import com.adaptor.deadrecall.inventory.BackpackInventory;
+import com.adaptor.deadrecall.inventory.BackpackMenu;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,7 +11,6 @@ import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.TooltipContext;
@@ -52,34 +52,34 @@ public class TieredBackpackItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipDisplay, tooltipAdder, tooltipFlag);
         tooltipAdder.accept(Component.translatable(
-                "item.deadrecall.backpack.tooltip.tier",
-                Component.translatable("item.deadrecall.backpack.tier." + tier.getName())
+            "item.deadrecall.backpack.tooltip.tier",
+            Component.translatable("item.deadrecall.backpack.tier." + tier.getName())
         ).withStyle(ChatFormatting.GRAY));
         tooltipAdder.accept(Component.translatable(
-                "item.deadrecall.backpack.tooltip.capacity",
-                tier.getSlots(),
-                tier.getRows()
+            "item.deadrecall.backpack.tooltip.capacity",
+            tier.getSlots(),
+            tier.getRows()
         ).withStyle(ChatFormatting.BLUE));
         tooltipAdder.accept(Component.translatable(
-                "item.deadrecall.backpack.tooltip.used",
-                BackpackItemHelper.countStoredStacks(stack),
-                tier.getSlots()
+            "item.deadrecall.backpack.tooltip.used",
+            BackpackItemHelper.countStoredStacks(stack),
+            tier.getSlots()
         ).withStyle(ChatFormatting.DARK_GRAY));
         tooltipAdder.accept(Component.translatable("item.deadrecall.backpack.tooltip.no_nesting").withStyle(ChatFormatting.RED));
         tooltipAdder.accept(Component.translatable("item.deadrecall.backpack.tooltip.death_drop").withStyle(ChatFormatting.GOLD));
         tooltipAdder.accept(Component.translatable(BackpackItemHelper.getProtectionTooltipKey(tier)).withStyle(
-                tier == BackpackTier.NETHERITE ? ChatFormatting.GOLD : ChatFormatting.YELLOW
+            tier == BackpackTier.NETHERITE ? ChatFormatting.GOLD : ChatFormatting.YELLOW
         ));
     }
 
     private static AbstractContainerMenu createChestMenu(int syncId, Inventory playerInventory, BackpackInventory backpackInventory, int rows) {
         return switch (rows) {
-            case 1 -> new ChestMenu(MenuType.GENERIC_9x1, syncId, playerInventory, backpackInventory, 1);
-            case 2 -> new ChestMenu(MenuType.GENERIC_9x2, syncId, playerInventory, backpackInventory, 2);
-            case 3 -> new ChestMenu(MenuType.GENERIC_9x3, syncId, playerInventory, backpackInventory, 3);
-            case 4 -> new ChestMenu(MenuType.GENERIC_9x4, syncId, playerInventory, backpackInventory, 4);
-            case 5 -> new ChestMenu(MenuType.GENERIC_9x5, syncId, playerInventory, backpackInventory, 5);
-            default -> new ChestMenu(MenuType.GENERIC_9x6, syncId, playerInventory, backpackInventory, 6);
+            case 1 -> new BackpackMenu(MenuType.GENERIC_9x1, syncId, playerInventory, backpackInventory, 1);
+            case 2 -> new BackpackMenu(MenuType.GENERIC_9x2, syncId, playerInventory, backpackInventory, 2);
+            case 3 -> new BackpackMenu(MenuType.GENERIC_9x3, syncId, playerInventory, backpackInventory, 3);
+            case 4 -> new BackpackMenu(MenuType.GENERIC_9x4, syncId, playerInventory, backpackInventory, 4);
+            case 5 -> new BackpackMenu(MenuType.GENERIC_9x5, syncId, playerInventory, backpackInventory, 5);
+            default -> new BackpackMenu(MenuType.GENERIC_9x6, syncId, playerInventory, backpackInventory, 6);
         };
     }
 
