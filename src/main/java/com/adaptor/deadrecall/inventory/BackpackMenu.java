@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
  * quick-move and swap operations, so the owning backpack needs an explicit identity lock.</p>
  */
 public final class BackpackMenu extends ChestMenu {
-    private final BackpackInventory backpackInventory;
+    private final ItemStack trackedBackpackStack;
     private final int backpackSlotCount;
 
     public BackpackMenu(
@@ -28,7 +28,7 @@ public final class BackpackMenu extends ChestMenu {
             int rows
     ) {
         super(menuType, containerId, playerInventory, backpackInventory, rows);
-        this.backpackInventory = backpackInventory;
+        this.trackedBackpackStack = backpackInventory.getBackpackStack();
         this.backpackSlotCount = rows * 9;
     }
 
@@ -62,14 +62,14 @@ public final class BackpackMenu extends ChestMenu {
     private boolean targetsTrackedBackpack(int slotIndex) {
         return slotIndex >= 0
                 && slotIndex < this.slots.size()
-                && this.backpackInventory.isTrackedStack(this.slots.get(slotIndex).getItem());
+                && this.slots.get(slotIndex).getItem() == this.trackedBackpackStack;
     }
 
     private boolean swapsTrackedBackpackFromInventory(Inventory inventory, ContainerInput input, int inventorySlot) {
         return input == ContainerInput.SWAP
                 && inventorySlot >= 0
                 && inventorySlot < inventory.getContainerSize()
-                && this.backpackInventory.isTrackedStack(inventory.getItem(inventorySlot));
+                && inventory.getItem(inventorySlot) == this.trackedBackpackStack;
     }
 
     private boolean collectsBackpacksWithPickupAll(ContainerInput input) {
