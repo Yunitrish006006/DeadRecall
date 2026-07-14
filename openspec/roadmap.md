@@ -48,7 +48,7 @@
 - DeadRecall 死亡背包成功建立後建立死亡節點基礎。
 - 死亡背包清空回收後停用對應死亡節點並從 Space Unit 地圖隱藏。
 - Space Unit 分散重生 Gamerule、持久個人重生點與密度加權有限採樣基礎。
-- Space Unit 線上好友 `PLAYER` 目的地、粗略位置地圖顯示與每次傳送確認基礎。
+- Space Unit 線上好友 `PLAYER` 目的地、粗略位置地圖顯示與舊版逐次確認流程基礎。
 - Space Unit 地圖資訊面板的線上玩家 Administrator／允許名單調整基礎。
 - Space Unit 未註冊磁石的石碑預覽 GUI 與 Server-side pending 確認封包基礎。
 - Space Unit 好友管理 GUI 名單瀏覽、邀請狀態顯示與移除／取消關係基礎。
@@ -61,6 +61,7 @@
 - ItemStack 自訂資料處理。
 - OpenSpec 銅傀儡文件。
 - Discord Bridge OpenSpec、玩家／管理／公開事件轉播、健康告警及伺服器狀態 Bot Token 頻道路由修正。
+- 講台替代配方資源：4 個任意木半磚＋1 本書；已加入資源，仍需 Dedicated Server 與遊戲內驗證。
 
 ## 進行中
 
@@ -72,14 +73,26 @@
 - OpenSpec 統一與平台架構整理。
 - DeadRecall 向 Totem 模組化架構過渡。
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
+- 講台配方覆寫的 CI、Dedicated Server 載入與遊戲內製作驗證。
 
 ## 待排程
 
+### Totem Nexus
+
+- **P1 — Direct Friend Player Teleport**：雙向好友關係直接授權 `PLAYER` 目的地傳送，不再要求目標玩家每次手持羅盤再次確認；解除好友、目標離線或失效時取消 session。詳見 [`changes/direct-friend-player-teleport/`](changes/direct-friend-player-teleport/)。
+- **P2 — Amethyst Catalyst Teleport Discount**：固定磁石石碑內每 4 個有效紫水晶催化方塊折抵 1 個跨維度紫水晶碎片，兩端可合併，最終成本最低為 1。詳見 [`changes/amethyst-catalyst-teleport-discount/`](changes/amethyst-catalyst-teleport-discount/)。
+
 ### DeadRecall Gameplay QoL
 
+- **P1 — Lectern Recipe Override**：以 4 個任意木半磚＋1 本書覆寫原版講台配方；JSON 資源已加入，目前待驗證。詳見 [`changes/lectern-recipe-override/`](changes/lectern-recipe-override/)。
 - **P2 — Concrete Powder Item Hardening**：掉落物形式的 16 色混凝土粉末實際浸入水中後，整疊 1:1 轉成同色混凝土；只在 Server 修改同一個 ItemEntity，不掃描全世界，不影響原版方塊硬化。詳見 [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)。
 
-此項目為小型、獨立且不需要資料 migration 的功能，可在目前高風險背包與 Nexus 修正穩定後排入短週期實作。
+### 短週期完成順序
+
+1. 完成好友直接傳送，移除舊逐次確認流程並補多人回歸測試。
+2. 驗證並完成講台配方覆寫。
+3. 實作混凝土粉末掉落物水中硬化。
+4. 擴充石碑快照、Payload 與 UI，完成紫水晶催化折抵。
 
 ## 尚未完成
 
@@ -111,7 +124,7 @@
 
 - 磁石完整管理介面整合與 UX 打磨。
 - 石碑完整管理介面的離線玩家查詢、名單瀏覽與批次調整。
-- 好友／人體磁石進階設定（同意偏好、通知、黑名單與完整互動流程）。
+- 好友／人體磁石進階設定（通知、黑名單與完整互動流程）。
 - 死亡節點傳送成本細節與回收後歷史紀錄介面。
 
 ### Totem Excavation
@@ -135,12 +148,12 @@
 ## 建議開發順序
 
 1. 先穩定目前 DeadRecall 2.x 的死亡背包及銅傀儡資料安全。
-2. 抽出 Totem Core 最小共用層，但暫不大規模更改 mod ID。
-3. 完成 Automata 的無 LLM 核心模式。
-4. 實作 Nexus SavedData、磁石互動及探索權限。
-5. 完成同維度基礎傳送，再加入穩定度及偏差。
-6. 加入跨維度紫水晶、結構磨損及地圖 GUI。
-7. 實作好友、人體磁石、分散重生及 Remnant 整合。
+2. 完成本 Roadmap 的短週期功能：好友直接傳送、講台配方、混凝土粉末與水晶折抵。
+3. 抽出 Totem Core 最小共用層，但暫不大規模更改 mod ID。
+4. 完成 Automata 的無 LLM 核心模式。
+5. 完善 Nexus SavedData、磁石互動、探索權限與玩家目標傳送。
+6. 完成同維度與跨維度傳送的穩定度、偏差、成本與石碑催化。
+7. 實作好友進階設定、分散重生及 Remnant 整合。
 8. 移植 Excavation。
 9. 最後建立 Cognition Agent Framework，作為可選模組。
 
