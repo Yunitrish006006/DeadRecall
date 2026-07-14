@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 /**
  * Vanilla chest menu with one additional server-side invariant: the ItemStack
  * backing the currently open backpack cannot be moved while the menu is open.
+ * SlotActionType is the click-action enum exposed by the 26.2 modern-yarn mappings.
  */
 public final class BackpackMenu extends ChestMenu {
     private final Inventory playerInventory;
