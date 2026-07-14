@@ -14,8 +14,8 @@
 ## 3. Validation
 
 - [x] 3.1 GitHub Actions 使用 Java 25 執行 `./gradlew build --no-daemon --stacktrace` 成功。
-- [ ] 3.2 Dedicated Server 啟動並確認 recipe 無 parse error。
-- [ ] 3.3 遊戲內測試不同木種半磚。
+- [x] 3.2 Dedicated Server 成功啟動到 `Done`；共載入 1,594 個 recipe，日誌沒有 recipe parse error。
+- [ ] 3.3 遊戲內測試不同木種半磚皆可製作。
 - [ ] 3.4 確認講台村民職業、書本與紅石行為不受影響。
 
 ## 4. Documentation
