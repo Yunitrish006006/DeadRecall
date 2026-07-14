@@ -26,6 +26,25 @@
 - 好友、人體磁石及死亡節點。
 - 可開關的分散重生 Gamerule。
 
+近期變更：
+
+```text
+openspec/changes/direct-friend-player-teleport/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/space-unit-lodestone/spec.md
+
+openspec/changes/amethyst-catalyst-teleport-discount/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/space-unit-lodestone/spec.md
+```
+
+- 雙向好友將直接授權線上 `PLAYER` 目標傳送，不再逐次確認。
+- 固定石碑中的紫水晶催化方塊將降低跨維度碎片成本。
+
 ### Totem Automata / Copper Golem
 
 ```text
@@ -86,6 +105,21 @@ openspec/
 - 玩家重新登入時接回仍存活身體；身體死亡時執行一次死亡流程。
 - 死亡背包、死亡紀錄、Nexus 死亡節點與 Discord Bridge 死亡事件整合。
 - Server restart、crash recovery、管理員修復與資料不一致處理。
+
+### DeadRecall Gameplay Recipes
+
+- [`openspec/specs/gameplay-recipes/spec.md`](openspec/specs/gameplay-recipes/spec.md)
+
+```text
+openspec/changes/lectern-recipe-override/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/gameplay-recipes/spec.md
+```
+
+- 講台配方覆寫為 4 個任意木半磚＋1 本書。
+- 使用 `data/minecraft/recipe/lectern.json` 覆寫原版 recipe ID。
 
 ### DeadRecall Gameplay QoL / Concrete Powder Item Hardening
 
