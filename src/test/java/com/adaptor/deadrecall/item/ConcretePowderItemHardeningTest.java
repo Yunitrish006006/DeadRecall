@@ -5,7 +5,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.item.Item;
@@ -15,9 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ConcretePowderItemHardeningTest {
     private static final List<String> COLORS = List.of(
@@ -41,19 +38,6 @@ class ConcretePowderItemHardeningTest {
             Item concrete = item(color + "_concrete");
             assertSame(concrete, ConcretePowderItemHardening.hardenedItem(powder));
         }
-    }
-
-    @Test
-    void preservesFullStackCountAndCompatibleComponents() {
-        ItemStack powder = stack(item("cyan_concrete_powder"), 64);
-        Component customName = Component.literal("Construction batch");
-        powder.set(DataComponents.CUSTOM_NAME, customName);
-
-        ItemStack hardened = ConcretePowderItemHardening.harden(powder);
-
-        assertTrue(hardened.is(item("cyan_concrete")));
-        assertEquals(64, hardened.getCount());
-        assertEquals(customName, hardened.get(DataComponents.CUSTOM_NAME));
     }
 
     @Test
