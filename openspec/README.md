@@ -38,7 +38,11 @@ Totem Core
 - [`specs/copper-golem/spec.md`](specs/copper-golem/spec.md)：現有銅傀儡目標規格。
 - [`specs/offline-player-body/spec.md`](specs/offline-player-body/spec.md)：Totem Remnant 的玩家下線後保留身體、重連、死亡與防複製規格。
 - [`specs/discord-bridge/spec.md`](specs/discord-bridge/spec.md)：Discord Bridge 的事件轉播、Worker 路由與安全規格。
-- [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)：待排程的混凝土粉末掉落物水中硬化功能，包含 proposal、design、tasks 與 delta spec。
+- [`specs/gameplay-recipes/spec.md`](specs/gameplay-recipes/spec.md)：DeadRecall 覆寫或新增的資料層配方規格。
+- [`changes/direct-friend-player-teleport/`](changes/direct-friend-player-teleport/)：雙向好友直接傳送，不再逐次確認。
+- [`changes/amethyst-catalyst-teleport-discount/`](changes/amethyst-catalyst-teleport-discount/)：傳送石碑紫水晶催化方塊降低跨維度成本。
+- [`changes/lectern-recipe-override/`](changes/lectern-recipe-override/)：以木半磚與書覆寫講台配方。
+- [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)：混凝土粉末掉落物水中硬化功能。
 
 ## 目前專案名稱
 
