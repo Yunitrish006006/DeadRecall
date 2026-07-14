@@ -1,31 +1,32 @@
 package com.adaptor.deadrecall.item;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 
 import java.util.Map;
 
 public final class ConcretePowderItemHardening {
     private static final Map<Item, Item> HARDENED_ITEMS = Map.ofEntries(
-            Map.entry(Blocks.WHITE_CONCRETE_POWDER.asItem(), Blocks.WHITE_CONCRETE.asItem()),
-            Map.entry(Blocks.LIGHT_GRAY_CONCRETE_POWDER.asItem(), Blocks.LIGHT_GRAY_CONCRETE.asItem()),
-            Map.entry(Blocks.GRAY_CONCRETE_POWDER.asItem(), Blocks.GRAY_CONCRETE.asItem()),
-            Map.entry(Blocks.BLACK_CONCRETE_POWDER.asItem(), Blocks.BLACK_CONCRETE.asItem()),
-            Map.entry(Blocks.BROWN_CONCRETE_POWDER.asItem(), Blocks.BROWN_CONCRETE.asItem()),
-            Map.entry(Blocks.RED_CONCRETE_POWDER.asItem(), Blocks.RED_CONCRETE.asItem()),
-            Map.entry(Blocks.ORANGE_CONCRETE_POWDER.asItem(), Blocks.ORANGE_CONCRETE.asItem()),
-            Map.entry(Blocks.YELLOW_CONCRETE_POWDER.asItem(), Blocks.YELLOW_CONCRETE.asItem()),
-            Map.entry(Blocks.LIME_CONCRETE_POWDER.asItem(), Blocks.LIME_CONCRETE.asItem()),
-            Map.entry(Blocks.GREEN_CONCRETE_POWDER.asItem(), Blocks.GREEN_CONCRETE.asItem()),
-            Map.entry(Blocks.CYAN_CONCRETE_POWDER.asItem(), Blocks.CYAN_CONCRETE.asItem()),
-            Map.entry(Blocks.LIGHT_BLUE_CONCRETE_POWDER.asItem(), Blocks.LIGHT_BLUE_CONCRETE.asItem()),
-            Map.entry(Blocks.BLUE_CONCRETE_POWDER.asItem(), Blocks.BLUE_CONCRETE.asItem()),
-            Map.entry(Blocks.PURPLE_CONCRETE_POWDER.asItem(), Blocks.PURPLE_CONCRETE.asItem()),
-            Map.entry(Blocks.MAGENTA_CONCRETE_POWDER.asItem(), Blocks.MAGENTA_CONCRETE.asItem()),
-            Map.entry(Blocks.PINK_CONCRETE_POWDER.asItem(), Blocks.PINK_CONCRETE.asItem())
+            mapping("white"),
+            mapping("light_gray"),
+            mapping("gray"),
+            mapping("black"),
+            mapping("brown"),
+            mapping("red"),
+            mapping("orange"),
+            mapping("yellow"),
+            mapping("lime"),
+            mapping("green"),
+            mapping("cyan"),
+            mapping("light_blue"),
+            mapping("blue"),
+            mapping("purple"),
+            mapping("magenta"),
+            mapping("pink")
     );
 
     private ConcretePowderItemHardening() {
@@ -60,5 +61,20 @@ public final class ConcretePowderItemHardening {
 
         itemEntity.setItem(hardened);
         return true;
+    }
+
+    private static Map.Entry<Item, Item> mapping(String color) {
+        return Map.entry(
+                vanillaItem(color + "_concrete_powder"),
+                vanillaItem(color + "_concrete")
+        );
+    }
+
+    private static Item vanillaItem(String path) {
+        Item item = BuiltInRegistries.ITEM.getValue(Identifier.parse("minecraft:" + path));
+        if (item == null) {
+            throw new IllegalStateException("Missing vanilla item minecraft:" + path);
+        }
+        return item;
     }
 }
