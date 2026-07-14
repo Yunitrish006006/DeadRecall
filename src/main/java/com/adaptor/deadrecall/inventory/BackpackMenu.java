@@ -1,11 +1,10 @@
 package com.adaptor.deadrecall.inventory;
 
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.SlotActionType;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -20,12 +19,12 @@ public final class BackpackMenu extends ChestMenu {
             MenuType<?> menuType,
             int containerId,
             Inventory playerInventory,
-            Container container,
+            BackpackInventory backpackInventory,
             int rows
     ) {
-        super(menuType, containerId, playerInventory, container, rows);
+        super(menuType, containerId, playerInventory, backpackInventory, rows);
         this.playerInventory = playerInventory;
-        this.backpackInventory = (BackpackInventory) container;
+        this.backpackInventory = backpackInventory;
     }
 
     @Override
@@ -37,11 +36,11 @@ public final class BackpackMenu extends ChestMenu {
     }
 
     @Override
-    public void clicked(int slotIndex, int button, ClickType clickType, Player player) {
-        if (isOpenedBackpackSlot(slotIndex) || swapsWithOpenedBackpack(button, clickType)) {
+    public void clicked(int slotIndex, int button, SlotActionType actionType, Player player) {
+        if (isOpenedBackpackSlot(slotIndex) || swapsWithOpenedBackpack(button, actionType)) {
             return;
         }
-        super.clicked(slotIndex, button, clickType, player);
+        super.clicked(slotIndex, button, actionType, player);
     }
 
     private boolean isOpenedBackpackSlot(int slotIndex) {
@@ -51,8 +50,8 @@ public final class BackpackMenu extends ChestMenu {
         return this.backpackInventory.isTrackedStackReference(this.slots.get(slotIndex).getItem());
     }
 
-    private boolean swapsWithOpenedBackpack(int button, ClickType clickType) {
-        if (clickType != ClickType.SWAP) {
+    private boolean swapsWithOpenedBackpack(int button, SlotActionType actionType) {
+        if (actionType != SlotActionType.SWAP) {
             return false;
         }
 
