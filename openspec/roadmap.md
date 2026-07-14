@@ -73,6 +73,14 @@
 - DeadRecall 向 Totem 模組化架構過渡。
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
 
+## 待排程
+
+### DeadRecall Gameplay QoL
+
+- **P2 — Concrete Powder Item Hardening**：掉落物形式的 16 色混凝土粉末實際浸入水中後，整疊 1:1 轉成同色混凝土；只在 Server 修改同一個 ItemEntity，不掃描全世界，不影響原版方塊硬化。詳見 [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)。
+
+此項目為小型、獨立且不需要資料 migration 的功能，可在目前高風險背包與 Nexus 修正穩定後排入短週期實作。
+
 ## 尚未完成
 
 ### Totem Core
