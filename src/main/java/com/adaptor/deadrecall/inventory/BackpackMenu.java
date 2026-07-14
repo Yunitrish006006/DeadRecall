@@ -8,8 +8,8 @@ import net.minecraft.world.inventory.SlotActionType;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Vanilla chest menu with one additional invariant: the ItemStack backing the
- * currently open backpack cannot be moved while the menu is open.
+ * Vanilla chest menu with one additional server-side invariant: the ItemStack
+ * backing the currently open backpack cannot be moved while the menu is open.
  */
 public final class BackpackMenu extends ChestMenu {
     private final Inventory playerInventory;
