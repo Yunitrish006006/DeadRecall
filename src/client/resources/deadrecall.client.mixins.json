@@ -6,6 +6,8 @@
   "client": [
     "OptionsMixin",
     "AbstractContainerScreenMixin",
+    "MenuScreensAccessor",
+    "SlotAccessor",
     "ItemEntityRenderStateMixin",
     "ItemEntityRendererMixin",
     "SpaceUnitMapScreenMixin"
