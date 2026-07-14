@@ -30,6 +30,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
+        id: gradle-build
         shell: bash
         run: |
           set +e
@@ -40,3 +41,11 @@ jobs:
             exit "$status"
           fi
           tail -n 40 gradle-build.log
+
+      - name: Upload Gradle failure log
+        if: failure() && steps.gradle-build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: gradle-build.log
+          if-no-files-found: error
