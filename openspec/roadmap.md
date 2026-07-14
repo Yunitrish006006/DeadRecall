@@ -52,6 +52,7 @@
 - Space Unit 地圖資訊面板的線上玩家 Administrator／允許名單調整基礎。
 - Space Unit 未註冊磁石的石碑預覽 GUI 與 Server-side pending 確認封包基礎。
 - Space Unit 好友管理 GUI 名單瀏覽、邀請狀態顯示與移除／取消關係基礎。
+- Space Unit 石碑紫水晶催化核心：快照 optional 欄位、資料驅動 tag、既有掃描計數、每 4 方塊折抵 1 碎片、最終成本最低 1，以及 Java 25 公式測試已完成。
 
 ### 共用基礎
 
@@ -77,12 +78,9 @@
 - 好友玩家直接傳送：核心授權入口已完成；待移除舊 pending consent 死碼、補目標通知、主動取消與多人回歸測試。
 - 講台配方覆寫的 Dedicated Server 載入與遊戲內製作驗證。
 - 混凝土粉末掉落物硬化的水源、流動水、雨天、Components、實體狀態與多人壓力驗證。
+- 紫水晶催化折抵的 Dedicated Server Mixin 套用、舊世界載入、拆除後重新報價與跨維度實測；Payload／UI 尚待顯示原始成本與折抵明細。
 
 ## 待排程
-
-### Totem Nexus
-
-- **P2 — Amethyst Catalyst Teleport Discount**：固定磁石石碑內每 4 個有效紫水晶催化方塊折抵 1 個跨維度紫水晶碎片，兩端可合併，最終成本最低為 1。詳見 [`changes/amethyst-catalyst-teleport-discount/`](changes/amethyst-catalyst-teleport-discount/)。
 
 ### DeadRecall Gameplay QoL
 
@@ -93,7 +91,7 @@
 1. 清理好友直接傳送的舊逐次確認程式，補通知、主動取消與多人回歸測試。
 2. 驗證並完成講台配方覆寫。
 3. 驗證混凝土粉末掉落物的水流、Components、實體狀態與多人行為。
-4. 擴充石碑快照、Payload 與 UI，完成紫水晶催化折抵。
+4. 驗證紫水晶催化折抵，並擴充 Payload／UI 顯示原始成本、催化數量與折抵。
 
 ## 尚未完成
 
@@ -126,6 +124,7 @@
 - 磁石完整管理介面整合與 UX 打磨。
 - 石碑完整管理介面的離線玩家查詢、名單瀏覽與批次調整。
 - 好友／人體磁石進階設定（通知、黑名單與完整互動流程）。
+- 紫水晶催化折抵的 base cost、catalyst count、discount Payload 欄位與地圖明細 UI。
 - 死亡節點傳送成本細節與回收後歷史紀錄介面。
 
 ### Totem Excavation
