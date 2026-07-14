@@ -36,8 +36,8 @@
 ## 5. Tests
 
 - [x] 5.1 16 色對應單元測試。
-- [x] 5.2 完整 64 個 stack 數量保存測試。
-- [x] 5.3 自訂名稱 Component 保存測試。
+- [ ] 5.2 完整 64 個 stack 數量保存 GameTest／遊戲內測試。
+- [ ] 5.3 自訂名稱與可相容 Components 保存 GameTest／遊戲內測試。
 - [ ] 5.4 水源、流動水、非接觸水與雨天 GameTest／遊戲內測試。
 - [ ] 5.5 ItemEntity identity／位置／速度／pickup delay 遊戲內測試。
 - [ ] 5.6 Dedicated server 啟動與多人丟入水流測試。
@@ -45,9 +45,9 @@
 
 ## 6. Documentation and release
 
-- [ ] 6.1 更新玩家功能文件。
+- [x] 6.1 更新玩家功能文件。
 - [ ] 6.2 更新 changelog／版本變更清單。
 - [x] 6.3 記錄水鍋不在第一版範圍內。
-- [ ] 6.4 執行 `./gradlew build`。
+- [x] 6.4 執行 `./gradlew build`；Java 25 CI 通過。
 - [ ] 6.5 執行可行的 GameTest／Dedicated Server 回歸測試。
 - [ ] 6.6 合併後將此 change 的完成狀態同步到 `openspec/roadmap.md`。
