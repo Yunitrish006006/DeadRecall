@@ -62,6 +62,7 @@
 - OpenSpec 銅傀儡文件。
 - Discord Bridge OpenSpec、玩家／管理／公開事件轉播、健康告警及伺服器狀態 Bot Token 頻道路由修正。
 - 講台替代配方資源：4 個任意木半磚＋1 本書；已加入資源，仍需 Dedicated Server 與遊戲內驗證。
+- 混凝土粉末掉落物水中硬化核心：16 色映射、Server-side 同一 ItemEntity 轉換、無世界全量掃描與 Java 25 build 已完成。
 
 ## 進行中
 
@@ -75,6 +76,7 @@
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
 - 好友玩家直接傳送：核心授權入口已完成；待移除舊 pending consent 死碼、補目標通知、主動取消與多人回歸測試。
 - 講台配方覆寫的 Dedicated Server 載入與遊戲內製作驗證。
+- 混凝土粉末掉落物硬化的水源、流動水、雨天、Components、實體狀態與多人壓力驗證。
 
 ## 待排程
 
@@ -85,13 +87,12 @@
 ### DeadRecall Gameplay QoL
 
 - **P1 — Lectern Recipe Override**：以 4 個任意木半磚＋1 本書覆寫原版講台配方；JSON 資源與 Gradle build 已完成，目前待 Dedicated Server 與遊戲內驗證。詳見 [`changes/lectern-recipe-override/`](changes/lectern-recipe-override/)。
-- **P2 — Concrete Powder Item Hardening**：掉落物形式的 16 色混凝土粉末實際浸入水中後，整疊 1:1 轉成同色混凝土；只在 Server 修改同一個 ItemEntity，不掃描全世界，不影響原版方塊硬化。詳見 [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)。
 
 ### 短週期完成順序
 
 1. 清理好友直接傳送的舊逐次確認程式，補通知、主動取消與多人回歸測試。
 2. 驗證並完成講台配方覆寫。
-3. 實作混凝土粉末掉落物水中硬化。
+3. 驗證混凝土粉末掉落物的水流、Components、實體狀態與多人行為。
 4. 擴充石碑快照、Payload 與 UI，完成紫水晶催化折抵。
 
 ## 尚未完成
