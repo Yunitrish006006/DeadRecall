@@ -49,7 +49,7 @@ public abstract class SpaceUnitHandlerCatalystMixin {
         return units.get(unitId)
                 .filter(SpaceUnitRecord::isLodestoneAnchor)
                 .map(SpaceUnitRecord::structure)
-                .mapToInt(snapshot -> snapshot.amethystCatalystBlocks())
+                .map(snapshot -> snapshot.amethystCatalystBlocks())
                 .orElse(0);
     }
 }
