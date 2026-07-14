@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -27,22 +27,22 @@ class ConcretePowderItemHardeningTest {
     @Test
     void mapsAllVanillaConcretePowderColors() {
         Map<Item, Item> expected = Map.ofEntries(
-                Map.entry(Items.WHITE_CONCRETE_POWDER, Items.WHITE_CONCRETE),
-                Map.entry(Items.LIGHT_GRAY_CONCRETE_POWDER, Items.LIGHT_GRAY_CONCRETE),
-                Map.entry(Items.GRAY_CONCRETE_POWDER, Items.GRAY_CONCRETE),
-                Map.entry(Items.BLACK_CONCRETE_POWDER, Items.BLACK_CONCRETE),
-                Map.entry(Items.BROWN_CONCRETE_POWDER, Items.BROWN_CONCRETE),
-                Map.entry(Items.RED_CONCRETE_POWDER, Items.RED_CONCRETE),
-                Map.entry(Items.ORANGE_CONCRETE_POWDER, Items.ORANGE_CONCRETE),
-                Map.entry(Items.YELLOW_CONCRETE_POWDER, Items.YELLOW_CONCRETE),
-                Map.entry(Items.LIME_CONCRETE_POWDER, Items.LIME_CONCRETE),
-                Map.entry(Items.GREEN_CONCRETE_POWDER, Items.GREEN_CONCRETE),
-                Map.entry(Items.CYAN_CONCRETE_POWDER, Items.CYAN_CONCRETE),
-                Map.entry(Items.LIGHT_BLUE_CONCRETE_POWDER, Items.LIGHT_BLUE_CONCRETE),
-                Map.entry(Items.BLUE_CONCRETE_POWDER, Items.BLUE_CONCRETE),
-                Map.entry(Items.PURPLE_CONCRETE_POWDER, Items.PURPLE_CONCRETE),
-                Map.entry(Items.MAGENTA_CONCRETE_POWDER, Items.MAGENTA_CONCRETE),
-                Map.entry(Items.PINK_CONCRETE_POWDER, Items.PINK_CONCRETE)
+                Map.entry(Blocks.WHITE_CONCRETE_POWDER.asItem(), Blocks.WHITE_CONCRETE.asItem()),
+                Map.entry(Blocks.LIGHT_GRAY_CONCRETE_POWDER.asItem(), Blocks.LIGHT_GRAY_CONCRETE.asItem()),
+                Map.entry(Blocks.GRAY_CONCRETE_POWDER.asItem(), Blocks.GRAY_CONCRETE.asItem()),
+                Map.entry(Blocks.BLACK_CONCRETE_POWDER.asItem(), Blocks.BLACK_CONCRETE.asItem()),
+                Map.entry(Blocks.BROWN_CONCRETE_POWDER.asItem(), Blocks.BROWN_CONCRETE.asItem()),
+                Map.entry(Blocks.RED_CONCRETE_POWDER.asItem(), Blocks.RED_CONCRETE.asItem()),
+                Map.entry(Blocks.ORANGE_CONCRETE_POWDER.asItem(), Blocks.ORANGE_CONCRETE.asItem()),
+                Map.entry(Blocks.YELLOW_CONCRETE_POWDER.asItem(), Blocks.YELLOW_CONCRETE.asItem()),
+                Map.entry(Blocks.LIME_CONCRETE_POWDER.asItem(), Blocks.LIME_CONCRETE.asItem()),
+                Map.entry(Blocks.GREEN_CONCRETE_POWDER.asItem(), Blocks.GREEN_CONCRETE.asItem()),
+                Map.entry(Blocks.CYAN_CONCRETE_POWDER.asItem(), Blocks.CYAN_CONCRETE.asItem()),
+                Map.entry(Blocks.LIGHT_BLUE_CONCRETE_POWDER.asItem(), Blocks.LIGHT_BLUE_CONCRETE.asItem()),
+                Map.entry(Blocks.BLUE_CONCRETE_POWDER.asItem(), Blocks.BLUE_CONCRETE.asItem()),
+                Map.entry(Blocks.PURPLE_CONCRETE_POWDER.asItem(), Blocks.PURPLE_CONCRETE.asItem()),
+                Map.entry(Blocks.MAGENTA_CONCRETE_POWDER.asItem(), Blocks.MAGENTA_CONCRETE.asItem()),
+                Map.entry(Blocks.PINK_CONCRETE_POWDER.asItem(), Blocks.PINK_CONCRETE.asItem())
         );
 
         expected.forEach((powder, concrete) -> assertSame(concrete, ConcretePowderItemHardening.hardenedItem(powder)));
@@ -50,20 +50,20 @@ class ConcretePowderItemHardeningTest {
 
     @Test
     void preservesFullStackCountAndCompatibleComponents() {
-        ItemStack powder = new ItemStack(Items.CYAN_CONCRETE_POWDER, 64);
+        ItemStack powder = new ItemStack(Blocks.CYAN_CONCRETE_POWDER.asItem(), 64);
         Component customName = Component.literal("Construction batch");
         powder.set(DataComponents.CUSTOM_NAME, customName);
 
         ItemStack hardened = ConcretePowderItemHardening.harden(powder);
 
-        assertTrue(hardened.is(Items.CYAN_CONCRETE));
+        assertTrue(hardened.is(Blocks.CYAN_CONCRETE.asItem()));
         assertEquals(64, hardened.getCount());
         assertEquals(customName, hardened.get(DataComponents.CUSTOM_NAME));
     }
 
     @Test
     void leavesUnsupportedItemsUntouched() {
-        ItemStack stone = new ItemStack(Items.STONE, 5);
+        ItemStack stone = new ItemStack(Blocks.STONE.asItem(), 5);
 
         assertSame(stone, ConcretePowderItemHardening.harden(stone));
     }
