@@ -29,4 +29,5 @@
 - [ ] 4.3 報價後拆除水晶，啟動或完成時成本更新的遊戲內測試。
 - [ ] 4.4 舊世界 snapshot 實際載入 migration 測試。
 - [x] 4.5 Java 25 `./gradlew build` 通過。
-- [ ] 4.6 Dedicated Server Mixin 套用與跨維度實測。
+- [x] 4.6 Dedicated Server 成功啟動到 `Done`，催化相關 Mixin 設定沒有啟動期錯誤。
+- [ ] 4.7 實際跨維度報價、扣款與兩端催化方塊整合測試。
