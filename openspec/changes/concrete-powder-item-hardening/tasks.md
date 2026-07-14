@@ -50,4 +50,4 @@
 - [x] 6.3 記錄水鍋不在第一版範圍內。
 - [x] 6.4 執行 `./gradlew build`；Java 25 CI 通過。
 - [ ] 6.5 執行可行的 GameTest／Dedicated Server 回歸測試。
-- [ ] 6.6 合併後將此 change 的完成狀態同步到 `openspec/roadmap.md`。
+- [x] 6.6 將核心完成與待驗證狀態同步到 `openspec/roadmap.md`。
