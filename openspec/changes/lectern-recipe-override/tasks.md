@@ -15,8 +15,9 @@
 
 - [x] 3.1 GitHub Actions 使用 Java 25 執行 `./gradlew build --no-daemon --stacktrace` 成功。
 - [x] 3.2 Dedicated Server 成功啟動到 `Done`；共載入 1,594 個 recipe，日誌沒有 recipe parse error。
-- [ ] 3.3 遊戲內測試不同木種半磚皆可製作。
-- [ ] 3.4 確認講台村民職業、書本與紅石行為不受影響。
+- [x] 3.3 JUnit 資源語意測試鎖定 `data/minecraft/recipe/lectern.json`、`minecraft:crafting_shaped`、4 個 `#minecraft:wooden_slabs`、1 本書與 1 個講台輸出。
+- [ ] 3.4 遊戲內測試橡木、竹子、緋紅蕈木、扭曲蕈木及混用木種半磚皆可製作。
+- [ ] 3.5 確認講台村民職業、書本與紅石行為不受影響。
 
 ## 4. Documentation
 
