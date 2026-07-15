@@ -133,7 +133,7 @@ public abstract class SpaceUnitHandlerRefreshMixin {
             ServerPlayer requester = server.getPlayerList().getPlayer(entry.getKey());
             if (requester != null) {
                 requester.sendSystemMessage(Component.translatable(
-                        "message.deadrecall.space_unit.teleport_cancelled.target"));
+                        "message.deadrecall.space_unit.teleport_cancelled.target_friendship"));
             }
         }
     }
