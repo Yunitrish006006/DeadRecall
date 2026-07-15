@@ -90,7 +90,26 @@
 - Client 不得決定或修改捕獲內容。
 - 通知、Discord 或記錄輸出不是交易的一部分，不得影響物品提交狀態。
 
-## 5. Legacy migration
+## 5. Death node recovery lifecycle
+
+死亡背包建立後會在 Custom Data 中保存綁定的 death node UUID。背包被清空並關閉時：
+
+1. 從背包 binding 讀取 node UUID。
+2. 查詢 SavedData 中的實際 `DEATH` record。
+3. 使用 record 的原 owner 驗證並停用該 node，而不是要求目前清空背包的玩家必須是原 owner。
+4. 將空死亡背包從目前持有者 Inventory／手中移除。
+5. 玩家與 Discord recovery 通知在停用完成後執行，任何通知例外只記錄警告。
+
+此順序保證：
+
+- 原 owner 離線後，死亡背包實體與 ACTIVE node 仍可由其他玩家回收。
+- 清空某個綁定背包只會停用該 UUID 對應的 node，不會以位置或附近實體推測目標。
+- 通知失敗不得留下空背包，也不得把已停用 node 重新啟用。
+- `DISABLED` node 與 discovery reference 可經 SavedData codec 保存；可見地圖仍以 ACTIVE status 過濾。
+
+實際 Dedicated Server process restart、同 UUID 重新連線及 respawn replacement player 仍需獨立整合測試；codec round-trip 只驗證序列化邊界，不等同完整程序重啟。
+
+## 6. Legacy migration
 
 以下舊流程已從 `Deadrecall` 程式碼與 Mixin 設定中完整刪除：
 
@@ -106,7 +125,7 @@
 
 死亡背包現在只有 `Player.dropEquipment` 前的直接擷取路徑。直接擷取失敗時只保證物品回到原版掉落，不再嘗試從世界掉落物建立替代死亡背包。
 
-## 6. Test strategy
+## 7. Test strategy
 
 ### Automated
 
@@ -123,6 +142,9 @@
 - Result preview 不得進入死亡背包。
 - transient 背包獨立掉落、transient 消失詛咒銷毀。
 - transient／workstation transaction 故障後必須回到原版世界掉落。
+- 非 owner 回收綁定死亡背包、其他 death node 隔離與原 owner 離線後實體保留。
+- recovery 通知故障不得影響 node disable 或空背包移除。
+- 回收後 Space Unit 與 discovery SavedData codec round-trip。
 - 同位置既有 ItemEntity 不得被修改或收集。
 - 兩名玩家同位置、同 tick 死亡時，各自背包內容不得交叉。
 - 直接擷取失敗時，原版掉落必須存在，且不得建立第二條死亡背包路徑。
@@ -133,5 +155,5 @@
 - 岩漿、仙人掌、虛空、爆炸及死亡點高密度掉落物。
 - 只持有一般／死亡背包時的原版掉落。
 - 第三方飾品槽與 addon 自訂 inventory API。
-- Server restart、斷線、重生及死亡節點回收。
+- Dedicated Server restart、同 UUID 重連／重生及世界檔 reload。
 - 與第三方墓碑、keep inventory 與飾品模組的事件優先序。
