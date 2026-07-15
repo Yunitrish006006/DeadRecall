@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.mixin;
 
 import com.adaptor.deadrecall.space.DeadRecallFriendSavedData;
+import com.adaptor.deadrecall.space.DeadRecallSpaceUnitSavedData;
 import com.adaptor.deadrecall.space.FriendTeleportSessionPolicy;
 import com.adaptor.deadrecall.space.SpaceUnitHandler;
 import com.adaptor.deadrecall.space.SpaceUnitStructureRefresh;
@@ -9,7 +10,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,27 +23,6 @@ public abstract class SpaceUnitHandlerRefreshMixin {
     @Accessor("teleportSessions")
     public static Map<UUID, Object> deadrecall$getTeleportSessions() {
         throw new AssertionError();
-    }
-
-    @Accessor("pendingPlayerTeleportConsents")
-    public static Map<?, ?> deadrecall$getLegacyPlayerTeleportConsents() {
-        throw new AssertionError();
-    }
-
-    @Invoker("startTeleport")
-    public static void deadrecall$startAuthorizedTeleport(
-            ServerPlayer player,
-            String sourceType,
-            UUID sourceUnitId,
-            UUID targetUnitId,
-            boolean playerTargetConsentGranted
-    ) {
-        throw new AssertionError();
-    }
-
-    @Inject(method = "register", at = @At("TAIL"))
-    private static void deadrecall$clearLegacyPlayerTeleportConsents(CallbackInfo ci) {
-        deadrecall$getLegacyPlayerTeleportConsents().clear();
     }
 
     @Inject(
@@ -60,10 +39,9 @@ public abstract class SpaceUnitHandlerRefreshMixin {
 
     @Inject(
             method = "startTeleport(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;Ljava/util/UUID;Ljava/util/UUID;)V",
-            at = @At("HEAD"),
-            cancellable = true
+            at = @At("HEAD")
     )
-    private static void deadrecall$refreshTeleportRouteAndAuthorizeFriends(
+    private static void deadrecall$refreshTeleportRoute(
             ServerPlayer player,
             String sourceType,
             UUID sourceUnitId,
@@ -71,14 +49,32 @@ public abstract class SpaceUnitHandlerRefreshMixin {
             CallbackInfo ci
     ) {
         MinecraftServer server = player.level().getServer();
-        deadrecall$getLegacyPlayerTeleportConsents().clear();
-
         if (SpaceUnitHandler.SOURCE_TYPE_LODESTONE.equals(sourceType)) {
             SpaceUnitStructureRefresh.refresh(server, sourceUnitId);
         }
         SpaceUnitStructureRefresh.refresh(server, targetUnitId);
+    }
 
+    @Inject(
+            method = "startTeleport(Lnet/minecraft/server/level/ServerPlayer;Ljava/lang/String;Ljava/util/UUID;Ljava/util/UUID;)V",
+            at = @At("RETURN")
+    )
+    private static void deadrecall$notifyFriendTeleportStarted(
+            ServerPlayer player,
+            String sourceType,
+            UUID sourceUnitId,
+            UUID targetUnitId,
+            CallbackInfo ci
+    ) {
         if (targetUnitId == null || targetUnitId.equals(player.getUUID())) {
+            return;
+        }
+
+        MinecraftServer server = player.level().getServer();
+        DeadRecallSpaceUnitSavedData unitData = server.overworld()
+                .getDataStorage()
+                .computeIfAbsent(DeadRecallSpaceUnitSavedData.TYPE);
+        if (unitData.get(targetUnitId).isPresent()) {
             return;
         }
 
@@ -94,16 +90,18 @@ public abstract class SpaceUnitHandlerRefreshMixin {
             return;
         }
 
-        deadrecall$startAuthorizedTeleport(player, sourceType, sourceUnitId, targetUnitId, true);
-        if (deadrecall$getTeleportSessions().containsKey(player.getUUID())) {
-            targetPlayer.sendSystemMessage(Component.empty()
-                    .append(Component.translatable("message.deadrecall.space_unit.teleport_start"))
-                    .append(Component.literal(": "))
-                    .append(player.getDisplayName())
-                    .append(Component.literal(" → "))
-                    .append(targetPlayer.getDisplayName()));
+        Object sessionValue = deadrecall$getTeleportSessions().get(player.getUUID());
+        if (!(sessionValue instanceof SpaceUnitTeleportSessionAccessor session)
+                || !targetUnitId.equals(session.deadrecall$getTargetUnitId())) {
+            return;
         }
-        ci.cancel();
+
+        targetPlayer.sendSystemMessage(Component.empty()
+                .append(Component.translatable("message.deadrecall.space_unit.teleport_start"))
+                .append(Component.literal(": "))
+                .append(player.getDisplayName())
+                .append(Component.literal(" → "))
+                .append(targetPlayer.getDisplayName()));
     }
 
     @Inject(
