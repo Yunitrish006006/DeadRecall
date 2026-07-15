@@ -2,10 +2,10 @@
 
 ## 1. Remove per-teleport consent
 
-- [ ] 1.1 移除核心檔案中的 pending consent 常數、Map、record、方法與過期清理；目前啟動與新傳送入口會清空 legacy Map，但實體死碼仍待直接刪除。
-- [x] 1.2 簡化公開傳送入口：線上雙向好友 PLAYER 目標直接進入既有已授權 session 流程。
-- [x] 1.3 支援中的羅盤右鍵流程只處理好友邀請／接受；Server 啟動時清除 legacy pending consent，新的好友傳送不再建立逐次請求。
-- [ ] 1.4 移除不再使用的翻譯 key 或保留 migration 期間相容說明。
+- [x] 1.1 已移除核心檔案中的 pending consent 常數、Map、record、方法、五參數 overload 與過期清理。
+- [x] 1.2 公開四參數傳送入口直接處理線上雙向好友 PLAYER 目標，不再轉入額外授權方法。
+- [x] 1.3 羅盤右鍵玩家只處理好友邀請／接受，不再查詢或接受傳送請求。
+- [x] 1.4 舊 `player_anchor_request_*` 翻譯 key 暫時保留作資源相容，但正式程式已無任何引用。
 
 ## 2. Session safety
 
@@ -16,7 +16,7 @@
 
 ## 3. UX and privacy
 
-- [x] 3.1 只有好友傳送 session 實際建立成功後，目標玩家才收到「Teleport: requester → target」本地化通知。
+- [x] 3.1 只有好友傳送 session 實際建立成功且目標 UUID 確認為 PLAYER 端點後，目標玩家才收到「Teleport: requester → target」通知。
 - [x] 3.2 保持 Client 粗略座標，不同步精確位置。
 - [x] 3.3 新的傳送請求不再進入「等待同意」流程。
 
