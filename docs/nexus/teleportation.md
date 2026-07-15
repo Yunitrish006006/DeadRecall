@@ -7,10 +7,10 @@ Space Unit 傳送採用 Server-authoritative session。Client 只提交來源型
 - 線上雙向好友可以作為 `PLAYER` 傳送目標。
 - 雙向好友關係本身視為持續授權；選取好友後直接建立傳送倒數，不需要目標玩家再用羅盤確認。
 - 非好友、只有單向邀請、離線玩家與玩家自己都不能作為有效 `PLAYER` 目標。
-- 只有 session 實際建立成功後，目標玩家才會收到 `Teleport: requester → target` 通知。
+- 只有 session 實際建立成功且目標 UUID 確認為玩家端點後，目標玩家才會收到 `Teleport: requester → target` 通知。
 - 倒數期間與完成前都會重新解析目標；解除好友會立即取消任一方向的相關 PLAYER 目標 session，目標離線、死亡或被移除時也不會完成傳送。
 - 完成時使用目標玩家的最新 Server 位置，Client 地圖仍只收到粗略座標與距離。
-- Server 啟動與新的好友傳送入口會清空舊版逐次確認暫存；核心檔案中仍保留部分不會進入的 legacy consent 死碼，後續會直接刪除。
+- 舊版逐次確認流程已從核心程式移除；羅盤右鍵玩家只處理好友邀請與接受。
 
 ## 成本
 
