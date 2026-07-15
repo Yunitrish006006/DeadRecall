@@ -35,6 +35,20 @@ jobs:
           set -o pipefail
           ./gradlew build --no-daemon --stacktrace 2>&1 | tee build.log
 
+      - name: Verify death backpack across Dedicated Server restarts
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf run/gametest/restart-probe
+          for phase in seed recover verify; do
+            echo "Running restart probe phase: ${phase}"
+            DEADRECALL_RESTART_PROBE_PHASE="${phase}" \
+              ./gradlew runGameTest --no-daemon --stacktrace \
+              2>&1 | tee "restart-${phase}.log"
+            test -f "run/gametest/restart-probe/${phase}.ok"
+            test ! -f "run/gametest/restart-probe/${phase}.failure"
+          done
+
       - name: Store failure reports
         if: failure()
         uses: actions/upload-artifact@v4
@@ -43,6 +57,7 @@ jobs:
           if-no-files-found: ignore
           path: |
             build.log
+            restart-*.log
             **/build/reports/
             **/build/test-results/
             run/gametest/
