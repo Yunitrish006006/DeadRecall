@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.saveddata.WeatherData;
 import net.minecraft.world.phys.Vec3;
 
 public final class ConcretePowderItemHardeningGameTest {
@@ -100,7 +101,8 @@ public final class ConcretePowderItemHardeningGameTest {
     @GameTest(maxTicks = 40, skyAccess = true)
     public void rainAloneDoesNotHardenConcretePowder(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        level.setWeatherParameters(0, 200, true, false);
+        WeatherData weather = level.getServer().getWeatherData();
+        setWeather(weather, true);
         helper.setBlock(ITEM_POS.below(), Blocks.STONE);
 
         ItemEntity entity = spawn(
@@ -117,9 +119,17 @@ public final class ConcretePowderItemHardeningGameTest {
                 require(helper, entity.getItem().is(item("green_concrete_powder")), "Rain hardened concrete powder without water contact");
                 helper.succeed();
             } finally {
-                level.setWeatherParameters(6000, 0, false, false);
+                setWeather(weather, false);
             }
         });
+    }
+
+    private static void setWeather(WeatherData weather, boolean raining) {
+        weather.setClearWeatherTime(raining ? 0 : 6000);
+        weather.setRainTime(raining ? 200 : 0);
+        weather.setThunderTime(0);
+        weather.setRaining(raining);
+        weather.setThundering(false);
     }
 
     private static ItemEntity spawn(GameTestHelper helper, BlockPos relativePos, ItemStack stack, Vec3 velocity) {
