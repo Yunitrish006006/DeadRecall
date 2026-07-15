@@ -45,6 +45,7 @@
 - [x] 4.9 游標、2×2 crafting inputs、外部箱子隔離、暫存背包排除、暫存消失詛咒與 transient rollback GameTest。
 - [x] 4.10 Crafting Table、Anvil、Smithing、Grindstone、Stonecutter、Loom、Cartography Table、Enchanting Table inputs 與 workstation rollback GameTest。
 - [x] 4.11 非 owner 回收、其他節點隔離、通知故障與回收後 SavedData codec round-trip GameTest。
+- [x] 4.12 以正常 Dedicated Server run 連續執行 seed／recover／verify 三個獨立 JVM，驗證 entity region、Space Unit SavedData、discovery、同 UUID replacement player 與回收刪除跨程序持久化。
 
 ## 5. Integration tests
 
@@ -56,7 +57,7 @@
 - [x] 5.6 原版工作站暫存 inputs 會被擷取；result preview 與持久 block/entity inventory 不得進入死亡 transaction。
 - [ ] 5.7 第三方飾品模組與 addon 自訂 inventory API 相容測試。
 - [x] 5.8 原 owner 離線後死亡背包實體與節點保持可回收；任意玩家清空綁定背包可停用正確節點；SavedData codec round-trip 保留回收狀態。
-- [ ] 5.9 Dedicated Server 實際重啟、同 UUID 重連／重生與世界檔 reload 回歸。
+- [x] 5.9 Dedicated Server 實際重啟、同 UUID replacement player 與世界檔 reload 回歸。
 
 ## 6. Documentation and delivery
 
