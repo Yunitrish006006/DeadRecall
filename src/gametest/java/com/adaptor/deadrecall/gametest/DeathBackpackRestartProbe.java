@@ -13,6 +13,7 @@ import com.adaptor.deadrecall.space.SpaceUnitType;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -48,6 +49,8 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
     private static final UUID OWNER_ID = UUID.fromString("6b2fac01-f28d-43fd-b729-5aca6521bb56");
     private static final BlockPos PROBE_POS = new BlockPos(1000, 96, 1000);
     private static final String BACKPACK_ID_TAG = "deadrecall_death_backpack_id";
+    private static final int LOAD_SETTLE_TICKS = 20;
+    private static final int SAVE_SETTLE_TICKS = 20;
 
     @Override
     public void onInitialize() {
@@ -56,25 +59,10 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
             return;
         }
         Path markerDirectory = markerDirectory();
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> executePhase(server, phase, markerDirectory));
-    }
-
-    private static void executePhase(MinecraftServer server, String phase, Path markerDirectory) {
-        try {
-            runPhase(server, phase);
-            writeMarker(markerDirectory, phase + ".ok", "success\n");
-        } catch (Throwable throwable) {
-            try {
-                writeMarker(markerDirectory, phase + ".failure", throwable.toString() + "\n");
-            } catch (RuntimeException markerFailure) {
-                throwable.addSuppressed(markerFailure);
-            }
-            throw new IllegalStateException("Death-backpack restart probe failed in phase " + phase, throwable);
-        } finally {
-            // End this normal Dedicated Server JVM. MinecraftServer.stopServer() then performs the
-            // same world/entity/SavedData save and close path used in production shutdowns.
-            server.halt(false);
-        }
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            ProbeSession session = new ProbeSession(phase, markerDirectory);
+            ServerTickEvents.END_SERVER_TICK.register(session::tick);
+        });
     }
 
     private static Path markerDirectory() {
@@ -255,6 +243,57 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
     private static void require(boolean condition, String message) {
         if (!condition) {
             throw new IllegalStateException(message);
+        }
+    }
+
+    private static final class ProbeSession {
+        private final String phase;
+        private final Path markerDirectory;
+        private int ticksRemaining = LOAD_SETTLE_TICKS;
+        private boolean phaseExecuted;
+        private boolean finished;
+
+        private ProbeSession(String phase, Path markerDirectory) {
+            this.phase = phase;
+            this.markerDirectory = markerDirectory;
+        }
+
+        private void tick(MinecraftServer server) {
+            if (finished || --ticksRemaining > 0) {
+                return;
+            }
+
+            if (!phaseExecuted) {
+                try {
+                    runPhase(server, phase);
+                    phaseExecuted = true;
+                    ticksRemaining = SAVE_SETTLE_TICKS;
+                    return;
+                } catch (Throwable throwable) {
+                    fail(server, throwable);
+                    return;
+                }
+            }
+
+            try {
+                writeMarker(markerDirectory, phase + ".ok", "success\n");
+                finished = true;
+                server.halt(false);
+            } catch (Throwable throwable) {
+                fail(server, throwable);
+            }
+        }
+
+        private void fail(MinecraftServer server, Throwable throwable) {
+            finished = true;
+            try {
+                writeMarker(markerDirectory, phase + ".failure", throwable.toString() + "\n");
+            } catch (RuntimeException markerFailure) {
+                throwable.addSuppressed(markerFailure);
+            } finally {
+                server.halt(false);
+            }
+            throw new IllegalStateException("Death-backpack restart probe failed in phase " + phase, throwable);
         }
     }
 }
