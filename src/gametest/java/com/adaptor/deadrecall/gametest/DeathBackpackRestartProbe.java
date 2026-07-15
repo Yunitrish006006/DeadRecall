@@ -57,19 +57,27 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
         }
         Path markerDirectory = markerDirectory();
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+        if (phase.equals("seed")) {
+            // GameTest setup clears world entities after SERVER_STARTED. Seed after all tests have
+            // completed so normal shutdown persists the probe ItemEntity and SavedData together.
+            ServerLifecycleEvents.SERVER_STOPPING.register(server -> executePhase(server, phase, markerDirectory));
+        } else {
+            ServerLifecycleEvents.SERVER_STARTED.register(server -> executePhase(server, phase, markerDirectory));
+        }
+    }
+
+    private static void executePhase(MinecraftServer server, String phase, Path markerDirectory) {
+        try {
+            runPhase(server, phase);
+            writeMarker(markerDirectory, phase + ".ok", "success\n");
+        } catch (Throwable throwable) {
             try {
-                runPhase(server, phase);
-                writeMarker(markerDirectory, phase + ".ok", "success\n");
-            } catch (Throwable throwable) {
-                try {
-                    writeMarker(markerDirectory, phase + ".failure", throwable.toString() + "\n");
-                } catch (RuntimeException markerFailure) {
-                    throwable.addSuppressed(markerFailure);
-                }
-                throw new IllegalStateException("Death-backpack restart probe failed in phase " + phase, throwable);
+                writeMarker(markerDirectory, phase + ".failure", throwable.toString() + "\n");
+            } catch (RuntimeException markerFailure) {
+                throwable.addSuppressed(markerFailure);
             }
-        });
+            throw new IllegalStateException("Death-backpack restart probe failed in phase " + phase, throwable);
+        }
     }
 
     private static Path markerDirectory() {
