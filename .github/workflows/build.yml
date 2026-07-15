@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - fix/**
+      - release/**
   pull_request:
 
 permissions:
@@ -28,6 +29,15 @@ jobs:
 
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
+
+      - name: Verify release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          test -n "${version}"
+          test -f "docs/releases/${version}.md"
+          grep -F -- "- [${version}](${version}.md)" docs/releases/README.md
 
       - name: Build and run server GameTests
         shell: bash
