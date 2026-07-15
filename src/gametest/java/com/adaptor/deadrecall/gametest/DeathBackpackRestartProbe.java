@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Server-only integration probe invoked by CI across separate runGameTest JVMs.
+ * Server-only integration probe invoked by CI across separate normal Dedicated Server JVMs.
  *
  * <p>The probe is part of the gametest source set and is never packaged in the production mod.
  * Enable one phase with {@code DEADRECALL_RESTART_PROBE_PHASE=seed|recover|verify}.</p>
@@ -56,14 +56,7 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
             return;
         }
         Path markerDirectory = markerDirectory();
-
-        if (phase.equals("seed")) {
-            // GameTest setup clears world entities after SERVER_STARTED. Seed after all tests have
-            // completed so the state can be flushed before normal shutdown saves the world again.
-            ServerLifecycleEvents.SERVER_STOPPING.register(server -> executePhase(server, phase, markerDirectory));
-        } else {
-            ServerLifecycleEvents.SERVER_STARTED.register(server -> executePhase(server, phase, markerDirectory));
-        }
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> executePhase(server, phase, markerDirectory));
     }
 
     private static void executePhase(MinecraftServer server, String phase, Path markerDirectory) {
@@ -77,6 +70,10 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
                 throwable.addSuppressed(markerFailure);
             }
             throw new IllegalStateException("Death-backpack restart probe failed in phase " + phase, throwable);
+        } finally {
+            // End this normal Dedicated Server JVM. MinecraftServer.stopServer() then performs the
+            // same world/entity/SavedData save and close path used in production shutdowns.
+            server.halt(false);
         }
     }
 
@@ -92,11 +89,7 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
         ServerLevel level = server.overworld();
         level.getChunk(PROBE_POS);
         switch (phase) {
-            case "seed" -> {
-                seed(level);
-                require(server.saveEverything(true, true, true),
-                        "Seed phase could not flush the probe world state");
-            }
+            case "seed" -> seed(level);
             case "recover" -> recover(server, level);
             case "verify" -> verify(level);
             default -> throw new IllegalArgumentException("Unknown restart probe phase: " + phase);
