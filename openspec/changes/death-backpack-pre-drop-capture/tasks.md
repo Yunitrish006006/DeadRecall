@@ -47,4 +47,4 @@
 - [x] 6.1 建立 proposal、design、tasks 與 delta spec。
 - [x] 6.2 更新玩家文件，說明死亡背包在掉落生成前直接封裝與目前 fallback。
 - [ ] 6.3 更新 changelog／版本變更清單。
-- [ ] 6.4 完成第一階段後更新 Roadmap 狀態。
+- [x] 6.4 完成第一階段後更新 Roadmap 狀態。
