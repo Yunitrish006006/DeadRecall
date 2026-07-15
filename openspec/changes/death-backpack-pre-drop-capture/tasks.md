@@ -24,7 +24,7 @@
 - [x] 3.2 死亡前的附近 ItemEntity UUID 掃描已在執行期停用。
 - [x] 3.3 直接擷取失敗時只回到原版 `Inventory.dropAll()`，不再執行 nearby-drop fallback。
 - [x] 3.4 舊半徑掃描器、雙重 server task 與 UUID 差集已從實際死亡路徑停用。
-- [ ] 3.5 從 `Deadrecall` 實體程式碼刪除舊半徑常數、Map、Set、record、雙重 task 與掃描方法。
+- [x] 3.5 已從 `Deadrecall` 刪除舊半徑常數、Map、Set、record、雙重 task、掃描方法與相容 Mixin。
 
 ## 4. Automated tests
 

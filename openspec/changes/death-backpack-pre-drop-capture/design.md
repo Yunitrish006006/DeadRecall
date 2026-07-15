@@ -42,7 +42,7 @@
 5. 建立死亡 Space Unit 節點並寫入背包 binding。
 6. 將完成標記寫入短期 Server-side Set。
 7. 原版 `Inventory.dropAll()` 繼續執行，只掉落未捕獲的背包類物品。
-8. `AFTER_DEATH` 僅消耗完成標記；舊 nearby-drop handler 永遠取消。
+8. `AFTER_DEATH` 不再執行任何附近掉落物收集。
 9. Discord 與玩家通知在交易完成後執行，通知失敗只記錄警告，不得回滾背包或物品。
 
 失敗流程：
@@ -67,26 +67,25 @@
 
 ## 5. Legacy migration
 
-目前 `DeadrecallDeathBackpackMixin` 會在執行期停用：
+以下舊流程已從 `Deadrecall` 程式碼與 Mixin 設定中完整刪除：
 
-- `rememberExistingDropsBeforeDeath`
-- 舊 `handlePlayerDeath` nearby-drop collector
-
-因此正常死亡與故障 fallback 都不會再執行：
-
+- `rememberExistingDropsBeforeDeath`。
+- 舊 `handlePlayerDeath` nearby-drop collector。
 - 半徑 10 格 AABB 掃描。
 - 既有 ItemEntity UUID 差集。
 - 雙重 `server.execute` 排程。
 - 掃描後 `ItemEntity.discard()` 回收。
+- `pendingDeathCollections`、`scheduledDeathBackpackCollections`、`PendingDeathCollection` 與相關常數。
+- 僅用於停用上述死碼的 `DeadrecallDeathBackpackMixin`。
 
-`Deadrecall` 類別內的舊常數、Map、Set、record 與方法仍暫時保留為不可達死碼。後續清理階段會直接刪除它們與不再使用的 imports；此清理不得改變已驗證的執行行為。
+死亡背包現在只有 `Player.dropEquipment` 前的直接擷取路徑。直接擷取失敗時只保證物品回到原版掉落，不再嘗試從世界掉落物建立替代死亡背包。
 
 ## 6. Test strategy
 
 ### Automated
 
 - Java 25 compile 與 Mixin annotation processing。
-- Fabric Server GameTest 啟動，確認 `Player.dropEquipment` 與 legacy handler 停用 Mixin 成功套用。
+- Fabric Server GameTest 啟動，確認 `Player.dropEquipment` 注入成功套用。
 - Inventory capture policy：一般物品捕獲、背包排除、空 stack 忽略。
 - 失敗注入測試：實體加入後失敗時，槽位完整還原且未完成 ItemEntity 被丟棄。
 - 死亡節點後失敗測試：節點停用、探索引用移除、槽位還原。
@@ -94,7 +93,8 @@
 - 64 格、自訂名稱、耐久、盔甲、副手等 Components 保存。
 - 同位置既有 ItemEntity 不得被修改或收集。
 - 兩名玩家同位置、同 tick 死亡時，各自背包內容不得交叉。
-- 直接擷取失敗時，原版掉落必須存在，且 legacy 掃描器不得建立第二條死亡背包路徑。
+- 直接擷取失敗時，原版掉落必須存在，且不得建立第二條死亡背包路徑。
+- Legacy scanner 實體刪除後完整 Java 25 build 與 Server GameTests。
 
 ### Integration
 
