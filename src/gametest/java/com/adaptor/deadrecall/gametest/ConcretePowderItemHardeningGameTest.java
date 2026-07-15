@@ -98,7 +98,7 @@ public final class ConcretePowderItemHardeningGameTest {
         });
     }
 
-    @GameTest(maxTicks = 40, skyAccess = true)
+    @GameTest(maxTicks = 80, skyAccess = true)
     public void rainAloneDoesNotHardenConcretePowder(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         WeatherData weather = level.getServer().getWeatherData();
@@ -113,9 +113,11 @@ public final class ConcretePowderItemHardeningGameTest {
         );
         entity.setNoGravity(true);
 
-        helper.runAtTickTime(10, () -> {
+        // Server weather fades in over multiple ticks; wait until the rain level crosses
+        // the vanilla isRaining() threshold before asserting the item stayed unchanged.
+        helper.runAtTickTime(30, () -> {
             try {
-                require(helper, level.isRaining(), "Rain fixture did not start raining");
+                require(helper, level.isRaining(), "Rain fixture did not finish fading in");
                 require(helper, entity.getItem().is(item("green_concrete_powder")), "Rain hardened concrete powder without water contact");
                 helper.succeed();
             } finally {
