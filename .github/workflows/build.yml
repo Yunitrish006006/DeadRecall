@@ -39,29 +39,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf restart-probe run/gametest/restart-probe
+          marker_dir="${GITHUB_WORKSPACE}/restart-probe"
+          rm -rf "${marker_dir}"
+          mkdir -p "${marker_dir}"
           for phase in seed recover verify; do
             echo "Running restart probe phase: ${phase}"
             DEADRECALL_RESTART_PROBE_PHASE="${phase}" \
+            DEADRECALL_RESTART_PROBE_MARKER_DIR="${marker_dir}" \
               ./gradlew runGameTest --no-daemon --stacktrace \
               2>&1 | tee "restart-${phase}.log"
-
-            marker=""
-            for candidate in \
-              "restart-probe/${phase}.ok" \
-              "run/gametest/restart-probe/${phase}.ok"; do
-              if [[ -f "${candidate}" ]]; then
-                marker="${candidate}"
-                break
-              fi
-            done
-            if [[ -z "${marker}" ]]; then
-              echo "Restart probe did not write a success marker for ${phase}" >&2
-              find . -maxdepth 4 -type f -path '*restart-probe*' -print >&2 || true
-              exit 1
-            fi
-            test ! -f "restart-probe/${phase}.failure"
-            test ! -f "run/gametest/restart-probe/${phase}.failure"
+            test -f "${marker_dir}/${phase}.ok"
+            test ! -f "${marker_dir}/${phase}.failure"
           done
 
       - name: Store failure reports
