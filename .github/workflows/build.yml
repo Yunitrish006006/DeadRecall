@@ -1,21 +1,196 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - master
-      - fix/**
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Apply legacy death collector cleanup
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          java_path = Path('src/main/java/com/adaptor/deadrecall/Deadrecall.java')
+          text = java_path.read_text(encoding='utf-8')
+          original = text
+
+          exact_removals = [
+              '    private static final double DEATH_BACKPACK_COLLECTION_RADIUS = 10.0D;\n',
+              '    private static final String TAG_DEATH_BACKPACK_ID = "deadrecall_death_backpack_id";\n',
+              '    private static final Map<UUID, PendingDeathCollection> pendingDeathCollections = new HashMap<>();\n',
+              '    private static final Set<UUID> scheduledDeathBackpackCollections = new HashSet<>();\n',
+          ]
+          for value in exact_removals:
+              if text.count(value) != 1:
+                  raise SystemExit(f'Expected exactly one legacy field: {value!r}')
+              text = text.replace(value, '')
+
+          old_allow_death = '''        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+              if (entity instanceof ServerPlayer player) {
+                  rememberExistingDropsBeforeDeath(player);
+              } else if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
+                  CopperGolemWrenchHandler.clearGatheringDisplayedItem(golem);
+              }
+              return true;
+          });
+          '''
+          new_allow_death = '''        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
+              if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
+                  CopperGolemWrenchHandler.clearGatheringDisplayedItem(golem);
+              }
+              return true;
+          });
+          '''
+          if text.count(old_allow_death) != 1:
+              raise SystemExit('Legacy ALLOW_DEATH player snapshot block not found exactly once')
+          text = text.replace(old_allow_death, new_allow_death)
+
+          death_handler_call = '                handlePlayerDeath(player);\n'
+          if text.count(death_handler_call) != 1:
+              raise SystemExit('Legacy AFTER_DEATH handler call not found exactly once')
+          text = text.replace(death_handler_call, '')
+
+          method_pattern = re.compile(
+              r'\n    private void handlePlayerDeath\(ServerPlayer player\) \{.*?'
+              r'\n    private static boolean isFirstJoin',
+              re.DOTALL,
+          )
+          text, method_count = method_pattern.subn('\n    private static boolean isFirstJoin', text)
+          if method_count != 1:
+              raise SystemExit(f'Expected one legacy method section, replaced {method_count}')
+
+          record_pattern = re.compile(
+              r'\n    private record PendingDeathCollection\(.*?\n    \}\n',
+              re.DOTALL,
+          )
+          text, record_count = record_pattern.subn('\n', text)
+          if record_count != 1:
+              raise SystemExit(f'Expected one PendingDeathCollection record, replaced {record_count}')
+
+          import_candidates = {
+              'import com.adaptor.deadrecall.item.BackpackItemHelper;\n': 'BackpackItemHelper',
+              'import net.minecraft.core.component.DataComponents;\n': 'DataComponents',
+              'import net.minecraft.nbt.CompoundTag;\n': 'CompoundTag',
+              'import net.minecraft.world.entity.item.ItemEntity;\n': 'ItemEntity',
+              'import net.minecraft.world.item.component.CustomData;\n': 'CustomData',
+              'import net.minecraft.world.item.component.ItemContainerContents;\n': 'ItemContainerContents',
+              'import net.minecraft.world.phys.AABB;\n': 'AABB',
+              'import java.util.HashSet;\n': 'HashSet',
+              'import java.util.Set;\n': 'Set<',
+          }
+          for import_line, token in import_candidates.items():
+              without_import = text.replace(import_line, '')
+              if import_line in text and token not in without_import:
+                  text = without_import
+
+          forbidden = [
+              'DEATH_BACKPACK_COLLECTION_RADIUS',
+              'TAG_DEATH_BACKPACK_ID',
+              'pendingDeathCollections',
+              'scheduledDeathBackpackCollections',
+              'PendingDeathCollection',
+              'rememberExistingDropsBeforeDeath',
+              'handlePlayerDeath(',
+              'markDeathBackpackUnique',
+          ]
+          for token in forbidden:
+              if token in text:
+                  raise SystemExit(f'Legacy token remains in Deadrecall.java: {token}')
+          if text == original:
+              raise SystemExit('Deadrecall.java was not changed')
+          java_path.write_text(text, encoding='utf-8')
+
+          mixin_path = Path('src/main/java/com/adaptor/deadrecall/mixin/DeadrecallDeathBackpackMixin.java')
+          if not mixin_path.exists():
+              raise SystemExit('Legacy compatibility mixin file is missing before cleanup')
+          mixin_path.unlink()
+
+          config_path = Path('src/main/resources/deadrecall.mixins.json')
+          config = json.loads(config_path.read_text(encoding='utf-8'))
+          mixins = config.get('mixins', [])
+          if mixins.count('DeadrecallDeathBackpackMixin') != 1:
+              raise SystemExit('Expected DeadrecallDeathBackpackMixin exactly once in mixin config')
+          mixins.remove('DeadrecallDeathBackpackMixin')
+          config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          standard_workflow = '''name: Build
+
+          on:
+            push:
+              branches:
+                - master
+                - fix/**
+            pull_request:
+
+          permissions:
+            contents: read
+
+          jobs:
+            build:
+              runs-on: ubuntu-latest
+              steps:
+                - name: Check out repository
+                  uses: actions/checkout@v4
+
+                - name: Set up Java 25
+                  uses: actions/setup-java@v4
+                  with:
+                    distribution: temurin
+                    java-version: '25'
+
+                - name: Set up Gradle
+                  uses: gradle/actions/setup-gradle@v4
+
+                - name: Make Gradle wrapper executable
+                  run: chmod +x gradlew
+
+                - name: Build and run server GameTests
+                  shell: bash
+                  run: |
+                    set -o pipefail
+                    ./gradlew build --no-daemon --stacktrace 2>&1 | tee build.log
+
+                - name: Store failure reports
+                  if: failure()
+                  uses: actions/upload-artifact@v4
+                  with:
+                    name: build-and-gametest-reports
+                    if-no-files-found: ignore
+                    path: |
+                      build.log
+                      **/build/reports/
+                      **/build/test-results/
+                      run/gametest/
+          '''
+          # Remove the indentation inherited from this Python heredoc.
+          lines = standard_workflow.splitlines()
+          workflow_text = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines) + '\n'
+          Path('.github/workflows/build.yml').write_text(workflow_text, encoding='utf-8')
+          PY
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/main/java/com/adaptor/deadrecall/Deadrecall.java \
+                  src/main/java/com/adaptor/deadrecall/mixin/DeadrecallDeathBackpackMixin.java \
+                  src/main/resources/deadrecall.mixins.json \
+                  .github/workflows/build.yml
+          git diff --cached --check
+          git commit -m "refactor: remove legacy death item scanner"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Set up Java 25
         uses: actions/setup-java@v4
