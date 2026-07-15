@@ -29,6 +29,7 @@
     "SpaceUnitHandlerCatalystMixin",
     "SpaceUnitHandlerRefreshMixin",
     "SpaceUnitMapSourceAccessor",
+    "SpaceUnitTeleportSessionAccessor",
     "SpaceUnitTeleportTargetAccessor",
     "StructureTemplateMixin",
     "TransportItemsBetweenContainersMixin",
