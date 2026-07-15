@@ -19,7 +19,8 @@ jobs:
       - name: Apply legacy death collector cleanup
         shell: bash
         run: |
-          python3 - <<'PY'
+          set -o pipefail
+          python3 - <<'PY' 2>&1 | tee patch.log
           from pathlib import Path
           import json
           import re
@@ -35,32 +36,37 @@ jobs:
               '    private static final Set<UUID> scheduledDeathBackpackCollections = new HashSet<>();\n',
           ]
           for value in exact_removals:
-              if text.count(value) != 1:
+              count = text.count(value)
+              print(f'field match {value.strip()}: {count}')
+              if count != 1:
                   raise SystemExit(f'Expected exactly one legacy field: {value!r}')
               text = text.replace(value, '')
 
-          old_allow_death = '''        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
-              if (entity instanceof ServerPlayer player) {
-                  rememberExistingDropsBeforeDeath(player);
-              } else if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
-                  CopperGolemWrenchHandler.clearGatheringDisplayedItem(golem);
-              }
-              return true;
-          });
-          '''
+          allow_pattern = re.compile(
+              r'        ServerLivingEntityEvents\.ALLOW_DEATH\.register\(\(entity, damageSource, damageAmount\) -> \{\n'
+              r'            if \(entity instanceof ServerPlayer player\) \{\n'
+              r'                rememberExistingDropsBeforeDeath\(player\);\n'
+              r'            \} else if \(entity instanceof net\.minecraft\.world\.entity\.animal\.golem\.CopperGolem golem\) \{\n'
+              r'                CopperGolemWrenchHandler\.clearGatheringDisplayedItem\(golem\);\n'
+              r'            \}\n'
+              r'            return true;\n'
+              r'        \}\);'
+          )
           new_allow_death = '''        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
-              if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
-                  CopperGolemWrenchHandler.clearGatheringDisplayedItem(golem);
-              }
-              return true;
-          });
-          '''
-          if text.count(old_allow_death) != 1:
-              raise SystemExit('Legacy ALLOW_DEATH player snapshot block not found exactly once')
-          text = text.replace(old_allow_death, new_allow_death)
+            if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
+                CopperGolemWrenchHandler.clearGatheringDisplayedItem(golem);
+            }
+            return true;
+        });'''
+          text, allow_count = allow_pattern.subn(new_allow_death, text)
+          print(f'ALLOW_DEATH block matches: {allow_count}')
+          if allow_count != 1:
+              raise SystemExit(f'Expected one legacy ALLOW_DEATH block, replaced {allow_count}')
 
           death_handler_call = '                handlePlayerDeath(player);\n'
-          if text.count(death_handler_call) != 1:
+          call_count = text.count(death_handler_call)
+          print(f'AFTER_DEATH call matches: {call_count}')
+          if call_count != 1:
               raise SystemExit('Legacy AFTER_DEATH handler call not found exactly once')
           text = text.replace(death_handler_call, '')
 
@@ -70,6 +76,7 @@ jobs:
               re.DOTALL,
           )
           text, method_count = method_pattern.subn('\n    private static boolean isFirstJoin', text)
+          print(f'legacy method section matches: {method_count}')
           if method_count != 1:
               raise SystemExit(f'Expected one legacy method section, replaced {method_count}')
 
@@ -78,6 +85,7 @@ jobs:
               re.DOTALL,
           )
           text, record_count = record_pattern.subn('\n', text)
+          print(f'legacy record matches: {record_count}')
           if record_count != 1:
               raise SystemExit(f'Expected one PendingDeathCollection record, replaced {record_count}')
 
@@ -95,6 +103,7 @@ jobs:
           for import_line, token in import_candidates.items():
               without_import = text.replace(import_line, '')
               if import_line in text and token not in without_import:
+                  print(f'removing unused import {import_line.strip()}')
                   text = without_import
 
           forbidden = [
@@ -176,18 +185,15 @@ jobs:
                       **/build/test-results/
                       run/gametest/
           '''
-          # Remove the indentation inherited from this Python heredoc.
           lines = standard_workflow.splitlines()
           workflow_text = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines) + '\n'
           Path('.github/workflows/build.yml').write_text(workflow_text, encoding='utf-8')
+          print('cleanup patch completed')
           PY
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/main/java/com/adaptor/deadrecall/Deadrecall.java \
-                  src/main/java/com/adaptor/deadrecall/mixin/DeadrecallDeathBackpackMixin.java \
-                  src/main/resources/deadrecall.mixins.json \
-                  .github/workflows/build.yml
+          git add -A
           git diff --cached --check
           git commit -m "refactor: remove legacy death item scanner"
           git push origin HEAD:${{ github.head_ref }}
@@ -217,6 +223,7 @@ jobs:
           name: build-and-gametest-reports
           if-no-files-found: ignore
           path: |
+            patch.log
             build.log
             **/build/reports/
             **/build/test-results/
