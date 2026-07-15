@@ -116,7 +116,6 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
                 PROBE_POS.getZ() + 0.5,
                 deathBackpack
         );
-        entity.setNoGravity(true);
         entity.setUnlimitedLifetime();
         require(level.addFreshEntity(entity), "Seed phase could not add the probe death backpack entity");
         require(node.status() == SpaceUnitStatus.ACTIVE, "Seed phase did not create an ACTIVE death node");
@@ -185,9 +184,17 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
     }
 
     private static ItemEntity findProbeBackpack(ServerLevel level) {
+        AABB fullSpawnChunkHeight = new AABB(
+                -64.0D,
+                -2048.0D,
+                -64.0D,
+                80.0D,
+                2048.0D,
+                80.0D
+        );
         return level.getEntitiesOfClass(
                         ItemEntity.class,
-                        new AABB(PROBE_POS).inflate(4.0),
+                        fullSpawnChunkHeight,
                         entity -> entity.isAlive() && BackpackItemHelper.isDeathBackpackItem(entity.getItem())
                 )
                 .stream()
