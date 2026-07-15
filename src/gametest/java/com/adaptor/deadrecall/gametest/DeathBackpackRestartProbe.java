@@ -15,6 +15,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -47,12 +48,12 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
     private static final String PHASE_ENV = "DEADRECALL_RESTART_PROBE_PHASE";
     private static final String MARKER_DIRECTORY_ENV = "DEADRECALL_RESTART_PROBE_MARKER_DIR";
     private static final UUID OWNER_ID = UUID.fromString("6b2fac01-f28d-43fd-b729-5aca6521bb56");
-    // Normal Dedicated Server keeps the spawn chunk ticketed. The high Y value prevents terrain
-    // contact while no-gravity keeps the probe backpack stationary across process restarts.
     private static final BlockPos PROBE_POS = new BlockPos(8, 200, 8);
+    private static final int PROBE_CHUNK_X = SectionPos.blockToSectionCoord(PROBE_POS.getX());
+    private static final int PROBE_CHUNK_Z = SectionPos.blockToSectionCoord(PROBE_POS.getZ());
     private static final String BACKPACK_ID_TAG = "deadrecall_death_backpack_id";
-    private static final int LOAD_SETTLE_TICKS = 20;
-    private static final int SAVE_SETTLE_TICKS = 20;
+    private static final int LOAD_SETTLE_TICKS = 100;
+    private static final int SAVE_SETTLE_TICKS = 40;
 
     @Override
     public void onInitialize() {
@@ -62,6 +63,9 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
         }
         Path markerDirectory = markerDirectory();
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            ServerLevel level = server.overworld();
+            level.setChunkForced(PROBE_CHUNK_X, PROBE_CHUNK_Z, true);
+            level.getChunk(PROBE_POS);
             ProbeSession session = new ProbeSession(phase, markerDirectory);
             ServerTickEvents.END_SERVER_TICK.register(session::tick);
         });
@@ -77,7 +81,6 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
 
     private static void runPhase(MinecraftServer server, String phase) {
         ServerLevel level = server.overworld();
-        level.getChunk(PROBE_POS);
         switch (phase) {
             case "seed" -> seed(level);
             case "recover" -> recover(server, level);
@@ -152,6 +155,7 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
                 "Verify phase did not reload the probe discovery reference");
         require(findProbeBackpack(level) == null,
                 "Verify phase reloaded a death backpack that was removed before the previous shutdown");
+        level.setChunkForced(PROBE_CHUNK_X, PROBE_CHUNK_Z, false);
     }
 
     private static SpaceUnitRecord requireProbeNode(ServerLevel level, SpaceUnitStatus expectedStatus) {
