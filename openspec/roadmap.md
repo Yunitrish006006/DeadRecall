@@ -65,6 +65,8 @@
 - Discord Bridge OpenSpec、玩家／管理／公開事件轉播、健康告警及伺服器狀態 Bot Token 頻道路由修正。
 - 講台替代配方資源：4 個任意木半磚＋1 本書；Java 25 build 與 Dedicated Server recipe 載入已驗證。
 - 混凝土粉末掉落物水中硬化核心：16 色映射、Server-side 同一 ItemEntity 轉換、無世界全量掃描、Java 25 build 與 Dedicated Server 啟動已完成。
+- Fabric Loom Server GameTest 基礎：獨立 `gametest` source set、測試模組 entrypoint、`runGameTest` 自動接入 `build`，並保留失敗報告 artifact。
+- 混凝土粉末自動回歸：水源、非水源流動水、未接觸水、雨天、64 格數量、自訂名稱、同一 ItemEntity、age、位置、速度與 pickup delay；5 個 required GameTests 全部通過。
 - 最新 `master` Dedicated Server 煙霧測試成功：Fabric／Mixin 初始化、1,594 個 recipe、1,699 個 advancement、三維度建立、保存與正常停止均完成。
 
 ## 進行中
@@ -79,7 +81,7 @@
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
 - 好友玩家直接傳送：核心流程、死碼清理、通知、主動取消與精確原因已完成；待兩名真實玩家回歸及完成時最新位置／安全落點驗證。
 - 講台配方覆寫：Dedicated Server 載入已通過；待不同木種製作、圖書管理員、書本與紅石行為驗證。
-- 混凝土粉末掉落物硬化：Dedicated Server 啟動已通過；待水源、流動水、雨天、Components、實體狀態與多人壓力驗證。
+- 混凝土粉末掉落物硬化：Server GameTest 自動驗證已完成；只剩兩名以上真人玩家水流測試與大量 ItemEntity 壓力測試。
 - 紫水晶催化折抵：Dedicated Server 啟動與 Mixin 初始化已通過；待舊世界載入、拆除後重新報價、實際跨維度扣款，以及 Payload／UI 明細。
 
 ## 待排程
@@ -95,7 +97,7 @@
 
 1. 完成好友玩家直接傳送的兩人多人回歸與最新位置／安全落點驗證。
 2. 完成講台配方的遊戲內行為驗證。
-3. 驗證混凝土粉末掉落物的水流、Components、實體狀態與多人行為。
+3. 完成混凝土粉末的真人多人水流與大量 ItemEntity 壓力測試；水源、流動水、雨天、Components 與實體狀態已由 GameTest 驗證。
 4. 驗證紫水晶催化折抵，並擴充 Payload／UI 顯示原始成本、催化數量與折抵。
 5. 傳送介面 Phase A：共用介面類型、Server context、四物品開啟 UI 與普通羅盤專屬能力分流。
 6. 傳送介面 Phase B：回生羅盤死亡節點偏差特化、書本固定磁石路線特化與第一階段 UI。
