@@ -44,9 +44,9 @@ import java.util.UUID;
  */
 public final class DeathBackpackRestartProbe implements ModInitializer {
     private static final String PHASE_ENV = "DEADRECALL_RESTART_PROBE_PHASE";
+    private static final String MARKER_DIRECTORY_ENV = "DEADRECALL_RESTART_PROBE_MARKER_DIR";
     private static final UUID OWNER_ID = UUID.fromString("6b2fac01-f28d-43fd-b729-5aca6521bb56");
     private static final BlockPos PROBE_POS = new BlockPos(1000, 96, 1000);
-    private static final Path MARKER_DIRECTORY = Path.of("restart-probe");
     private static final String BACKPACK_ID_TAG = "deadrecall_death_backpack_id";
 
     @Override
@@ -55,20 +55,29 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
         if (phase == null || phase.isBlank()) {
             return;
         }
+        Path markerDirectory = markerDirectory();
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             try {
                 runPhase(server, phase);
-                writeMarker(phase + ".ok", "success\n");
+                writeMarker(markerDirectory, phase + ".ok", "success\n");
             } catch (Throwable throwable) {
                 try {
-                    writeMarker(phase + ".failure", throwable.toString() + "\n");
+                    writeMarker(markerDirectory, phase + ".failure", throwable.toString() + "\n");
                 } catch (RuntimeException markerFailure) {
                     throwable.addSuppressed(markerFailure);
                 }
                 throw new IllegalStateException("Death-backpack restart probe failed in phase " + phase, throwable);
             }
         });
+    }
+
+    private static Path markerDirectory() {
+        String configured = System.getenv(MARKER_DIRECTORY_ENV);
+        if (configured == null || configured.isBlank()) {
+            return Path.of("restart-probe").toAbsolutePath().normalize();
+        }
+        return Path.of(configured).toAbsolutePath().normalize();
     }
 
     private static void runPhase(MinecraftServer server, String phase) {
@@ -225,11 +234,11 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
         return ((DeadRecallSpaceUnitSavedDataAccessor) (Object) units(level)).deadrecall$getUnitsById();
     }
 
-    private static void writeMarker(String fileName, String content) {
+    private static void writeMarker(Path markerDirectory, String fileName, String content) {
         try {
-            Files.createDirectories(MARKER_DIRECTORY);
+            Files.createDirectories(markerDirectory);
             Files.writeString(
-                    MARKER_DIRECTORY.resolve(fileName),
+                    markerDirectory.resolve(fileName),
                     content,
                     StandardCharsets.UTF_8
             );
