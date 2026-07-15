@@ -41,6 +41,7 @@ Totem Core
 - [`specs/gameplay-recipes/spec.md`](specs/gameplay-recipes/spec.md)：DeadRecall 覆寫或新增的資料層配方規格。
 - [`changes/direct-friend-player-teleport/`](changes/direct-friend-player-teleport/)：雙向好友直接傳送，不再逐次確認。
 - [`changes/amethyst-catalyst-teleport-discount/`](changes/amethyst-catalyst-teleport-discount/)：傳送石碑紫水晶催化方塊降低跨維度成本。
+- [`changes/teleport-interface-item-specializations/`](changes/teleport-interface-item-specializations/)：普通羅盤、回生羅盤、書本與已繪製地圖的傳送介面與特化規格。
 - [`changes/lectern-recipe-override/`](changes/lectern-recipe-override/)：以木半磚與書覆寫講台配方。
 - [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)：混凝土粉末掉落物水中硬化功能。
 
