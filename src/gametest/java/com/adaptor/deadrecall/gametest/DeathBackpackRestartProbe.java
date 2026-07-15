@@ -47,7 +47,9 @@ public final class DeathBackpackRestartProbe implements ModInitializer {
     private static final String PHASE_ENV = "DEADRECALL_RESTART_PROBE_PHASE";
     private static final String MARKER_DIRECTORY_ENV = "DEADRECALL_RESTART_PROBE_MARKER_DIR";
     private static final UUID OWNER_ID = UUID.fromString("6b2fac01-f28d-43fd-b729-5aca6521bb56");
-    private static final BlockPos PROBE_POS = new BlockPos(1000, 96, 1000);
+    // Normal Dedicated Server keeps the spawn chunk ticketed. The high Y value prevents terrain
+    // contact while no-gravity keeps the probe backpack stationary across process restarts.
+    private static final BlockPos PROBE_POS = new BlockPos(8, 200, 8);
     private static final String BACKPACK_ID_TAG = "deadrecall_death_backpack_id";
     private static final int LOAD_SETTLE_TICKS = 20;
     private static final int SAVE_SETTLE_TICKS = 20;
