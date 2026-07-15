@@ -40,10 +40,17 @@ openspec/changes/amethyst-catalyst-teleport-discount/
 ├── design.md
 ├── tasks.md
 └── specs/space-unit-lodestone/spec.md
+
+openspec/changes/teleport-interface-item-specializations/
+├── proposal.md
+├── design.md
+├── tasks.md
+└── specs/space-unit-lodestone/spec.md
 ```
 
 - 雙向好友將直接授權線上 `PLAYER` 目標傳送，不再逐次確認。
 - 固定石碑中的紫水晶催化方塊將降低跨維度碎片成本。
+- 普通羅盤、回生羅盤、書本與已繪製地圖將可開啟傳送介面，並提供死亡節點精準化、路線典籍與地圖覆蓋特化。
 
 ### Totem Automata / Copper Golem
 
