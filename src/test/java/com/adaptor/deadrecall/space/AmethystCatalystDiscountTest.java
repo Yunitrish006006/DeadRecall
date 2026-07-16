@@ -26,4 +26,37 @@ class AmethystCatalystDiscountTest {
     void noBaseCostRemainsFree() {
         assertEquals(0, AmethystCatalystDiscount.finalCost(0, 16, 16));
     }
+
+    @Test
+    void quoteExposesPayloadReadyBreakdown() {
+        AmethystCatalystDiscount.Quote quote = AmethystCatalystDiscount.quote(6, 5, 7);
+
+        assertEquals(6, quote.baseCost());
+        assertEquals(5, quote.sourceCatalysts());
+        assertEquals(7, quote.targetCatalysts());
+        assertEquals(3, quote.availableDiscount());
+        assertEquals(3, quote.appliedDiscount());
+        assertEquals(3, quote.finalCost());
+    }
+
+    @Test
+    void quoteSeparatesAvailableAndAppliedDiscount() {
+        AmethystCatalystDiscount.Quote quote = AmethystCatalystDiscount.quote(2, 40, 40);
+
+        assertEquals(20, quote.availableDiscount());
+        assertEquals(1, quote.appliedDiscount());
+        assertEquals(1, quote.finalCost());
+    }
+
+    @Test
+    void quoteNormalizesInvalidNegativeInputs() {
+        AmethystCatalystDiscount.Quote quote = AmethystCatalystDiscount.quote(-3, -4, -8);
+
+        assertEquals(0, quote.baseCost());
+        assertEquals(0, quote.sourceCatalysts());
+        assertEquals(0, quote.targetCatalysts());
+        assertEquals(0, quote.availableDiscount());
+        assertEquals(0, quote.appliedDiscount());
+        assertEquals(0, quote.finalCost());
+    }
 }
