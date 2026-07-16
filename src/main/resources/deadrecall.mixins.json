@@ -30,6 +30,7 @@
     "ServerPlayerDistributedSpawnMixin",
     "SpaceUnitHandlerCatalystMixin",
     "SpaceUnitHandlerRefreshMixin",
+    "SpaceUnitMapCatalystBreakdownMixin",
     "SpaceUnitMapSourceAccessor",
     "SpaceUnitOfflinePlayerNameMixin",
     "SpaceUnitTeleportSessionAccessor",
