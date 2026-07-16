@@ -42,7 +42,7 @@ public abstract class SpaceUnitHandlerCatalystMixin {
                 ? catalystBlocks(units, targetAccessor.deadrecall$getId())
                 : 0;
 
-        return AmethystCatalystDiscount.finalCost(baseCost, sourceCatalysts, targetCatalysts);
+        return AmethystCatalystDiscount.quote(baseCost, sourceCatalysts, targetCatalysts).finalCost();
     }
 
     private static int catalystBlocks(DeadRecallSpaceUnitSavedData units, java.util.UUID unitId) {
