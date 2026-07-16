@@ -9,7 +9,7 @@
 
 ## 2. Quote and payment
 
-- [ ] 2.1 將原始紫水晶成本、催化數量、折抵與最終成本分離到正式報價模型。
+- [x] 2.1 將原始紫水晶成本、催化數量、折抵與最終成本分離到正式報價模型。
 - [x] 2.2 實作每 4 個催化方塊折抵 1、跨維度最終成本最低為 1。
 - [x] 2.3 只讓固定磁石來源與固定磁石目標提供折抵；玩家、死亡及其他非石碑端點貢獻 0。
 - [x] 2.4 沿用開始與完成傳送前的定向重新掃描及重新報價。
@@ -17,8 +17,8 @@
 
 ## 3. Networking and UI
 
-- [ ] 3.1 Payload 加入 base cost、catalyst count 與 discount。
-- [ ] 3.2 地圖資訊面板顯示「原始成本 - 石碑折抵 = 最終成本」。
+- [x] 3.1 Payload 加入 base cost、catalyst count 與 discount。
+- [x] 3.2 地圖資訊面板顯示「原始成本 - 石碑折抵 = 最終成本」。
 - [ ] 3.3 Client／Server codec 同步並加上長度與範圍限制。
 - [x] 3.4 第一階段沿用既有 `amethystCost` 欄位回傳最終成本，避免先破壞 Client／Server codec。
 
