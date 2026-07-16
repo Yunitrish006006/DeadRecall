@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -121,14 +120,10 @@ public abstract class SpaceUnitMapScreenMixin {
         int x = panelX() + 12;
         int y = panelY() + panelHeight() - 46 + 27;
         int width = Math.max(36, firstFooterButtonX() - x - 8);
-        String text = Component.translatable(
-                "message.deadrecall.space_unit.metric.catalyst_breakdown",
-                selected.baseAmethystCost(),
-                selected.sourceCatalysts(),
-                selected.targetCatalysts(),
-                selected.catalystDiscount(),
-                selected.amethystCost()
-        ).getString();
+        String text = "Amethyst " + selected.baseAmethystCost()
+                + " | Catalyst " + selected.sourceCatalysts() + "+" + selected.targetCatalysts()
+                + " | -" + selected.catalystDiscount()
+                + " = " + selected.amethystCost();
         extractor.text(Minecraft.getInstance().font, trimToWidth(text, width), x, y, 0xFFB9A3E3);
     }
 
