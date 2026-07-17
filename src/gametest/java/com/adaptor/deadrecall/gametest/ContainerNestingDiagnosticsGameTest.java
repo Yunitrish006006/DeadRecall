@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -28,7 +29,9 @@ public final class ContainerNestingDiagnosticsGameTest {
         shulker.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(List.of(innerBackpack)));
 
         ItemStack bundle = new ItemStack(Items.BUNDLE);
-        bundle.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(List.of(new ItemStack(ModItems.DEATH_BACKPACK))));
+        bundle.set(DataComponents.BUNDLE_CONTENTS, new BundleContents(List.of(
+                ItemStackTemplate.fromNonEmptyStack(new ItemStack(ModItems.DEATH_BACKPACK))
+        )));
 
         ItemStack rootBackpack = new ItemStack(ModItems.BACKPACK_ADVANCED);
         rootBackpack.set(DataComponents.CUSTOM_NAME, Component.literal("Legacy root"));
