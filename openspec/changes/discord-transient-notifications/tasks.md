@@ -8,9 +8,9 @@
 
 ## 2. DeadRecall
 
-- [ ] 2.1 Add `delete_after_seconds: 600` to temporary text event payloads.
-- [ ] 2.2 Add `delete_after_seconds: 600` to server status payloads.
-- [ ] 2.3 Add payload-policy unit tests.
+- [x] 2.1 Add `delete_after_seconds: 600` to temporary text event payloads.
+- [x] 2.2 Add `delete_after_seconds: 600` to server status payloads.
+- [x] 2.3 Add payload-policy unit tests.
 
 ## 3. Discord Worker
 
@@ -27,3 +27,7 @@
 - [ ] 4.2 Discord Worker syntax/tests pass.
 - [ ] 4.3 DeadRecall PR Actions pass.
 - [ ] 4.4 Worker deployment smoke test confirms a temporary message is deleted after 10 minutes.
+
+## Blocker
+
+The connected GitHub App can read `Yunitrish006006/discord-bot`, but all branch and file write operations currently return HTTP 403. Worker tasks remain open until that repository is added to the GitHub App installation with write access.
