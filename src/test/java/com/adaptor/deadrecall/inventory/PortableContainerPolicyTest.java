@@ -6,19 +6,22 @@ import net.minecraft.SharedConstants;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.Bootstrap;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PortableContainerPolicyTest {
@@ -79,24 +82,32 @@ class PortableContainerPolicyTest {
     }
 
     private static List<Item> shulkerBoxes() {
-        return List.of(
-                Items.SHULKER_BOX,
-                Items.WHITE_SHULKER_BOX,
-                Items.ORANGE_SHULKER_BOX,
-                Items.MAGENTA_SHULKER_BOX,
-                Items.LIGHT_BLUE_SHULKER_BOX,
-                Items.YELLOW_SHULKER_BOX,
-                Items.LIME_SHULKER_BOX,
-                Items.PINK_SHULKER_BOX,
-                Items.GRAY_SHULKER_BOX,
-                Items.LIGHT_GRAY_SHULKER_BOX,
-                Items.CYAN_SHULKER_BOX,
-                Items.PURPLE_SHULKER_BOX,
-                Items.BLUE_SHULKER_BOX,
-                Items.BROWN_SHULKER_BOX,
-                Items.GREEN_SHULKER_BOX,
-                Items.RED_SHULKER_BOX,
-                Items.BLACK_SHULKER_BOX
-        );
+        return Arrays.stream(new String[]{
+                        "shulker_box",
+                        "white_shulker_box",
+                        "orange_shulker_box",
+                        "magenta_shulker_box",
+                        "light_blue_shulker_box",
+                        "yellow_shulker_box",
+                        "lime_shulker_box",
+                        "pink_shulker_box",
+                        "gray_shulker_box",
+                        "light_gray_shulker_box",
+                        "cyan_shulker_box",
+                        "purple_shulker_box",
+                        "blue_shulker_box",
+                        "brown_shulker_box",
+                        "green_shulker_box",
+                        "red_shulker_box",
+                        "black_shulker_box"
+                })
+                .map(PortableContainerPolicyTest::vanillaItem)
+                .toList();
+    }
+
+    private static Item vanillaItem(String path) {
+        Item item = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("minecraft", path));
+        assertNotNull(item, "Missing vanilla item minecraft:" + path);
+        return item;
     }
 }
