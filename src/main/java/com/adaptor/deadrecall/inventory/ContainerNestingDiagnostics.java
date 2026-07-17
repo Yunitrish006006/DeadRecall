@@ -67,6 +67,7 @@ public final class ContainerNestingDiagnostics {
                 retained.addAll(report.findings().subList(0, Math.min(remaining, report.findings().size())));
             }
         }
+        truncated |= totalFindings > retained.size();
         return new ScanReport("*", roots, stacks, totalFindings, List.copyOf(retained), truncated);
     }
 
