@@ -44,7 +44,7 @@ public final class PortableContainerNestingGameTest {
     }
 
     @GameTest(maxTicks = 20)
-    public void shulkerMenuAndSidedAutomationRejectBackpacks(GameTestHelper helper) {
+    public void shulkerMenuAndEverySidedAutomationFaceRejectBackpacks(GameTestHelper helper) {
         helper.setBlock(SHULKER_POS, Blocks.SHULKER_BOX);
         ShulkerBoxBlockEntity shulker = shulker(helper);
         ShulkerBoxSlot slot = new ShulkerBoxSlot(shulker, 0, 0, 0);
@@ -54,10 +54,12 @@ public final class PortableContainerNestingGameTest {
 
         require(helper, !slot.mayPlace(normalBackpack), "Shulker menu accepted a normal backpack");
         require(helper, !slot.mayPlace(deathBackpack), "Shulker menu accepted a death backpack");
-        require(helper, !shulker.canPlaceItemThroughFace(0, normalBackpack, Direction.UP),
-                "Sided automation accepted a normal backpack");
-        require(helper, !shulker.canPlaceItemThroughFace(0, deathBackpack, Direction.UP),
-                "Sided automation accepted a death backpack");
+        for (Direction direction : Direction.values()) {
+            require(helper, !shulker.canPlaceItemThroughFace(0, normalBackpack, direction),
+                    "Sided automation accepted a normal backpack from " + direction);
+            require(helper, !shulker.canPlaceItemThroughFace(0, deathBackpack, direction),
+                    "Sided automation accepted a death backpack from " + direction);
+        }
         helper.succeed();
     }
 
