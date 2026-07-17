@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall.mixin;
 
+import com.adaptor.deadrecall.inventory.PortableContainerDiagnostics;
 import com.adaptor.deadrecall.inventory.PortableContainerPolicy;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -23,6 +24,13 @@ public abstract class ShulkerBoxBlockEntityMixin {
             CallbackInfoReturnable<Boolean> cir
     ) {
         if (!PortableContainerPolicy.mayInsertIntoPortableContainer(stack)) {
+            ShulkerBoxBlockEntity shulker = (ShulkerBoxBlockEntity) (Object) this;
+            PortableContainerDiagnostics.logRejectedAutomation(
+                    shulker.getLevel(),
+                    shulker.getBlockPos(),
+                    stack,
+                    "vanilla_sided_transfer"
+            );
             cir.setReturnValue(false);
         }
     }
