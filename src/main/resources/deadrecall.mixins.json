@@ -9,6 +9,7 @@
     "DeadRecallSpaceDiscoverySavedDataAccessor",
     "DeadRecallSpaceUnitCatalystMixin",
     "DeadRecallSpaceUnitSavedDataAccessor",
+    "DiscordBridgeTransientNotificationMixin",
     "EnchantmentHelperMixin",
     "EnchantmentMenuMixin",
     "EnchantingTableBlockMixin",
