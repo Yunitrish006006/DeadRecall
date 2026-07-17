@@ -9,6 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -23,7 +24,7 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
     @Inject(method = "buildMapPayload", at = @At("RETURN"), cancellable = true)
     private static void deadrecall$appendCatalystBreakdown(
             ServerPlayer player,
-            Object source,
+            @Coerce Object source,
             List<SpaceUnitRecord> visibleUnits,
             CallbackInfoReturnable<SpaceUnitMapPayload> cir
     ) {
@@ -39,13 +40,13 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
 
         int sourceCatalysts = 0;
         if (SpaceUnitHandler.SOURCE_TYPE_LODESTONE.equals(payload.sourceType())) {
-            sourceCatalysts = catalystBlocks(units, payload.sourceUnitId());
+            sourceCatalysts = deadrecall$mapCatalystBlocks(units, payload.sourceUnitId());
         }
 
         List<SpaceUnitMapPayload.Entry> enriched = new ArrayList<>(payload.entries().size());
         for (SpaceUnitMapPayload.Entry entry : payload.entries()) {
             boolean crossDimension = !payload.sourceDimension().equals(entry.dimension());
-            int targetCatalysts = catalystBlocks(units, entry.id());
+            int targetCatalysts = deadrecall$mapCatalystBlocks(units, entry.id());
             int baseCost = crossDimension
                     ? Math.max(BASE_CROSS_DIMENSION_COST,
                     BASE_CROSS_DIMENSION_COST + (int) Math.ceil((1.0D - entry.resonance()) * 4.0D))
@@ -104,7 +105,10 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
         ));
     }
 
-    private static int catalystBlocks(DeadRecallSpaceUnitSavedData units, java.util.UUID unitId) {
+    private static int deadrecall$mapCatalystBlocks(
+            DeadRecallSpaceUnitSavedData units,
+            java.util.UUID unitId
+    ) {
         return units.get(unitId)
                 .filter(SpaceUnitRecord::isLodestoneAnchor)
                 .map(SpaceUnitRecord::structure)
