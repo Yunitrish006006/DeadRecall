@@ -1,9 +1,11 @@
 package com.adaptor.deadrecall.mixin;
 
+import com.adaptor.deadrecall.inventory.PortableContainerDiagnostics;
 import com.adaptor.deadrecall.inventory.PortableContainerPolicy;
 import com.adaptor.deadrecall.item.copper.CopperGolemWrenchHandler;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -32,7 +34,17 @@ public abstract class CopperGolemPortableContainerMixin {
             int slot,
             ItemStack stack
     ) {
-        return PortableContainerPolicy.mayInsertIntoContainer(container, stack)
-                && container.canPlaceItem(slot, stack);
+        if (!PortableContainerPolicy.mayInsertIntoContainer(container, stack)) {
+            if (container instanceof ShulkerBoxBlockEntity shulker) {
+                PortableContainerDiagnostics.logRejectedAutomation(
+                        shulker.getLevel(),
+                        shulker.getBlockPos(),
+                        stack,
+                        "copper_golem_transfer"
+                );
+            }
+            return false;
+        }
+        return container.canPlaceItem(slot, stack);
     }
 }
