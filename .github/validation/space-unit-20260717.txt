@@ -1,0 +1,4 @@
+Validation trigger for the current OpenSpec implementation state.
+
+Base commit: 64719e90e2dfe63d687a4b18c1592cc839ef6ac8
+Scope: Java 25 Gradle build, tests, Mixin initialization, Space Unit payload codec.
