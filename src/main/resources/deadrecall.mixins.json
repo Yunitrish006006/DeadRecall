@@ -27,6 +27,8 @@
     "RaidMixin",
     "RaidsMixin",
     "RecipeManagerMixin",
+    "ShulkerBoxBlockEntityMixin",
+    "ShulkerBoxSlotMixin",
     "SnowballMixin",
     "ServerPlayerDistributedSpawnMixin",
     "SpaceUnitHandlerCatalystMixin",
