@@ -30,9 +30,11 @@
 - [x] Backpack into every Shulker Box color and reverse-direction policy coverage.
 - [x] Drag, shift-click, number-key, double-click and cursor interaction matrix.
 - [ ] Hopper, hopper minecart, dropper and dispenser fixture matrix.
-  - [x] Real Hopper-to-Shulker rejection GameTest.
-  - [x] Ordinary-item Hopper-to-Shulker control GameTest.
-  - [x] Shared Shulker sided-insertion guard used by hopper minecart, dropper and dispenser paths.
+  - [x] Real Hopper-to-Shulker rejection and ordinary-item control GameTests.
+  - [x] Real Dropper-to-Shulker rejection and ordinary-item control GameTests.
+  - [x] All six Shulker sided-insertion faces reject normal and death backpacks.
+  - [x] Shared Shulker sided-insertion guard used by hopper minecart and other container-targeting automation paths.
+  - [ ] Dedicated Hopper Minecart and Dispenser fixtures.
 - [x] Death capture and rollback exactly-once tests for Bundle and Shulker Box stacks.
 - [x] Existing invalid nesting load/extract/reinsert fixture test.
 - [x] Custom Data Components and named container preservation test.
