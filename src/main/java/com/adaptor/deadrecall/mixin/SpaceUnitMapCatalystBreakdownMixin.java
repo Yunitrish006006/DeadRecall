@@ -37,24 +37,23 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
         DeadRecallSpaceUnitSavedData units = server.overworld()
                 .getDataStorage()
                 .computeIfAbsent(DeadRecallSpaceUnitSavedData.TYPE);
-
-        int sourceCatalysts = 0;
-        if (SpaceUnitHandler.SOURCE_TYPE_LODESTONE.equals(payload.sourceType())) {
-            sourceCatalysts = deadrecall$mapCatalystBlocks(units, payload.sourceUnitId());
-        }
+        boolean sourceLodestone = SpaceUnitHandler.SOURCE_TYPE_LODESTONE.equals(payload.sourceType());
+        int sourceCatalysts = deadrecall$storedCatalystBlocks(units, payload.sourceUnitId());
 
         List<SpaceUnitMapPayload.Entry> enriched = new ArrayList<>(payload.entries().size());
         for (SpaceUnitMapPayload.Entry entry : payload.entries()) {
             boolean crossDimension = !payload.sourceDimension().equals(entry.dimension());
-            int targetCatalysts = deadrecall$mapCatalystBlocks(units, entry.id());
+            boolean targetLodestone = SpaceUnitHandler.SOURCE_TYPE_LODESTONE.equals(entry.type());
             int baseCost = crossDimension
                     ? Math.max(BASE_CROSS_DIMENSION_COST,
                     BASE_CROSS_DIMENSION_COST + (int) Math.ceil((1.0D - entry.resonance()) * 4.0D))
                     : 0;
-            AmethystCatalystDiscount.Quote quote = AmethystCatalystDiscount.quote(
+            AmethystCatalystDiscount.Quote quote = AmethystCatalystDiscount.quoteForEndpoints(
                     baseCost,
+                    sourceLodestone,
                     sourceCatalysts,
-                    targetCatalysts
+                    targetLodestone,
+                    deadrecall$storedCatalystBlocks(units, entry.id())
             );
 
             enriched.add(new SpaceUnitMapPayload.Entry(
@@ -105,12 +104,11 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
         ));
     }
 
-    private static int deadrecall$mapCatalystBlocks(
+    private static int deadrecall$storedCatalystBlocks(
             DeadRecallSpaceUnitSavedData units,
             java.util.UUID unitId
     ) {
         return units.get(unitId)
-                .filter(SpaceUnitRecord::isLodestoneAnchor)
                 .map(SpaceUnitRecord::structure)
                 .map(snapshot -> snapshot.amethystCatalystBlocks())
                 .orElse(0);
