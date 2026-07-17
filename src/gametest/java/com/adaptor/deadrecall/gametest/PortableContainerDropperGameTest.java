@@ -43,11 +43,10 @@ public final class PortableContainerDropperGameTest {
         helper.setBlock(POWER_POS, Blocks.REDSTONE_BLOCK);
 
         helper.runAtTickTime(12, () -> {
-            require(helper, dropper.getItem(0).isEmpty(), "Control Dropper did not transfer ordinary items");
+            require(helper, dropper.getItem(0).is(Items.DIRT) && dropper.getItem(0).getCount() == 1,
+                    "Control Dropper did not transfer exactly one ordinary item");
             require(helper, shulker.getItem(0).is(Items.DIRT) && shulker.getItem(0).getCount() == 1,
-                    "Control Shulker Box did not receive the ordinary item");
-            require(helper, dropper.getItem(0).isEmpty() || dropper.getItem(0).getCount() == 1,
-                    "Control Dropper produced an invalid remaining count");
+                    "Control Shulker Box did not receive exactly one ordinary item");
             helper.succeed();
         });
     }
