@@ -23,9 +23,9 @@
 
 ## 4. Verification
 
-- [ ] 4.1 DeadRecall Java 25 build and tests pass.
+- [x] 4.1 DeadRecall Java 25 build and tests pass.
 - [ ] 4.2 Discord Worker syntax/tests pass.
-- [ ] 4.3 DeadRecall PR Actions pass.
+- [x] 4.3 DeadRecall PR Actions pass.
 - [ ] 4.4 Worker deployment smoke test confirms a temporary message is deleted after 10 minutes.
 
 ## Blocker
