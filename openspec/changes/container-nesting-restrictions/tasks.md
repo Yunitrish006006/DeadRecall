@@ -28,13 +28,13 @@
 
 - [x] Backpack into Bundle and Bundle into backpack policy/runtime-hook coverage.
 - [x] Backpack into every Shulker Box color and reverse-direction policy coverage.
-- [ ] Drag, shift-click, number-key, double-click and cursor interaction matrix.
+- [x] Drag, shift-click, number-key, double-click and cursor interaction matrix.
 - [ ] Hopper, hopper minecart, dropper and dispenser fixture matrix.
   - [x] Real Hopper-to-Shulker rejection GameTest.
   - [x] Ordinary-item Hopper-to-Shulker control GameTest.
   - [x] Shared Shulker sided-insertion guard used by hopper minecart, dropper and dispenser paths.
 - [x] Death capture and rollback exactly-once tests for Bundle and Shulker Box stacks.
-- [ ] Existing invalid nesting load/extract/reinsert fixture test.
+- [x] Existing invalid nesting load/extract/reinsert fixture test.
 - [x] Custom Data Components and named container preservation test.
 - [ ] Multiplayer race and Dedicated Server restart tests.
   - [x] Existing three-JVM Dedicated Server restart probe remains required by CI.
