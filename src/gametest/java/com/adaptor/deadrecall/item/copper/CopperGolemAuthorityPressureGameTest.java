@@ -33,21 +33,14 @@ public final class CopperGolemAuthorityPressureGameTest {
         try {
             CopperGolemData.migrate(golem);
             int initialRevision = CopperGolemData.revision(golem);
-
-            CopperGolemWrenchHandler.setTransportEnabledFromUi(
-                    player, golem.getUUID(), true, initialRevision);
+            CopperGolemWrenchHandler.setTransportEnabledFromUi(player, golem.getUUID(), true, initialRevision);
             int acceptedRevision = CopperGolemData.revision(golem);
-            require(helper, acceptedRevision > initialRevision,
-                    "Accepted running mutation did not advance revision");
-            require(helper, CopperGolemWrenchHandler.isTransportEnabled(golem),
-                    "Accepted running mutation was not applied");
+            require(helper, acceptedRevision > initialRevision, "Accepted running mutation did not advance revision");
+            require(helper, CopperGolemWrenchHandler.isTransportEnabled(golem), "Accepted running mutation was not applied");
 
-            CopperGolemWrenchHandler.setTransportEnabledFromUi(
-                    player, golem.getUUID(), false, initialRevision);
-            CopperGolemWrenchHandler.setModeFromUi(
-                    player, golem.getUUID(), CopperGolemMode.GATHERING.id(), initialRevision);
-            CopperGolemWrenchHandler.setGatheringLlmFromUi(
-                    player, golem.getUUID(), true, "stale prompt", initialRevision);
+            CopperGolemWrenchHandler.setTransportEnabledFromUi(player, golem.getUUID(), false, initialRevision);
+            CopperGolemWrenchHandler.setModeFromUi(player, golem.getUUID(), CopperGolemMode.GATHERING.id(), initialRevision);
+            CopperGolemWrenchHandler.setGatheringLlmFromUi(player, golem.getUUID(), true, "stale prompt", initialRevision);
 
             require(helper, CopperGolemData.revision(golem) == acceptedRevision,
                     "Stale UI mutation changed the authoritative revision");
@@ -74,13 +67,9 @@ public final class CopperGolemAuthorityPressureGameTest {
         try {
             CopperGolemData.migrate(golem);
             int sharedRevision = CopperGolemData.revision(golem);
-
-            CopperGolemWrenchHandler.setTransportEnabledFromUi(
-                    first, golem.getUUID(), true, sharedRevision);
-            CopperGolemWrenchHandler.setTransportEnabledFromUi(
-                    second, golem.getUUID(), false, sharedRevision);
-            CopperGolemWrenchHandler.setModeFromUi(
-                    second, golem.getUUID(), CopperGolemMode.GATHERING.id(), sharedRevision);
+            CopperGolemWrenchHandler.setTransportEnabledFromUi(first, golem.getUUID(), true, sharedRevision);
+            CopperGolemWrenchHandler.setTransportEnabledFromUi(second, golem.getUUID(), false, sharedRevision);
+            CopperGolemWrenchHandler.setModeFromUi(second, golem.getUUID(), CopperGolemMode.GATHERING.id(), sharedRevision);
 
             require(helper, CopperGolemWrenchHandler.isTransportEnabled(golem),
                     "Second same-tick mutation overwrote the first accepted running state");
@@ -118,10 +107,8 @@ public final class CopperGolemAuthorityPressureGameTest {
                         "Pressure scanning removed or killed a managed copper golem");
                 long cursor = CopperGolemData.readEntityTag(golem)
                         .getLongOr("deadrecall_gathering_scan_index", 0L);
-                require(helper, cursor >= 0L,
-                        "Pressure scanning produced an invalid negative cursor");
+                require(helper, cursor >= 0L, "Pressure scanning produced an invalid negative cursor");
             }
-
             for (int index = 0; index < PRESSURE_GOLEM_COUNT / 2; index++) {
                 golems.get(index).discard();
             }
@@ -157,12 +144,12 @@ public final class CopperGolemAuthorityPressureGameTest {
                 "deadrecall_gathering_corner_a_x", "deadrecall_gathering_corner_a_y", "deadrecall_gathering_corner_a_z");
         writePos(tag, absolute.offset(1, 1, 1),
                 "deadrecall_gathering_corner_b_x", "deadrecall_gathering_corner_b_y", "deadrecall_gathering_corner_b_z");
-        CopperGolemData.writeStringList(
-                tag, "deadrecall_gathering_manual_targets", List.of("minecraft:stone"), 64);
+        CopperGolemData.writeStringList(tag, "deadrecall_gathering_manual_targets",
+                List.of("minecraft:stone"), 64);
         CopperGolemData.writeItemStack(tag, "deadrecall_gathering_tool_stack", new ItemStack(Items.IRON_PICKAXE));
         CopperGolemData.writeItemStack(tag, CopperGolemData.TAG_FUEL_STACK, new ItemStack(Items.COAL));
         CopperGolemData.writeEntityTag(golem, tag);
-        CopperGolemWrenchHandler.trackCopperGolem(golem);
+        invokeWrench("trackCopperGolem", new Class<?>[]{CopperGolem.class}, golem);
     }
 
     private static ServerPlayer createBoundPlayer(GameTestHelper helper, CopperGolem golem, BlockPos relativePos) {
