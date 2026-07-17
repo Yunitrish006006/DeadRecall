@@ -43,7 +43,7 @@ public final class ContainerSafetyAdminInitializer implements ModInitializer {
         ScanReport report = ContainerNestingDiagnostics.merge(playerReports);
         sendReport(source, Component.translatable("message.deadrecall.container_scan.scope_all"), report);
         audit(source, report);
-        return report.totalFindings();
+        return commandResult(report);
     }
 
     private static int scanPlayer(CommandSourceStack source, String playerName) {
@@ -56,7 +56,11 @@ public final class ContainerSafetyAdminInitializer implements ModInitializer {
         ScanReport report = ContainerNestingDiagnostics.scanPlayer(player);
         sendReport(source, Component.literal(player.getName().getString()), report);
         audit(source, report);
-        return report.totalFindings();
+        return commandResult(report);
+    }
+
+    private static int commandResult(ScanReport report) {
+        return Math.max(1, report.totalFindings());
     }
 
     private static void sendReport(CommandSourceStack source, Component scope, ScanReport report) {
