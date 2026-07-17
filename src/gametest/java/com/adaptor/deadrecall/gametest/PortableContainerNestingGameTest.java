@@ -1,12 +1,16 @@
 package com.adaptor.deadrecall.gametest;
 
+import com.adaptor.deadrecall.inventory.PortableContainerPolicy;
 import com.adaptor.deadrecall.item.ModItems;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.ShulkerBoxSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -17,6 +21,27 @@ import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 public final class PortableContainerNestingGameTest {
     private static final BlockPos SHULKER_POS = new BlockPos(2, 1, 2);
     private static final BlockPos HOPPER_POS = SHULKER_POS.above();
+
+    @GameTest(maxTicks = 20)
+    public void runtimePolicyRejectsBothNestingDirections(GameTestHelper helper) {
+        ItemStack normalBackpack = new ItemStack(ModItems.BACKPACK_BASIC);
+        ItemStack deathBackpack = new ItemStack(ModItems.DEATH_BACKPACK);
+
+        require(helper, !normalBackpack.getItem().canFitInsideContainerItems(),
+                "Normal backpack did not opt out of vanilla container items");
+        require(helper, !deathBackpack.getItem().canFitInsideContainerItems(),
+                "Death backpack did not opt out of vanilla container items");
+        require(helper, !PortableContainerPolicy.mayInsertIntoPortableContainer(normalBackpack),
+                "Portable-container policy accepted a normal backpack");
+        require(helper, !PortableContainerPolicy.mayInsertIntoPortableContainer(deathBackpack),
+                "Portable-container policy accepted a death backpack");
+
+        assertRestrictedInsideBackpack(helper, new ItemStack(Items.BUNDLE), "minecraft:bundle");
+        for (String path : shulkerBoxPaths()) {
+            assertRestrictedInsideBackpack(helper, new ItemStack(vanillaItem(helper, path)), "minecraft:" + path);
+        }
+        helper.succeed();
+    }
 
     @GameTest(maxTicks = 20)
     public void shulkerMenuAndSidedAutomationRejectBackpacks(GameTestHelper helper) {
@@ -64,6 +89,43 @@ public final class PortableContainerNestingGameTest {
                     "Control Shulker Box did not receive ordinary items");
             helper.succeed();
         });
+    }
+
+    private static void assertRestrictedInsideBackpack(GameTestHelper helper, ItemStack stack, String id) {
+        require(helper, PortableContainerPolicy.isRestrictedPortableContainer(stack),
+                id + " was not classified as a portable container");
+        require(helper, !PortableContainerPolicy.mayInsertIntoBackpack(stack),
+                id + " was accepted inside a DeadRecall backpack");
+    }
+
+    private static String[] shulkerBoxPaths() {
+        return new String[]{
+                "shulker_box",
+                "white_shulker_box",
+                "orange_shulker_box",
+                "magenta_shulker_box",
+                "light_blue_shulker_box",
+                "yellow_shulker_box",
+                "lime_shulker_box",
+                "pink_shulker_box",
+                "gray_shulker_box",
+                "light_gray_shulker_box",
+                "cyan_shulker_box",
+                "purple_shulker_box",
+                "blue_shulker_box",
+                "brown_shulker_box",
+                "green_shulker_box",
+                "red_shulker_box",
+                "black_shulker_box"
+        };
+    }
+
+    private static Item vanillaItem(GameTestHelper helper, String path) {
+        Item item = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath("minecraft", path));
+        if (item == null) {
+            throw helper.assertionException("Missing vanilla item minecraft:" + path);
+        }
+        return item;
     }
 
     private static void placeHopperOverShulker(GameTestHelper helper) {
