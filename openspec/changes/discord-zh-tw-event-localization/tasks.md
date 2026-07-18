@@ -7,7 +7,7 @@
 - [ ] 1.3 Runtime resource reload 與原子 snapshot 替換；目前 Dedicated Server 不提供 Client `zh_tw.json`，第一階段採版本發布時更新的 bundled snapshot。
 - [x] 1.4 實作 literal、translatable、巢狀參數、placeholder 與 sibling component 純文字解析。
 - [x] 1.5a 未知 key 使用安全中文 fallback，最終 payload 不洩漏 raw translation key。
-- [ ] 1.5b 對重複 missing-key warning 增加節流；目前 missing key 直接使用 deterministic fallback，不逐筆寫 warning。
+- [x] 1.5b Missing-key warning 依 key 去重並限制最多 128 種，避免未知 key 洗版；fallback 維持 deterministic。
 
 ## 2. Semantic event formatting
 
@@ -16,7 +16,7 @@
 - [x] 2.3 `task`／`goal`／`challenge` 顯示為「進度」／「目標」／「挑戰」。
 - [x] 2.4 村民升級傳遞 custom name、profession path、previous level 與 current level。
 - [x] 2.5 未命名村民、profession 與 level 1–5 使用繁中名稱；自訂名稱維持 literal。
-- [ ] 2.6 死亡訊息、Boss／實體預設名稱、raid result 與 difficulty display name 接入共用 localization service。
+- [x] 2.6 死亡訊息、Boss／實體預設名稱、raid result 與 difficulty display name 接入共用 localization service。
 - [x] 2.7 玩家名稱、物品／村民自訂名稱與 nested literal text 不被翻譯或改寫。
 
 ## 3. Safety and compatibility
@@ -36,7 +36,7 @@
 - [x] 4.6 自訂村民名稱原樣保留，profession 與 level 仍中文化。
 - [x] 4.7 Advancement 與村民各自 exactly-once 建立 Discord payload。
 - [x] 4.8 Dedicated Server GameTest 載入 bundled snapshot，不依賴 Client language class。
-- [ ] 4.9 真實 Worker／Discord 失敗時 localization event 不影響遊戲流程。
+- [x] 4.9 本機 HTTP Worker 回傳 503 時，localized payload 已送達且錯誤留在非同步 transport，不回拋到遊戲事件。
 - [x] 4.10 Java 25 Validate、完整 Server GameTests、死亡背包與 Copper Golem 三階段 restart probes 全部通過。
 
 ## 5. Documentation
