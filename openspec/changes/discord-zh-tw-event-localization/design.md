@@ -23,6 +23,8 @@ assets/deadrecall/lang/discord_zh_tw/*.json
 
 各檔案在 class initialization 時合併，並以 `Map.copyOf` 發布 immutable snapshot。第一階段不支援 runtime resource reload；翻譯更新隨 DeadRecall 版本發布。
 
+Phase 2 將 Minecraft 26.2 的 death template 與 entity name 子集合併到同一 snapshot。Missing key 只會依 key 記錄一次 warning，且單次程序最多記錄 128 種，避免 datapack 或版本差異造成 log flood。
+
 ## Processing boundary
 
 ```text
@@ -71,13 +73,22 @@ Resolver 支援：
 
 格式：`村民（圖書管理員）升級：新手 → 學徒`。同一次升級只建立一筆 `villager_level_up` payload。
 
+## Phase 2 system events
+
+- 玩家死亡保留原始 death `Component`，在建立 payload 前解析 template、玩家／實體與 custom item 參數。
+- 終界龍與凋零使用實體 display-name `Component`；Vanilla 預設名稱翻譯，自訂 literal 名稱保持原樣。
+- Raid 結果以 `victory`／`defeat`／`stopped`／`ended` semantic value 進入 formatter。
+- Difficulty 以 serialized path 解析 `options.difficulty.*`，不把英文 path 顯示到 Discord。
+
+這些事件與 advancement／村民共用 `DiscordEventNotifications → DiscordEventDispatcher`，因此 transport 只接收 immutable strings。JUnit 使用真實本機 HTTP endpoint 回覆 503，驗證 Worker 失敗留在非同步 transport 且不回拋到遊戲事件。
+
 ## Compatibility
 
 不改變 Worker endpoint、`event/username/message/channels` 欄位、event ID、API Key、Bot Token／Webhook fallback、多頻道路由、SavedData 或世界 identifier。
 
 ## Phasing
 
-本階段完成使用者回報的 advancement 與村民中文化。死亡訊息、Boss／實體名稱、raid result 與 difficulty 後續接入同一 service，不得建立第二套翻譯架構。
+Phase 1 完成 advancement 與村民中文化；Phase 2 已完成死亡訊息、Boss／實體名稱、raid result 與 difficulty，全部沿用同一 service。Runtime resource reload 保留為後續獨立工作。
 
 ## Tests
 
