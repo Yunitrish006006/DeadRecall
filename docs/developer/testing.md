@@ -247,6 +247,9 @@ DEADRECALL_COPPER_RESTART_PROBE_MARKER_DIR
 - 64 格數量與自訂名稱 Component 保留。
 - 使用同一個 ItemEntity，不建立替代實體。
 - age、位置範圍、速度與 pickup delay 不會被轉換流程重設。
+- 512 個以不同 Component 防止合併的 ItemEntity（粉末與普通物品各半）可在 10 tick 內完成；粉末原地硬化、普通物品常數時間短路，且流程不查詢世界 entity 集合。
+
+這項壓力測試是 deterministic regression，不設定容易受 CI 主機負載影響的 wall-clock microbenchmark 門檻。真人 Client 同時丟入流動水的網路驗收仍保留為發布前手動項目。
 
 ## CI
 
