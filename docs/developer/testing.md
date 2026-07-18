@@ -125,6 +125,18 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 `runRestartProbe` 另會在 seed 正常關閉後直接移除實際 `space_units.dat` 內的 `amethyst_catalyst_blocks`，再以兩個獨立 JVM 驗證舊世界預設 0、實際石碑重掃為 4，以及更新後 snapshot 再次持久化。
 
+## 傳送介面 Phase A 回歸
+
+`TeleportInterfacePhaseAGameTest` 經 Fabric 的正式 `UseItemCallback`、`UseBlockCallback` 與 `SpaceUnitHandler.startTeleport` 路徑驗證：
+
+- 普通羅盤、回生羅盤、書本與具有 map ID 的已繪製地圖都能建立 Server-only `PLAYER` 與已註冊 `LODESTONE` 來源 context。
+- 空白地圖、缺少 map ID 的已繪製地圖與不支援物品保持 `PASS`，不建立 context。
+- 四種介面物品對非磁石方塊保持 `PASS`，讓原版方塊互動先處理。
+- 非普通羅盤不能註冊未註冊磁石或執行磁石管理；普通羅盤既有能力不變。
+- context 保存確切使用手、介面類型與 map ID；物品換手、換類型或 map ID 改變會使 context／session 失效，且不先扣除資源。
+
+純 JUnit 另驗證 filled-map identity 的 map ID invariant。這些測試不取代真人 Client 的 GUI、輸入優先序與多人網路延遲驗收。
+
 ## 講台替代配方回歸
 
 `LecternGameplayGameTest` 使用 Minecraft 26.2 的實際 RecipeManager、Lectern BlockEntity、Menu、紅石排程與村民 POI，驗證：

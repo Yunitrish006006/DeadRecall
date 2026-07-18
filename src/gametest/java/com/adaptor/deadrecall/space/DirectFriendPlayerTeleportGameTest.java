@@ -8,6 +8,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.item.ItemStack;
@@ -37,12 +38,7 @@ public final class DirectFriendPlayerTeleportGameTest {
             makeFriends(helper, requester, target);
             requireOnline(helper, requester, target);
 
-            SpaceUnitHandler.startTeleport(
-                    requester,
-                    SpaceUnitHandler.SOURCE_TYPE_PLAYER,
-                    requester.getUUID(),
-                    target.getUUID()
-            );
+            startPlayerTeleport(requester, target);
 
             Object session = sessions().get(requester.getUUID());
             require(helper, session instanceof SpaceUnitTeleportSessionAccessor,
@@ -66,31 +62,16 @@ public final class DirectFriendPlayerTeleportGameTest {
             preparePlayer(target, true);
             requireOnline(helper, requester, target);
 
-            SpaceUnitHandler.startTeleport(
-                    requester,
-                    SpaceUnitHandler.SOURCE_TYPE_PLAYER,
-                    requester.getUUID(),
-                    target.getUUID()
-            );
+            startPlayerTeleport(requester, target);
             require(helper, !sessions().containsKey(requester.getUUID()),
                     "A non-friend PLAYER target created a teleport session");
 
             friendData(helper).inviteOrAccept(requester.getUUID(), target.getUUID());
-            SpaceUnitHandler.startTeleport(
-                    requester,
-                    SpaceUnitHandler.SOURCE_TYPE_PLAYER,
-                    requester.getUUID(),
-                    target.getUUID()
-            );
+            startPlayerTeleport(requester, target);
             require(helper, !sessions().containsKey(requester.getUUID()),
                     "A one-way pending friend invite created a teleport session");
 
-            SpaceUnitHandler.startTeleport(
-                    requester,
-                    SpaceUnitHandler.SOURCE_TYPE_PLAYER,
-                    requester.getUUID(),
-                    requester.getUUID()
-            );
+            startPlayerTeleport(requester, requester);
             require(helper, !sessions().containsKey(requester.getUUID()),
                     "A player created a PLAYER teleport session targeting themselves");
             helper.succeed();
@@ -111,12 +92,7 @@ public final class DirectFriendPlayerTeleportGameTest {
         makeFriends(helper, requester, target);
         requireOnline(helper, requester, target);
 
-        SpaceUnitHandler.startTeleport(
-                requester,
-                SpaceUnitHandler.SOURCE_TYPE_PLAYER,
-                requester.getUUID(),
-                target.getUUID()
-        );
+        startPlayerTeleport(requester, target);
         require(helper, sessions().containsKey(requester.getUUID()),
                 "Direct friend session did not start before latest-position regression");
 
@@ -291,6 +267,12 @@ public final class DirectFriendPlayerTeleportGameTest {
     }
 
     private static void startPlayerTeleport(ServerPlayer requester, ServerPlayer target) {
+        SpaceUnitHandler.establishInterfaceContext(
+                requester,
+                InteractionHand.MAIN_HAND,
+                SpaceUnitHandler.SOURCE_TYPE_PLAYER,
+                requester.getUUID()
+        ).orElseThrow(() -> new IllegalStateException("Could not establish compass interface context"));
         SpaceUnitHandler.startTeleport(
                 requester,
                 SpaceUnitHandler.SOURCE_TYPE_PLAYER,
@@ -358,6 +340,7 @@ public final class DirectFriendPlayerTeleportGameTest {
         DeadRecallFriendSavedData data = friendData(helper);
         for (ServerPlayer player : players) {
             sessions().remove(player.getUUID());
+            SpaceUnitHandler.clearInterfaceContext(player.getUUID());
         }
         for (int first = 0; first < players.length; first++) {
             for (int second = first + 1; second < players.length; second++) {
