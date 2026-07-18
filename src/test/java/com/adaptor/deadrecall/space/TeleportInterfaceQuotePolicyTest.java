@@ -133,6 +133,67 @@ class TeleportInterfaceQuotePolicyTest {
                 high.structureWearChancePercent());
     }
 
+    @Test
+    void filledMapReducesCoveredFoodAndDeviationOnly() {
+        TeleportInterfaceQuotePolicy.Quote covered = TeleportInterfaceQuotePolicy.specialize(
+                TeleportInterfaceType.FILLED_MAP,
+                SpaceUnitType.PLAYER,
+                false,
+                true,
+                7,
+                101,
+                13,
+                7
+        );
+        TeleportInterfaceQuotePolicy.Quote uncovered = TeleportInterfaceQuotePolicy.specialize(
+                TeleportInterfaceType.FILLED_MAP,
+                SpaceUnitType.PLAYER,
+                false,
+                false,
+                7,
+                101,
+                13,
+                7
+        );
+
+        assertEquals(6, covered.foodCost());
+        assertEquals(10, covered.maxHorizontalDeviation());
+        assertEquals(101, covered.prepareTicks());
+        assertEquals(7, covered.structureWearChancePercent());
+        assertTrue(covered.bonusActive());
+        assertEquals(7, uncovered.foodCost());
+        assertEquals(13, uncovered.maxHorizontalDeviation());
+        assertFalse(uncovered.bonusActive());
+    }
+
+    @Test
+    void filledMapFoodDiscountKeepsMinimumOneAndClampsInputs() {
+        TeleportInterfaceQuotePolicy.Quote minimum = TeleportInterfaceQuotePolicy.specialize(
+                TeleportInterfaceType.FILLED_MAP,
+                SpaceUnitType.LODESTONE,
+                false,
+                true,
+                1,
+                80,
+                1,
+                6
+        );
+        TeleportInterfaceQuotePolicy.Quote clamped = TeleportInterfaceQuotePolicy.specialize(
+                TeleportInterfaceType.FILLED_MAP,
+                SpaceUnitType.LODESTONE,
+                false,
+                true,
+                999,
+                80,
+                1,
+                6
+        );
+
+        assertEquals(1, minimum.foodCost());
+        assertEquals(0, minimum.maxHorizontalDeviation());
+        assertEquals(16, clamped.foodCost());
+    }
+
     private static TeleportInterfaceQuotePolicy.Quote specialize(
             TeleportInterfaceType interfaceType,
             SpaceUnitType targetType,
@@ -144,6 +205,8 @@ class TeleportInterfaceQuotePolicyTest {
                 interfaceType,
                 targetType,
                 owned,
+                false,
+                10,
                 prepareTicks,
                 deviation,
                 wearChance

@@ -149,6 +149,25 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 `TeleportInterfacePhaseBGameTest` 另透過正式 `startTeleport` 建立普通羅盤與書本 session，確認書本 final prepare ticks 已真正寫入 Server session。`SpaceUnitMapPayloadCodecTest` 驗證介面 enum、active flag、說明 key 與獨立 final structure-wear 欄位 round-trip，並拒絕未知 enum、非法範圍與空白／過長 key。
 
+## 傳送介面 Phase C 回歸
+
+`FilledMapCoverageTest` 與 `TeleportInterfaceQuotePolicyTest` 驗證：
+
+- 128×128 像素覆蓋使用最小邊 inclusive、最大邊 exclusive，比例尺 0–4 每級將範圍加倍。
+- Dimension 不符永不啟用加成，非法比例尺會被拒絕。
+- 覆蓋目標的食物成本使用 ceil 80% 並維持最低 1；偏差使用 floor 80%，準備時間與結構磨損不變。
+- 超量食物與其他報價輸入先 clamp 至合法範圍；紫水晶計算仍走既有獨立催化公式。
+
+`TeleportInterfacePhaseCGameTest` 使用真實 `MapItem.create`、Server `MapItemSavedData`、好友 `PLAYER` 解析與正式 session tick 驗證：
+
+- Server map ID／Dimension／中心／比例尺真的會啟用地圖報價，而不是信任 Client 座標。
+- Payload 只包含好友的 64 格網格座標與距離級距；精確 Server 位置只用於覆蓋判斷。
+- 目標 Dimension 的地圖可覆蓋跨 Dimension 好友並降低食物成本，但紫水晶成本與既有催化最低值完全不變。
+- 已啟用加成的好友移出覆蓋範圍會在付款前取消 session。
+- 移除啟動地圖的 map ID 也會在付款前取消，食物成本不會先行扣除。
+
+未探索與無權限固定節點仍由既有 `visibleDiscoveredUnits` 權限／探索回歸先過濾，地圖 coverage 不會把它們重新加入 Payload。真人 Client 的地圖手持互動、多人延遲與動態移動仍列為手動驗收。
+
 ## 講台替代配方回歸
 
 `LecternGameplayGameTest` 使用 Minecraft 26.2 的實際 RecipeManager、Lectern BlockEntity、Menu、紅石排程與村民 POI，驗證：
