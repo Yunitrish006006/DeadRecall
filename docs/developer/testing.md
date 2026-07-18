@@ -95,6 +95,20 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 詳細 fixture、事件順序與邊界記錄於 `docs/developer/direct-friend-player-teleport-testing.md`。
 
+## 講台替代配方回歸
+
+`LecternGameplayGameTest` 使用 Minecraft 26.2 的實際 RecipeManager、Lectern BlockEntity、Menu、紅石排程與村民 POI，驗證：
+
+- 橡木、竹、緋紅蕈木、扭曲蕈木及四種混合半磚皆匹配唯一的 `minecraft:lectern`。
+- 每次產出恰好一個講台；舊書櫃 ingredient 不再產出講台。
+- 三頁 writable book 的 Components 可經 `LecternBlock.tryPlaceBook` 放入並由 Reading Menu 讀取。
+- Menu 翻到最後一頁會同步 authoritative page，Comparator 值由 1 上升至 15。
+- 翻頁建立強度 15 的 direct redstone pulse，並在排程兩 tick 後復位；Comparator 頁面訊號不被清除。
+- 經 Menu 取書會 exactly-once 回到玩家 Inventory，並清除 `HAS_BOOK` 與 BlockEntity book slot。
+- 未就業村民會透過 Vanilla Brain／POI 流程自然認領講台並成為圖書管理員。
+
+詳細 fixture 與斷言記錄於 `docs/developer/lectern-recipe-testing.md`。
+
 ## 銅傀儡回歸
 
 銅傀儡的 Server GameTests 分為八組：
