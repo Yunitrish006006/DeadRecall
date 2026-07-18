@@ -72,8 +72,9 @@
 
 - [`openspec/specs/gameplay-recipes/spec.md`](openspec/specs/gameplay-recipes/spec.md)
 - [`openspec/changes/lectern-recipe-override/`](openspec/changes/lectern-recipe-override/)
+- [`docs/developer/lectern-recipe-testing.md`](docs/developer/lectern-recipe-testing.md)
 
-講台配方覆寫為 4 個任意木半磚＋1 本書。
+講台配方覆寫為 4 個任意木半磚＋1 本書；木種混用、書本／Menu、Comparator／紅石脈衝及村民圖書管理員 POI 已由 Server GameTest 驗證。
 
 ## Gameplay QoL / Concrete Powder Item Hardening
 
