@@ -335,6 +335,7 @@
   "message.deadrecall.space_unit.metric.hunger": "Hunger cost: %s",
   "message.deadrecall.space_unit.metric.food": "Food item cost: %s / available %s",
   "message.deadrecall.space_unit.metric.amethyst": "Amethyst shard cost: %s / available %s",
+  "message.deadrecall.space_unit.metric.amethyst_breakdown": "Amethyst %s | catalysts %s+%s | -%s = %s",
   "message.deadrecall.space_unit.metric.time": "Prepare time: %s seconds",
   "message.deadrecall.space_unit.metric.stability": "Route stability: %s/100",
   "message.deadrecall.space_unit.metric.drift": "Maximum drift: %s blocks",

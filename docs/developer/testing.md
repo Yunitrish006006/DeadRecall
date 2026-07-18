@@ -114,6 +114,17 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 詳細 fixture、事件順序與邊界記錄於 `docs/developer/direct-friend-player-teleport-testing.md`。
 
+## 紫水晶催化傳送回歸
+
+`AmethystCatalystTeleportGameTest` 透過正式 `SpaceUnitHandler.startTeleport`、倒數完成與資源扣款路徑驗證：
+
+- 固定磁石到固定磁石的跨維度報價會合併兩端催化方塊，並只扣一次折抵後的紫水晶碎片。
+- 報價後拆除目標催化方塊時，完成前會重新掃描結構、提高成本並按最新報價扣款。
+- 玩家來源、玩家目標與死亡節點即使保存了不可能的舊催化數，也不會提供該端折抵。
+- Payload codec round-trip 保留 base、兩端催化數、discount 與 final cost；超過 128 個節點、負數／超量長度及不一致報價都會被拒絕。
+
+`runRestartProbe` 另會在 seed 正常關閉後直接移除實際 `space_units.dat` 內的 `amethyst_catalyst_blocks`，再以兩個獨立 JVM 驗證舊世界預設 0、實際石碑重掃為 4，以及更新後 snapshot 再次持久化。
+
 ## 講台替代配方回歸
 
 `LecternGameplayGameTest` 使用 Minecraft 26.2 的實際 RecipeManager、Lectern BlockEntity、Menu、紅石排程與村民 POI，驗證：
@@ -194,9 +205,9 @@ run/restartProbe/world
 
 三次獨立 JVM：
 
-1. `seed`：保存 ACTIVE death node、discovery 與綁定的 death-backpack ItemEntity。
-2. `recover`：重新載入世界，以相同 UUID 的 replacement `ServerPlayer` 回收背包並停用節點。
-3. `verify`：再次重新載入，確認節點仍為 `DISABLED`、探索資料存在，而且已刪除的背包實體不會復活。
+1. `seed`：保存 ACTIVE death node、discovery、綁定的 death-backpack ItemEntity，以及具有四個催化方塊的固定磁石 snapshot；正常關閉後把 SavedData 改寫成缺少催化欄位的舊格式。
+2. `recover`：重新載入世界，以相同 UUID 的 replacement `ServerPlayer` 回收背包並停用節點；同時確認舊磁石 snapshot 先以 0 載入，再從世界結構重掃為 4。
+3. `verify`：再次重新載入，確認節點仍為 `DISABLED`、探索資料存在、已刪除的背包實體不會復活，而且催化 snapshot 仍為 4。
 
 環境變數：
 
