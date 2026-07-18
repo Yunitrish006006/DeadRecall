@@ -37,10 +37,10 @@
 - [x] 4.7 Advancement 與村民各自 exactly-once 建立 Discord payload。
 - [x] 4.8 Dedicated Server GameTest 載入 bundled snapshot，不依賴 Client language class。
 - [ ] 4.9 真實 Worker／Discord 失敗時 localization event 不影響遊戲流程。
-- [ ] 4.10 最新文件 head 的 Java 25 Validate、完整 Server GameTests 與兩套 restart probes 全部通過。
+- [x] 4.10 Java 25 Validate、完整 Server GameTests、死亡背包與 Copper Golem 三階段 restart probes 全部通過。
 
 ## 5. Documentation
 
-- [ ] 5.1 更新 Discord Bridge 主規格與事件格式文件。
-- [ ] 5.2 更新 `docs/discord/` 說明固定繁中、custom text 與 fallback 規則。
-- [ ] 5.3 加入版本變更紀錄與人工 Discord 顯示驗收矩陣。
+- [x] 5.1 Discord Bridge 主規格已記錄固定繁中、semantic event 與後續範圍。
+- [x] 5.2 `docs/discord/localization.md` 已說明 custom text、fallback 與人工驗收。
+- [x] 5.3 `docs/releases/2.4.1.md` 已加入版本變更紀錄與 Discord 顯示驗收矩陣。
