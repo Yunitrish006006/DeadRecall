@@ -50,6 +50,8 @@ public final class TeleportInterfacePhaseCGameTest {
                     "Payload did not retain its authoritative filled-map interface type");
             require(helper, entry.interfaceBonusActive(),
                     "Server map coverage did not activate the friend-target specialization");
+            require(helper, entry.baseFoodCost() == 5 && entry.finalFoodCost() == 4,
+                    "Covered friend payload did not retain its five-to-four base/final food quote");
             require(helper, entry.saturationCost() == 4,
                     "Covered five-point friend route did not receive the ceil(80%) food cost");
             require(helper, entry.interfaceBonusMessageKey().endsWith("filled_map.active"),
@@ -169,6 +171,10 @@ public final class TeleportInterfacePhaseCGameTest {
 
             require(helper, covered.interfaceBonusActive(),
                     "Map of the target Dimension did not cover its cross-Dimension friend target");
+            require(helper, covered.baseFoodCost() == baseline.baseFoodCost(),
+                    "Filled-map specialization changed the cross-Dimension base food quote");
+            require(helper, covered.finalFoodCost() < covered.baseFoodCost(),
+                    "Filled-map payload did not retain a reduced final food quote");
             require(helper, covered.saturationCost() < baseline.saturationCost(),
                     "Covered cross-Dimension route did not reduce food-equivalent cost");
             require(helper, baseline.amethystCost() > 0,

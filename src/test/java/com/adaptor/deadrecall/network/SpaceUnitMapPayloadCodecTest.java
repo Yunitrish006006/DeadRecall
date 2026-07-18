@@ -36,6 +36,13 @@ class SpaceUnitMapPayloadCodecTest {
             assertEquals(2, decodedEntry.catalystDiscount());
             assertEquals(3, decodedEntry.amethystCost());
             assertEquals(TeleportInterfaceType.BOOK, decoded.interfaceType());
+            assertEquals(0, decodedEntry.baseFoodCost());
+            assertEquals(0, decodedEntry.finalFoodCost());
+            assertEquals(150, decodedEntry.basePrepareTicks());
+            assertEquals(120, decodedEntry.prepareTicks());
+            assertEquals(8, decodedEntry.baseMaxHorizontalDeviation());
+            assertEquals(8, decodedEntry.maxHorizontalDeviation());
+            assertEquals(9, decodedEntry.baseStructureWearChancePercent());
             assertEquals(7, decodedEntry.structureWearChancePercent());
             assertTrue(decodedEntry.interfaceBonusActive());
             assertEquals(
@@ -124,6 +131,15 @@ class SpaceUnitMapPayloadCodecTest {
         );
     }
 
+    @Test
+    void quoteDetailsRejectFinalValuesAboveBaseOrInconsistentFoodAllocation() {
+        assertThrows(IllegalArgumentException.class, () -> detailedEntry(4, 5, 120, 120, 8, 8, 9, 7));
+        assertThrows(IllegalArgumentException.class, () -> detailedEntry(5, 4, 100, 120, 8, 8, 9, 7));
+        assertThrows(IllegalArgumentException.class, () -> detailedEntry(5, 4, 120, 120, 7, 8, 9, 7));
+        assertThrows(IllegalArgumentException.class, () -> detailedEntry(5, 4, 120, 120, 8, 8, 6, 7));
+        assertThrows(IllegalArgumentException.class, () -> detailedEntry(5, 4, 120, 120, 8, 8, 9, 7, 3));
+    }
+
     private static void assertRejectedEntryCount(int entryCount) {
         FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
         try {
@@ -194,6 +210,8 @@ class SpaceUnitMapPayloadCodecTest {
                 0,
                 0,
                 0,
+                0,
+                0,
                 20,
                 finalCost,
                 16,
@@ -201,12 +219,87 @@ class SpaceUnitMapPayloadCodecTest {
                 sourceCatalysts,
                 targetCatalysts,
                 discount,
+                150,
                 120,
                 8,
+                8,
                 10,
+                9,
                 structureWearChancePercent,
                 interfaceBonusActive,
                 interfaceBonusMessageKey,
+                false,
+                true,
+                true,
+                0,
+                0,
+                true,
+                ""
+        );
+    }
+
+    private static SpaceUnitMapPayload.Entry detailedEntry(
+            int baseFoodCost,
+            int finalFoodCost,
+            int basePrepareTicks,
+            int finalPrepareTicks,
+            int baseDeviation,
+            int finalDeviation,
+            int baseWear,
+            int finalWear) {
+        return detailedEntry(
+                baseFoodCost,
+                finalFoodCost,
+                basePrepareTicks,
+                finalPrepareTicks,
+                baseDeviation,
+                finalDeviation,
+                baseWear,
+                finalWear,
+                finalFoodCost
+        );
+    }
+
+    private static SpaceUnitMapPayload.Entry detailedEntry(
+            int baseFoodCost,
+            int finalFoodCost,
+            int basePrepareTicks,
+            int finalPrepareTicks,
+            int baseDeviation,
+            int finalDeviation,
+            int baseWear,
+            int finalWear,
+            int allocatedFoodCost) {
+        return new SpaceUnitMapPayload.Entry(
+                UUID.fromString("33333333-3333-3333-3333-333333333333"),
+                "lodestone",
+                "Detailed Target",
+                "private",
+                false,
+                "minecraft:overworld",
+                0,
+                64,
+                0,
+                0.75D,
+                1,
+                128,
+                baseFoodCost,
+                finalFoodCost,
+                allocatedFoodCost,
+                0,
+                0,
+                20,
+                0,
+                0,
+                basePrepareTicks,
+                finalPrepareTicks,
+                baseDeviation,
+                finalDeviation,
+                7,
+                baseWear,
+                finalWear,
+                true,
+                "message.deadrecall.space_unit.interface_bonus.book.active",
                 false,
                 true,
                 true,

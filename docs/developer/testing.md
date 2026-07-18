@@ -168,6 +168,18 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 未探索與無權限固定節點仍由既有 `visibleDiscoveredUnits` 權限／探索回歸先過濾，地圖 coverage 不會把它們重新加入 Payload。真人 Client 的地圖手持互動、多人延遲與動態移動仍列為手動驗收。
 
+## 傳送介面 Phase D 回歸
+
+`SpaceUnitMapPayloadCodecTest` 會 round-trip 每個項目的基準與最終食物成本、準備時間、最大水平偏差及固定石碑磨損率，也驗證最終食物在飽和度、飢餓值與物品欄的配置。decoder 會拒絕 `final` 高於 `base` 或配置總額與最終成本不一致的報價。
+
+`TeleportInterfacePhaseDGameTest` 經真實 Server 報價路徑驗證：
+
+- 書本對固定磁石的 Payload 同時保存未折抵與折抵後的準備時間／磨損率，未受影響的食物與偏差保持相等。
+- 回生羅盤對自己的死亡節點只降低最終偏差，基準值仍保留，其他報價欄位不變。
+- Payload 數值符合正式 `TeleportInterfaceQuotePolicy` 的 ceil／floor 與最低值規則，不由 Client 重算。
+
+Phase A–D、既有好友 `PLAYER` 多人 GameTests 與紫水晶跨 Dimension GameTests 共使用 29 個 required Server GameTests；死亡背包、Space Unit 與銅傀儡的獨立 Dedicated Server restart probes 也持續驗證舊世界保存。Phase D 只增加 transient context、session 與網路欄位，沒有變更 SavedData schema。這些自動測試仍不等同於兩名以上真人 Client 的 UI、網路延遲與動態移動驗收，該項保持為發布前手動測試。
+
 ## 講台替代配方回歸
 
 `LecternGameplayGameTest` 使用 Minecraft 26.2 的實際 RecipeManager、Lectern BlockEntity、Menu、紅石排程與村民 POI，驗證：

@@ -620,8 +620,15 @@ public class SpaceUnitMapScreen extends Screen {
                         Component.translatable("message.deadrecall.space_unit.metric.distance", distanceText(entry))),
                 new QuoteMetric(
                         new ItemStack(Items.GOLDEN_CARROT),
-                        Integer.toString(entry.saturationCost()),
-                        Component.translatable("message.deadrecall.space_unit.metric.saturation", entry.saturationCost())),
+                        comparisonValue(entry.baseFoodCost(), entry.finalFoodCost()),
+                        Component.translatable(
+                                "message.deadrecall.space_unit.metric.food_quote",
+                                entry.baseFoodCost(),
+                                entry.finalFoodCost(),
+                                entry.saturationCost(),
+                                entry.hungerCost(),
+                                entry.foodPointsNeeded(),
+                                entry.safeFoodPointsAvailable())),
                 new QuoteMetric(
                         new ItemStack(Items.COOKED_BEEF),
                         Integer.toString(entry.hungerCost()),
@@ -638,8 +645,11 @@ public class SpaceUnitMapScreen extends Screen {
                                 entry.amethystCost(), entry.amethystAvailable())),
                 new QuoteMetric(
                         new ItemStack(Items.CLOCK),
-                        Integer.toString(seconds(entry.prepareTicks())),
-                        Component.translatable("message.deadrecall.space_unit.metric.time", seconds(entry.prepareTicks()))),
+                        comparisonValue(seconds(entry.basePrepareTicks()), seconds(entry.prepareTicks())),
+                        Component.translatable(
+                                "message.deadrecall.space_unit.metric.time_quote",
+                                seconds(entry.basePrepareTicks()),
+                                seconds(entry.prepareTicks()))),
                 new QuoteMetric(
                         new ItemStack(Items.COMPASS),
                         Long.toString(Math.round(entry.resonance() * 100.0D)),
@@ -647,13 +657,21 @@ public class SpaceUnitMapScreen extends Screen {
                                 Math.round(entry.resonance() * 100.0D))),
                 new QuoteMetric(
                         new ItemStack(Items.ENDER_PEARL),
-                        Integer.toString(entry.maxHorizontalDeviation()),
-                        Component.translatable("message.deadrecall.space_unit.metric.drift", entry.maxHorizontalDeviation())),
+                        comparisonValue(
+                                entry.baseMaxHorizontalDeviation(),
+                                entry.maxHorizontalDeviation()),
+                        Component.translatable(
+                                "message.deadrecall.space_unit.metric.drift_quote",
+                                entry.baseMaxHorizontalDeviation(),
+                                entry.maxHorizontalDeviation())),
                 new QuoteMetric(
                         new ItemStack(Items.CRACKED_STONE_BRICKS),
-                        entry.structureWearChancePercent() + "%",
+                        comparisonPercentValue(
+                                entry.baseStructureWearChancePercent(),
+                                entry.structureWearChancePercent()),
                         Component.translatable(
-                                "message.deadrecall.space_unit.metric.wear",
+                                "message.deadrecall.space_unit.metric.wear_quote",
+                                entry.baseStructureWearChancePercent(),
                                 entry.structureWearChancePercent()))
         );
 
@@ -1002,7 +1020,19 @@ public class SpaceUnitMapScreen extends Screen {
     }
 
     private static int totalFoodCost(SpaceUnitMapPayload.Entry entry) {
-        return entry.saturationCost() + entry.hungerCost() + entry.foodPointsNeeded();
+        return entry.finalFoodCost();
+    }
+
+    private static String comparisonValue(int baseValue, int finalValue) {
+        return baseValue == finalValue
+                ? Integer.toString(finalValue)
+                : baseValue + "→" + finalValue;
+    }
+
+    private static String comparisonPercentValue(int baseValue, int finalValue) {
+        return baseValue == finalValue
+                ? finalValue + "%"
+                : baseValue + "%→" + finalValue + "%";
     }
 
     private static int seconds(int ticks) {

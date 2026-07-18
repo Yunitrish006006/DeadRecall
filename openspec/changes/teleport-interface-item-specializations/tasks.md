@@ -40,7 +40,7 @@
 ## 5. Networking and UI
 
 - [x] 5.1 報價 Payload 加入介面類型與加成是否有效。
-- [ ] 5.2 第二階段 Payload 加入成本、時間、偏差與磨損的 base／final 明細。
+- [x] 5.2 第二階段 Payload 加入成本、時間、偏差與磨損的 base／final 明細。
 - [x] 5.3 Client／Server codec 同步並限制 enum、字串與數值範圍。
 - [x] 5.4 地圖資訊面板顯示目前介面物品、特化名稱、有效條件與最終效果。
 - [x] 5.5 非普通羅盤介面隱藏或停用註冊、探索、好友與磁石管理入口。
@@ -80,6 +80,6 @@
 
 ### Phase D — Quote details and release validation
 
-- [ ] 7.9 擴充 Payload 與 GUI 顯示 base／final 明細。
-- [ ] 7.10 完成 Dedicated Server、多人、跨 Dimension、死亡節點與舊世界回歸。
-- [ ] 7.11 更新玩家文件與版本變更紀錄。
+- [x] 7.9 擴充 Payload 與 GUI 顯示 base／final 明細。
+- [x] 7.10 完成 Dedicated Server、多人、跨 Dimension、死亡節點與舊世界回歸。
+- [x] 7.11 更新玩家文件與版本變更紀錄。

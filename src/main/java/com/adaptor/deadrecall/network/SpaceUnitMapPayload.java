@@ -57,6 +57,8 @@ public record SpaceUnitMapPayload(
             double resonance,
             int tier,
             int distanceBlocks,
+            int baseFoodCost,
+            int finalFoodCost,
             int saturationCost,
             int hungerCost,
             int foodPointsNeeded,
@@ -67,9 +69,12 @@ public record SpaceUnitMapPayload(
             int sourceCatalysts,
             int targetCatalysts,
             int catalystDiscount,
+            int basePrepareTicks,
             int prepareTicks,
+            int baseMaxHorizontalDeviation,
             int maxHorizontalDeviation,
             int damageChancePercent,
+            int baseStructureWearChancePercent,
             int structureWearChancePercent,
             boolean interfaceBonusActive,
             String interfaceBonusMessageKey,
@@ -82,6 +87,16 @@ public record SpaceUnitMapPayload(
             String blockedReason) {
 
         public Entry {
+            requireRange("baseFoodCost", baseFoodCost, 0, TeleportInterfaceQuotePolicy.MAX_FOOD_COST);
+            requireRange("finalFoodCost", finalFoodCost, 0, TeleportInterfaceQuotePolicy.MAX_FOOD_COST);
+            requireReduction("food cost", baseFoodCost, finalFoodCost);
+            int allocatedFoodCost = saturationCost + hungerCost + foodPointsNeeded;
+            if (allocatedFoodCost != 0 && allocatedFoodCost != finalFoodCost) {
+                throw new IllegalArgumentException(
+                        "Final food allocation is inconsistent: final=" + finalFoodCost
+                                + ", allocated=" + allocatedFoodCost
+                );
+            }
             requireRange("baseAmethystCost", baseAmethystCost, 0, MAX_BASE_AMETHYST_COST);
             requireRange("amethystCost", amethystCost, 0, MAX_BASE_AMETHYST_COST);
             requireRange(
@@ -98,10 +113,23 @@ public record SpaceUnitMapPayload(
             );
             requireRange("catalystDiscount", catalystDiscount, 0, MAX_BASE_AMETHYST_COST);
             requireRange(
+                    "basePrepareTicks",
+                    basePrepareTicks,
+                    0,
+                    TeleportInterfaceQuotePolicy.MAX_PREPARE_TICKS
+            );
+            requireRange(
                     "prepareTicks",
                     prepareTicks,
                     0,
                     TeleportInterfaceQuotePolicy.MAX_PREPARE_TICKS
+            );
+            requireReduction("prepare ticks", basePrepareTicks, prepareTicks);
+            requireRange(
+                    "baseMaxHorizontalDeviation",
+                    baseMaxHorizontalDeviation,
+                    0,
+                    TeleportInterfaceQuotePolicy.MAX_DEVIATION
             );
             requireRange(
                     "maxHorizontalDeviation",
@@ -109,12 +137,24 @@ public record SpaceUnitMapPayload(
                     0,
                     TeleportInterfaceQuotePolicy.MAX_DEVIATION
             );
+            requireReduction("horizontal deviation", baseMaxHorizontalDeviation, maxHorizontalDeviation);
             requireRange("damageChancePercent", damageChancePercent, 0, 60);
+            requireRange(
+                    "baseStructureWearChancePercent",
+                    baseStructureWearChancePercent,
+                    0,
+                    TeleportInterfaceQuotePolicy.MAX_WEAR_CHANCE_PERCENT
+            );
             requireRange(
                     "structureWearChancePercent",
                     structureWearChancePercent,
                     0,
                     TeleportInterfaceQuotePolicy.MAX_WEAR_CHANCE_PERCENT
+            );
+            requireReduction(
+                    "structure wear chance",
+                    baseStructureWearChancePercent,
+                    structureWearChancePercent
             );
             if (interfaceBonusMessageKey == null
                     || interfaceBonusMessageKey.isBlank()
@@ -139,6 +179,59 @@ public record SpaceUnitMapPayload(
                                 + ", final=" + amethystCost
                 );
             }
+        }
+
+        /** Authoritative quote constructor before catalyst breakdown enrichment. */
+        public Entry(
+                UUID id,
+                String type,
+                String name,
+                String visibility,
+                boolean friendShared,
+                String dimension,
+                int x,
+                int y,
+                int z,
+                double resonance,
+                int tier,
+                int distanceBlocks,
+                int baseFoodCost,
+                int finalFoodCost,
+                int saturationCost,
+                int hungerCost,
+                int foodPointsNeeded,
+                int safeFoodPointsAvailable,
+                int amethystCost,
+                int amethystAvailable,
+                int basePrepareTicks,
+                int prepareTicks,
+                int baseMaxHorizontalDeviation,
+                int maxHorizontalDeviation,
+                int damageChancePercent,
+                int baseStructureWearChancePercent,
+                int structureWearChancePercent,
+                boolean interfaceBonusActive,
+                String interfaceBonusMessageKey,
+                boolean favorite,
+                boolean manageable,
+                boolean owned,
+                int administratorCount,
+                int allowedPlayerCount,
+                boolean canTeleport,
+                String blockedReason) {
+            this(
+                    id, type, name, visibility, friendShared, dimension, x, y, z, resonance, tier,
+                    distanceBlocks, baseFoodCost, finalFoodCost,
+                    saturationCost, hungerCost, foodPointsNeeded, safeFoodPointsAvailable,
+                    amethystCost, amethystAvailable, amethystCost, 0, 0, 0,
+                    basePrepareTicks, prepareTicks,
+                    baseMaxHorizontalDeviation, maxHorizontalDeviation,
+                    damageChancePercent,
+                    baseStructureWearChancePercent, structureWearChancePercent,
+                    interfaceBonusActive, interfaceBonusMessageKey,
+                    favorite, manageable, owned,
+                    administratorCount, allowedPlayerCount, canTeleport, blockedReason
+            );
         }
 
         /**
@@ -178,10 +271,16 @@ public record SpaceUnitMapPayload(
                 String blockedReason) {
             this(
                     id, type, name, visibility, friendShared, dimension, x, y, z, resonance, tier,
-                    distanceBlocks, saturationCost, hungerCost, foodPointsNeeded, safeFoodPointsAvailable,
+                    distanceBlocks,
+                    saturationCost + hungerCost + foodPointsNeeded,
+                    saturationCost + hungerCost + foodPointsNeeded,
+                    saturationCost, hungerCost, foodPointsNeeded, safeFoodPointsAvailable,
                     amethystCost, amethystAvailable, amethystCost, 0, 0, 0,
-                    prepareTicks, maxHorizontalDeviation, damageChancePercent,
-                    structureWearChancePercent, interfaceBonusActive, interfaceBonusMessageKey,
+                    prepareTicks, prepareTicks,
+                    maxHorizontalDeviation, maxHorizontalDeviation,
+                    damageChancePercent,
+                    structureWearChancePercent, structureWearChancePercent,
+                    interfaceBonusActive, interfaceBonusMessageKey,
                     favorite, manageable, owned,
                     administratorCount, allowedPlayerCount, canTeleport, blockedReason
             );
@@ -247,6 +346,8 @@ public record SpaceUnitMapPayload(
         buf.writeDouble(entry.resonance());
         buf.writeInt(entry.tier());
         buf.writeInt(entry.distanceBlocks());
+        buf.writeInt(entry.baseFoodCost());
+        buf.writeInt(entry.finalFoodCost());
         buf.writeInt(entry.saturationCost());
         buf.writeInt(entry.hungerCost());
         buf.writeInt(entry.foodPointsNeeded());
@@ -257,9 +358,12 @@ public record SpaceUnitMapPayload(
         buf.writeInt(entry.sourceCatalysts());
         buf.writeInt(entry.targetCatalysts());
         buf.writeInt(entry.catalystDiscount());
+        buf.writeInt(entry.basePrepareTicks());
         buf.writeInt(entry.prepareTicks());
+        buf.writeInt(entry.baseMaxHorizontalDeviation());
         buf.writeInt(entry.maxHorizontalDeviation());
         buf.writeInt(entry.damageChancePercent());
+        buf.writeInt(entry.baseStructureWearChancePercent());
         buf.writeInt(entry.structureWearChancePercent());
         buf.writeBoolean(entry.interfaceBonusActive());
         buf.writeUtf(entry.interfaceBonusMessageKey(), 128);
@@ -300,6 +404,11 @@ public record SpaceUnitMapPayload(
                 buf.readInt(),
                 buf.readInt(),
                 buf.readInt(),
+                buf.readInt(),
+                buf.readInt(),
+                buf.readInt(),
+                buf.readInt(),
+                buf.readInt(),
                 buf.readBoolean(),
                 buf.readUtf(128),
                 buf.readBoolean(),
@@ -322,6 +431,14 @@ public record SpaceUnitMapPayload(
         if (value < minimum || value > maximum) {
             throw new IllegalArgumentException(
                     field + " out of range: " + value + " (expected " + minimum + ".." + maximum + ")"
+            );
+        }
+    }
+
+    private static void requireReduction(String field, int baseValue, int finalValue) {
+        if (finalValue > baseValue) {
+            throw new IllegalArgumentException(
+                    "Final " + field + " exceeds base value: base=" + baseValue + ", final=" + finalValue
             );
         }
     }
