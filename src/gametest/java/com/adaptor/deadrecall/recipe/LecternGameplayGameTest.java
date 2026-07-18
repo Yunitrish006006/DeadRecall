@@ -4,13 +4,15 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.Filterable;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.inventory.LecternMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -44,7 +46,7 @@ public final class LecternGameplayGameTest {
                 List.of(Items.OAK_SLAB, Items.OAK_SLAB, Items.OAK_SLAB, Items.OAK_SLAB),
                 Items.BOOKSHELF
         );
-        Optional<RecipeHolder<CraftingRecipe>> legacyMatch = helper.getLevel().getRecipeManager()
+        Optional<RecipeHolder<CraftingRecipe>> legacyMatch = helper.getLevel().recipeAccess()
                 .getRecipeFor(RecipeType.CRAFTING, legacyBookshelfInput, helper.getLevel());
         require(helper, legacyMatch.isEmpty() || !legacyMatch.get().value().assemble(legacyBookshelfInput).is(Items.LECTERN),
                 "The overwritten minecraft:lectern recipe still accepted the legacy bookshelf ingredient");
@@ -121,23 +123,23 @@ public final class LecternGameplayGameTest {
 
     @GameTest(maxTicks = 2400)
     public void unemployedVillagerClaimsLecternAndBecomesLibrarian(GameTestHelper helper) {
-        helper.getLevel().setDayTime(2000L);
+        helper.getLevel().getLevelData().setDayTime(2000L);
         helper.setBlock(LECTERN_POS.below(), Blocks.STONE);
         helper.setBlock(LECTERN_POS, Blocks.LECTERN);
         helper.setBlock(LECTERN_POS.west().below(), Blocks.STONE);
 
-        Villager villager = helper.spawn(EntityType.VILLAGER, LECTERN_POS.west());
-        require(helper, villager.getVillagerData().getProfession() == VillagerProfession.NONE,
+        Villager villager = spawnVillager(helper, LECTERN_POS.west());
+        require(helper, villager.getVillagerData().profession() == VillagerProfession.NONE,
                 "The fixture villager did not start unemployed");
 
         helper.succeedWhen(() -> require(helper,
-                villager.getVillagerData().getProfession() == VillagerProfession.LIBRARIAN,
+                villager.getVillagerData().profession() == VillagerProfession.LIBRARIAN,
                 "The villager did not claim the lectern POI and become a librarian"));
     }
 
     private static void assertCraftsLectern(GameTestHelper helper, List<Item> slabs, String description) {
         CraftingInput input = craftingInput(slabs, Items.BOOK);
-        Optional<RecipeHolder<CraftingRecipe>> match = helper.getLevel().getRecipeManager()
+        Optional<RecipeHolder<CraftingRecipe>> match = helper.getLevel().recipeAccess()
                 .getRecipeFor(RecipeType.CRAFTING, input, helper.getLevel());
         require(helper, match.isPresent(), "No crafting recipe matched " + description);
         RecipeHolder<CraftingRecipe> recipe = match.get();
@@ -163,6 +165,15 @@ public final class LecternGameplayGameTest {
         slots.set(4, new ItemStack(centerIngredient));
         slots.set(7, new ItemStack(slabs.get(3)));
         return CraftingInput.of(3, 3, slots);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Villager spawnVillager(GameTestHelper helper, BlockPos relativePos) {
+        EntityType<?> rawType = BuiltInRegistries.ENTITY_TYPE.getValue(
+                Identifier.fromNamespaceAndPath("minecraft", "villager")
+        );
+        require(helper, rawType != null, "Missing minecraft:villager entity type");
+        return helper.spawn((EntityType<Villager>) rawType, relativePos);
     }
 
     private static int countItem(ServerPlayer player, Item item) {
