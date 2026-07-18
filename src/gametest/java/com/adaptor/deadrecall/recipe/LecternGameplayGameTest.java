@@ -123,17 +123,16 @@ public final class LecternGameplayGameTest {
 
     @GameTest(maxTicks = 2400)
     public void unemployedVillagerClaimsLecternAndBecomesLibrarian(GameTestHelper helper) {
-        helper.getLevel().getLevelData().setDayTime(2000L);
         helper.setBlock(LECTERN_POS.below(), Blocks.STONE);
         helper.setBlock(LECTERN_POS, Blocks.LECTERN);
         helper.setBlock(LECTERN_POS.west().below(), Blocks.STONE);
 
         Villager villager = spawnVillager(helper, LECTERN_POS.west());
-        require(helper, villager.getVillagerData().profession() == VillagerProfession.NONE,
+        require(helper, villager.getVillagerData().profession().is(VillagerProfession.NONE),
                 "The fixture villager did not start unemployed");
 
         helper.succeedWhen(() -> require(helper,
-                villager.getVillagerData().profession() == VillagerProfession.LIBRARIAN,
+                villager.getVillagerData().profession().is(VillagerProfession.LIBRARIAN),
                 "The villager did not claim the lectern POI and become a librarian"));
     }
 
