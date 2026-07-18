@@ -335,6 +335,7 @@
   "message.deadrecall.space_unit.metric.hunger": "饥饿值消耗：%s",
   "message.deadrecall.space_unit.metric.food": "食物物品成本：%s / 可用 %s",
   "message.deadrecall.space_unit.metric.amethyst": "紫水晶碎片成本：%s / 可用 %s",
+  "message.deadrecall.space_unit.metric.amethyst_breakdown": "紫水晶 %s｜催化 %s+%s｜抵扣 %s＝%s",
   "message.deadrecall.space_unit.metric.time": "准备时间：%s 秒",
   "message.deadrecall.space_unit.metric.stability": "路线稳定度：%s/100",
   "message.deadrecall.space_unit.metric.drift": "最大偏差：%s 格",

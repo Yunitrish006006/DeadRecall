@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall.network;
 
+import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -22,6 +23,20 @@ public record SpaceUnitMapPayload(
     public static final Type<SpaceUnitMapPayload> TYPE =
             new Type<>(Identifier.fromNamespaceAndPath("deadrecall", "space_unit_map"));
     public static final int MAX_ENTRIES = 128;
+    public static final int MAX_CATALYST_BLOCKS_PER_ENDPOINT = 74;
+    public static final int MAX_BASE_AMETHYST_COST = 64;
+
+    public SpaceUnitMapPayload {
+        if (entries == null) {
+            throw new IllegalArgumentException("Space Unit map entries cannot be null");
+        }
+        if (entries.size() > MAX_ENTRIES) {
+            throw new IllegalArgumentException(
+                    "Space Unit map entries exceed limit: " + entries.size() + " > " + MAX_ENTRIES
+            );
+        }
+        entries = List.copyOf(entries);
+    }
 
     public record Entry(
             UUID id,
@@ -56,6 +71,42 @@ public record SpaceUnitMapPayload(
             int allowedPlayerCount,
             boolean canTeleport,
             String blockedReason) {
+
+        public Entry {
+            requireRange("baseAmethystCost", baseAmethystCost, 0, MAX_BASE_AMETHYST_COST);
+            requireRange("amethystCost", amethystCost, 0, MAX_BASE_AMETHYST_COST);
+            requireRange(
+                    "sourceCatalysts",
+                    sourceCatalysts,
+                    0,
+                    MAX_CATALYST_BLOCKS_PER_ENDPOINT
+            );
+            requireRange(
+                    "targetCatalysts",
+                    targetCatalysts,
+                    0,
+                    MAX_CATALYST_BLOCKS_PER_ENDPOINT
+            );
+            requireRange("catalystDiscount", catalystDiscount, 0, MAX_BASE_AMETHYST_COST);
+
+            int maxAppliedDiscount = Math.max(0, baseAmethystCost - 1);
+            if (catalystDiscount > maxAppliedDiscount) {
+                throw new IllegalArgumentException(
+                        "Catalyst discount exceeds payable cost: base=" + baseAmethystCost
+                                + ", discount=" + catalystDiscount
+                );
+            }
+            int expectedFinalCost = baseAmethystCost == 0
+                    ? 0
+                    : Math.max(1, baseAmethystCost - catalystDiscount);
+            if (amethystCost != expectedFinalCost) {
+                throw new IllegalArgumentException(
+                        "Inconsistent amethyst quote: base=" + baseAmethystCost
+                                + ", discount=" + catalystDiscount
+                                + ", final=" + amethystCost
+                );
+            }
+        }
 
         /**
          * Compatibility constructor for call sites that have not yet populated catalyst details.
@@ -124,7 +175,7 @@ public record SpaceUnitMapPayload(
             );
 
     private static void writeEntries(FriendlyByteBuf buf, List<Entry> entries) {
-        int size = Math.min(entries.size(), MAX_ENTRIES);
+        int size = entries.size();
         buf.writeInt(size);
         for (int i = 0; i < size; i++) {
             writeEntry(buf, entries.get(i));
@@ -132,7 +183,10 @@ public record SpaceUnitMapPayload(
     }
 
     private static List<Entry> readEntries(FriendlyByteBuf buf) {
-        int size = Math.min(buf.readInt(), MAX_ENTRIES);
+        int size = buf.readInt();
+        if (size < 0 || size > MAX_ENTRIES) {
+            throw new DecoderException("Space Unit map entry count out of range: " + size);
+        }
         List<Entry> entries = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             entries.add(readEntry(buf));
@@ -210,6 +264,14 @@ public record SpaceUnitMapPayload(
                 buf.readBoolean(),
                 buf.readUtf(128)
         );
+    }
+
+    private static void requireRange(String field, int value, int minimum, int maximum) {
+        if (value < minimum || value > maximum) {
+            throw new IllegalArgumentException(
+                    field + " out of range: " + value + " (expected " + minimum + ".." + maximum + ")"
+            );
+        }
     }
 
     @Override
