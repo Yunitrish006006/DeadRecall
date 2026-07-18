@@ -28,8 +28,10 @@
 
 - [`openspec/specs/copper-golem/spec.md`](openspec/specs/copper-golem/spec.md)
 - [`openspec/changes/copper-golem-operation-modes/`](openspec/changes/copper-golem-operation-modes/)
+- [`openspec/changes/copper-golem-client-text-input-shortcuts/`](openspec/changes/copper-golem-client-text-input-shortcuts/)
+- [`docs/developer/copper-golem-client-input-testing.md`](docs/developer/copper-golem-client-input-testing.md)
 
-`SORTING`／`GATHERING`、容器型管理 GUI、來源與目的地、採集工作區、工具／倉庫／燃料、Home、LLM、Client 視覺化、權威 payload、chunk persistence、跨 JVM probe 與壓力測試均已完成。詳細狀態以該 change 的 `tasks.md` 為準。
+`SORTING`／`GATHERING`、容器型管理 GUI、來源與目的地、採集工作區、工具／倉庫／燃料、Home、LLM、Client 視覺化、權威 payload、chunk persistence、跨 JVM probe 與壓力測試均已完成。Client text-input change 修正 Prompt／API 欄位聚焦時 Inventory key 與整理快捷鍵搶占輸入的問題；實際鍵盤驗收狀態以該 change 的 `tasks.md` 為準。
 
 ## DeadRecall / Discord Bridge
 
