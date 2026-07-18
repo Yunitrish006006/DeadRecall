@@ -81,6 +81,20 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 公開 SPI、transaction 順序與 addon 實作要求記錄於 `docs/developer/death-backpack-addon-inventory-api.md`。
 
+## 好友 PLAYER 傳送回歸
+
+`DirectFriendPlayerTeleportGameTest` 使用同一個 Dedicated GameTest Server 中、已註冊於 `MinecraftServer.getPlayerList()` 的多個真實 `ServerPlayer`，驗證：
+
+- 雙向好友可直接建立 PLAYER session。
+- 非好友、單向 pending invite 與 self target 均不得建立 session。
+- 解除好友時，同一呼叫內立即取消雙方向 session，且保留第三名玩家的無關 session。
+- 目標死亡或從 PlayerList 離線後，下一個 authoritative session tick 取消且不扣成本。
+- 倒數期間目標移動後，完成時重新解析最新座標並搜尋安全落點。
+- 倒數期間目標切換至 Nether 後，Requester 跟隨最新 Dimension 與安全落點。
+- 成功傳送只扣除一次成本，完成後額外 Server ticks 不會再次扣款。
+
+詳細 fixture、事件順序與邊界記錄於 `docs/developer/direct-friend-player-teleport-testing.md`。
+
 ## 銅傀儡回歸
 
 銅傀儡的 Server GameTests 分為八組：
