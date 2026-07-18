@@ -78,7 +78,7 @@
 - ItemStack 自訂資料處理。
 - OpenSpec 銅傀儡文件。
 - Discord Bridge OpenSpec、玩家／管理／公開事件轉播、健康告警及伺服器狀態 Bot Token 頻道路由修正。
-- 講台替代配方資源：4 個任意木半磚＋1 本書；Java 25 build 與 Dedicated Server recipe 載入已驗證。
+- 講台替代配方已完成：4 個任意木半磚＋1 本書；RecipeManager 已驗證橡木、竹、緋紅蕈木、扭曲蕈木與混合半磚，講台書本／Menu／Comparator／兩 tick 紅石脈衝及村民圖書管理員 POI 均通過 Server GameTest。
 - 混凝土粉末掉落物水中硬化核心：16 色映射、Server-side 同一 ItemEntity 轉換、無世界全量掃描、Java 25 build 與 Dedicated Server 啟動已完成。
 - Fabric Loom Server GameTest 基礎：獨立 `gametest` source set、測試模組 entrypoint、`runGameTest` 自動接入 `build`，並保留失敗報告 artifact。
 - 正常 Dedicated Server restart probe 基礎：死亡背包 `runRestartProbe` 與銅傀儡 `runCopperRestartProbe` 使用獨立 world、跨 JVM phase marker、entity region／SavedData reload 與失敗 artifact。
@@ -91,7 +91,6 @@
 - OpenSpec 統一與平台架構整理。
 - DeadRecall 向 Totem 模組化架構過渡。
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
-- 講台配方覆寫：Dedicated Server 載入已通過；待不同木種製作、圖書管理員、書本與紅石行為驗證。
 - 混凝土粉末掉落物硬化：Server GameTest 自動驗證已完成；只剩兩名以上真人玩家水流測試與大量 ItemEntity 壓力測試。
 - 紫水晶催化折抵：Dedicated Server 啟動與 Mixin 初始化已通過；待舊世界載入、拆除後重新報價、實際跨維度扣款，以及 Payload／UI 明細。
 
@@ -106,13 +105,12 @@
 
 ### 短週期完成順序
 
-1. 完成講台配方的遊戲內行為驗證。
-2. 完成混凝土粉末的真人多人水流與大量 ItemEntity 壓力測試；水源、流動水、雨天、Components 與實體狀態已由 GameTest 驗證。
-3. 驗證紫水晶催化折抵，並擴充 Payload／UI 顯示原始成本、催化數量與折抵。
-4. 傳送介面 Phase A：共用介面類型、Server context、四物品開啟 UI 與普通羅盤專屬能力分流。
-5. 傳送介面 Phase B：回生羅盤死亡節點偏差特化、書本固定磁石路線特化與第一階段 UI。
-6. 傳送介面 Phase C：已繪製地圖覆蓋範圍、食物成本／偏差特化、動態玩家目標與隱私驗證。
-7. 傳送介面 Phase D：base／final 報價明細、完整 Payload、Dedicated Server 與多人回歸。
+1. 完成混凝土粉末的真人多人水流與大量 ItemEntity 壓力測試；水源、流動水、雨天、Components 與實體狀態已由 GameTest 驗證。
+2. 驗證紫水晶催化折抵，並擴充 Payload／UI 顯示原始成本、催化數量與折抵。
+3. 傳送介面 Phase A：共用介面類型、Server context、四物品開啟 UI 與普通羅盤專屬能力分流。
+4. 傳送介面 Phase B：回生羅盤死亡節點偏差特化、書本固定磁石路線特化與第一階段 UI。
+5. 傳送介面 Phase C：已繪製地圖覆蓋範圍、食物成本／偏差特化、動態玩家目標與隱私驗證。
+6. 傳送介面 Phase D：base／final 報價明細、完整 Payload、Dedicated Server 與多人回歸。
 
 ## 尚未完成
 
@@ -163,7 +161,7 @@
 
 ## 建議開發順序
 
-1. 收尾講台配方、混凝土粉末壓力及紫水晶催化等短週期驗證。
+1. 收尾混凝土粉末壓力及紫水晶催化等短週期驗證。
 2. 實作傳送介面物品特化 Phase A–D，完成目前 Nexus 使用者介面主線。
 3. 實作 Remnant 離線玩家身體及其死亡背包、死亡節點與 Discord 整合。
 4. 抽出 Totem Core 最小共用層，再逐步建立穩定公開 API 與 migration framework。
