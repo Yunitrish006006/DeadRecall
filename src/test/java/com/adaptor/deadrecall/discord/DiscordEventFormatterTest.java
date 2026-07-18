@@ -3,6 +3,9 @@ package com.adaptor.deadrecall.discord;
 import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -60,5 +63,35 @@ class DiscordEventFormatterTest {
                 "Archivist E（圖書管理員）升級：學徒 → 老手",
                 DiscordEventFormatter.villagerLevelUpMessage("Archivist E", "librarian", 2, 3)
         );
+    }
+
+    @Test
+    void advancementNotificationCreatesExactlyOneLocalizedPayload() throws Exception {
+        List<DiscordEventPayload> captured = new ArrayList<>();
+        try (AutoCloseable ignored = DiscordEventDispatcher.observeForTesting(captured::add)) {
+            DiscordEventNotifications.advancement(
+                    "Alex",
+                    Component.translatable("advancements.story.mine_stone.title"),
+                    "task"
+            );
+        }
+        assertEquals(List.of(new DiscordEventPayload(
+                "advancement",
+                "Alex",
+                "Alex 完成了進度「石器時代」"
+        )), captured);
+    }
+
+    @Test
+    void villagerNotificationCreatesExactlyOneLocalizedPayload() throws Exception {
+        List<DiscordEventPayload> captured = new ArrayList<>();
+        try (AutoCloseable ignored = DiscordEventDispatcher.observeForTesting(captured::add)) {
+            DiscordEventNotifications.villagerLevelUp("", "librarian", 1, 2);
+        }
+        assertEquals(List.of(new DiscordEventPayload(
+                "villager_level_up",
+                "系統",
+                "村民（圖書管理員）升級：新手 → 學徒"
+        )), captured);
     }
 }
