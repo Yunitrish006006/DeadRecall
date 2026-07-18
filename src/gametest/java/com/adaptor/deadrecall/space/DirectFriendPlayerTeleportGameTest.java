@@ -1,6 +1,5 @@
 package com.adaptor.deadrecall.space;
 
-import com.adaptor.deadrecall.mixin.SpaceUnitHandlerRefreshMixin;
 import com.adaptor.deadrecall.mixin.SpaceUnitTeleportSessionAccessor;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
@@ -16,6 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -182,6 +182,7 @@ public final class DirectFriendPlayerTeleportGameTest {
             requireOnline(helper, requester, target);
             startPlayerTeleport(requester, target);
 
+            target.setHealth(0.0F);
             target.die(helper.getLevel().damageSources().generic());
             SpaceUnitHandler.tickTeleportSessions(helper.getLevel().getServer());
 
@@ -325,7 +326,15 @@ public final class DirectFriendPlayerTeleportGameTest {
     }
 
     private static Map<UUID, Object> sessions() {
-        return SpaceUnitHandlerRefreshMixin.deadrecall$getTeleportSessions();
+        try {
+            Field field = SpaceUnitHandler.class.getDeclaredField("teleportSessions");
+            field.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            Map<UUID, Object> sessions = (Map<UUID, Object>) field.get(null);
+            return sessions;
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Could not inspect active teleport sessions", exception);
+        }
     }
 
     private static void requireOnline(GameTestHelper helper, ServerPlayer... players) {
