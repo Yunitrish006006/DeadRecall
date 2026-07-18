@@ -84,6 +84,9 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
                     entry.prepareTicks(),
                     entry.maxHorizontalDeviation(),
                     entry.damageChancePercent(),
+                    entry.structureWearChancePercent(),
+                    entry.interfaceBonusActive(),
+                    entry.interfaceBonusMessageKey(),
                     entry.favorite(),
                     entry.manageable(),
                     entry.owned(),
@@ -102,6 +105,7 @@ public abstract class SpaceUnitMapCatalystBreakdownMixin {
                 payload.sourceX(),
                 payload.sourceY(),
                 payload.sourceZ(),
+                payload.interfaceType(),
                 List.copyOf(enriched)
         ));
     }

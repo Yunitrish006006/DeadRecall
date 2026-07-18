@@ -1,5 +1,7 @@
 package com.adaptor.deadrecall.network;
 
+import com.adaptor.deadrecall.space.TeleportInterfaceQuotePolicy;
+import com.adaptor.deadrecall.space.TeleportInterfaceType;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,6 +20,7 @@ public record SpaceUnitMapPayload(
         int sourceX,
         int sourceY,
         int sourceZ,
+        TeleportInterfaceType interfaceType,
         List<Entry> entries)
         implements CustomPacketPayload {
     public static final Type<SpaceUnitMapPayload> TYPE =
@@ -27,6 +30,9 @@ public record SpaceUnitMapPayload(
     public static final int MAX_BASE_AMETHYST_COST = 64;
 
     public SpaceUnitMapPayload {
+        if (interfaceType == null) {
+            throw new IllegalArgumentException("Teleport interface type cannot be null");
+        }
         if (entries == null) {
             throw new IllegalArgumentException("Space Unit map entries cannot be null");
         }
@@ -64,6 +70,9 @@ public record SpaceUnitMapPayload(
             int prepareTicks,
             int maxHorizontalDeviation,
             int damageChancePercent,
+            int structureWearChancePercent,
+            boolean interfaceBonusActive,
+            String interfaceBonusMessageKey,
             boolean favorite,
             boolean manageable,
             boolean owned,
@@ -88,6 +97,30 @@ public record SpaceUnitMapPayload(
                     MAX_CATALYST_BLOCKS_PER_ENDPOINT
             );
             requireRange("catalystDiscount", catalystDiscount, 0, MAX_BASE_AMETHYST_COST);
+            requireRange(
+                    "prepareTicks",
+                    prepareTicks,
+                    0,
+                    TeleportInterfaceQuotePolicy.MAX_PREPARE_TICKS
+            );
+            requireRange(
+                    "maxHorizontalDeviation",
+                    maxHorizontalDeviation,
+                    0,
+                    TeleportInterfaceQuotePolicy.MAX_DEVIATION
+            );
+            requireRange("damageChancePercent", damageChancePercent, 0, 60);
+            requireRange(
+                    "structureWearChancePercent",
+                    structureWearChancePercent,
+                    0,
+                    TeleportInterfaceQuotePolicy.MAX_WEAR_CHANCE_PERCENT
+            );
+            if (interfaceBonusMessageKey == null
+                    || interfaceBonusMessageKey.isBlank()
+                    || interfaceBonusMessageKey.length() > 128) {
+                throw new IllegalArgumentException("Invalid interface bonus message key");
+            }
 
             int maxAppliedDiscount = Math.max(0, baseAmethystCost - 1);
             if (catalystDiscount > maxAppliedDiscount) {
@@ -133,6 +166,9 @@ public record SpaceUnitMapPayload(
                 int prepareTicks,
                 int maxHorizontalDeviation,
                 int damageChancePercent,
+                int structureWearChancePercent,
+                boolean interfaceBonusActive,
+                String interfaceBonusMessageKey,
                 boolean favorite,
                 boolean manageable,
                 boolean owned,
@@ -144,7 +180,9 @@ public record SpaceUnitMapPayload(
                     id, type, name, visibility, friendShared, dimension, x, y, z, resonance, tier,
                     distanceBlocks, saturationCost, hungerCost, foodPointsNeeded, safeFoodPointsAvailable,
                     amethystCost, amethystAvailable, amethystCost, 0, 0, 0,
-                    prepareTicks, maxHorizontalDeviation, damageChancePercent, favorite, manageable, owned,
+                    prepareTicks, maxHorizontalDeviation, damageChancePercent,
+                    structureWearChancePercent, interfaceBonusActive, interfaceBonusMessageKey,
+                    favorite, manageable, owned,
                     administratorCount, allowedPlayerCount, canTeleport, blockedReason
             );
         }
@@ -160,6 +198,7 @@ public record SpaceUnitMapPayload(
                         buf.writeInt(payload.sourceX());
                         buf.writeInt(payload.sourceY());
                         buf.writeInt(payload.sourceZ());
+                        buf.writeUtf(payload.interfaceType().id(), 32);
                         writeEntries(buf, payload.entries());
                     },
                     buf -> new SpaceUnitMapPayload(
@@ -170,6 +209,7 @@ public record SpaceUnitMapPayload(
                             buf.readInt(),
                             buf.readInt(),
                             buf.readInt(),
+                            readInterfaceType(buf),
                             readEntries(buf)
                     )
             );
@@ -220,6 +260,9 @@ public record SpaceUnitMapPayload(
         buf.writeInt(entry.prepareTicks());
         buf.writeInt(entry.maxHorizontalDeviation());
         buf.writeInt(entry.damageChancePercent());
+        buf.writeInt(entry.structureWearChancePercent());
+        buf.writeBoolean(entry.interfaceBonusActive());
+        buf.writeUtf(entry.interfaceBonusMessageKey(), 128);
         buf.writeBoolean(entry.favorite());
         buf.writeBoolean(entry.manageable());
         buf.writeBoolean(entry.owned());
@@ -256,6 +299,9 @@ public record SpaceUnitMapPayload(
                 buf.readInt(),
                 buf.readInt(),
                 buf.readInt(),
+                buf.readInt(),
+                buf.readBoolean(),
+                buf.readUtf(128),
                 buf.readBoolean(),
                 buf.readBoolean(),
                 buf.readBoolean(),
@@ -264,6 +310,12 @@ public record SpaceUnitMapPayload(
                 buf.readBoolean(),
                 buf.readUtf(128)
         );
+    }
+
+    private static TeleportInterfaceType readInterfaceType(FriendlyByteBuf buf) {
+        String id = buf.readUtf(32);
+        return TeleportInterfaceType.fromId(id)
+                .orElseThrow(() -> new DecoderException("Unknown teleport interface type: " + id));
     }
 
     private static void requireRange(String field, int value, int minimum, int maximum) {

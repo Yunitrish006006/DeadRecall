@@ -137,6 +137,18 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 純 JUnit 另驗證 filled-map identity 的 map ID invariant。這些測試不取代真人 Client 的 GUI、輸入優先序與多人網路延遲驗收。
 
+## 傳送介面 Phase B 回歸
+
+`TeleportInterfaceQuotePolicyTest` 以純 JVM 矩陣驗證：
+
+- 普通羅盤完整保留基準時間、偏差與磨損率。
+- 回生羅盤只對自己的 `DEATH` 目標套用 50% 偏差並使用 floor；他人死亡節點與非死亡目標維持基準。
+- 書本只對 `LODESTONE` 目標套用 20% 準備時間與 25% 固定石碑磨損率降低，分別使用 ceil／floor，且準備時間最低 30 ticks。
+- 書本不改變偏差；非固定目標的時間與磨損率不變。
+- 負數與超量輸入會先 clamp 至合法的時間、偏差與機率範圍。
+
+`TeleportInterfacePhaseBGameTest` 另透過正式 `startTeleport` 建立普通羅盤與書本 session，確認書本 final prepare ticks 已真正寫入 Server session。`SpaceUnitMapPayloadCodecTest` 驗證介面 enum、active flag、說明 key 與獨立 final structure-wear 欄位 round-trip，並拒絕未知 enum、非法範圍與空白／過長 key。
+
 ## 講台替代配方回歸
 
 `LecternGameplayGameTest` 使用 Minecraft 26.2 的實際 RecipeManager、Lectern BlockEntity、Menu、紅石排程與村民 POI，驗證：

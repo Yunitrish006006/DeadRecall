@@ -13,6 +13,7 @@
       "com.adaptor.deadrecall.gametest.ConcretePowderItemHardeningGameTest",
       "com.adaptor.deadrecall.space.AmethystCatalystTeleportGameTest",
       "com.adaptor.deadrecall.space.TeleportInterfacePhaseAGameTest",
+      "com.adaptor.deadrecall.space.TeleportInterfacePhaseBGameTest",
       "com.adaptor.deadrecall.discord.DiscordAdvancementLocalizationGameTest",
       "com.adaptor.deadrecall.discord.DiscordVillagerLocalizationGameTest",
       "com.adaptor.deadrecall.discord.DiscordSystemEventLocalizationGameTest",

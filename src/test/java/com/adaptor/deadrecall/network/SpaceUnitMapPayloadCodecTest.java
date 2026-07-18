@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall.network;
 
+import com.adaptor.deadrecall.space.TeleportInterfaceType;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpaceUnitMapPayloadCodecTest {
     @Test
@@ -33,6 +35,13 @@ class SpaceUnitMapPayloadCodecTest {
             assertEquals(4, decodedEntry.targetCatalysts());
             assertEquals(2, decodedEntry.catalystDiscount());
             assertEquals(3, decodedEntry.amethystCost());
+            assertEquals(TeleportInterfaceType.BOOK, decoded.interfaceType());
+            assertEquals(7, decodedEntry.structureWearChancePercent());
+            assertTrue(decodedEntry.interfaceBonusActive());
+            assertEquals(
+                    "message.deadrecall.space_unit.interface_bonus.book.active",
+                    decodedEntry.interfaceBonusMessageKey()
+            );
             assertThrows(UnsupportedOperationException.class, () -> decoded.entries().clear());
         } finally {
             buffer.release();
@@ -56,6 +65,19 @@ class SpaceUnitMapPayloadCodecTest {
     }
 
     @Test
+    void decoderRejectsUnknownInterfaceType() {
+        FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
+        try {
+            writePayloadIdentity(buffer);
+            buffer.writeUtf("not_an_interface", 32);
+            buffer.writeInt(0);
+            assertThrows(DecoderException.class, () -> SpaceUnitMapPayload.CODEC.decode(buffer));
+        } finally {
+            buffer.release();
+        }
+    }
+
+    @Test
     void catalystFieldsRejectImpossibleRangesAndInconsistentTotals() {
         assertThrows(
                 IllegalArgumentException.class,
@@ -69,6 +91,37 @@ class SpaceUnitMapPayloadCodecTest {
         );
         assertThrows(IllegalArgumentException.class, () -> entry(5, 4, 4, 2, 4));
         assertThrows(IllegalArgumentException.class, () -> entry(5, 74, 74, 5, 1));
+    }
+
+    @Test
+    void interfaceFieldsRejectImpossibleRangesAndMessageKeys() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> entry(5, 4, 4, 2, 3, 61, true,
+                        "message.deadrecall.space_unit.interface_bonus.book.active")
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> entry(5, 4, 4, 2, 3, 7, true, "")
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> entry(5, 4, 4, 2, 3, 7, true, "x".repeat(129))
+        );
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new SpaceUnitMapPayload(
+                        UUID.randomUUID(),
+                        "player",
+                        "Source",
+                        "minecraft:overworld",
+                        0,
+                        0,
+                        0,
+                        null,
+                        List.of()
+                )
+        );
     }
 
     private static void assertRejectedEntryCount(int entryCount) {
@@ -91,6 +144,7 @@ class SpaceUnitMapPayloadCodecTest {
                 1,
                 2,
                 3,
+                TeleportInterfaceType.BOOK,
                 entries
         );
     }
@@ -101,6 +155,28 @@ class SpaceUnitMapPayloadCodecTest {
             int targetCatalysts,
             int discount,
             int finalCost
+    ) {
+        return entry(
+                baseCost,
+                sourceCatalysts,
+                targetCatalysts,
+                discount,
+                finalCost,
+                7,
+                true,
+                "message.deadrecall.space_unit.interface_bonus.book.active"
+        );
+    }
+
+    private static SpaceUnitMapPayload.Entry entry(
+            int baseCost,
+            int sourceCatalysts,
+            int targetCatalysts,
+            int discount,
+            int finalCost,
+            int structureWearChancePercent,
+            boolean interfaceBonusActive,
+            String interfaceBonusMessageKey
     ) {
         return new SpaceUnitMapPayload.Entry(
                 UUID.fromString("22222222-2222-2222-2222-222222222222"),
@@ -128,6 +204,9 @@ class SpaceUnitMapPayloadCodecTest {
                 120,
                 8,
                 10,
+                structureWearChancePercent,
+                interfaceBonusActive,
+                interfaceBonusMessageKey,
                 false,
                 true,
                 true,
@@ -139,6 +218,11 @@ class SpaceUnitMapPayloadCodecTest {
     }
 
     private static void writePayloadHeader(FriendlyByteBuf buffer) {
+        writePayloadIdentity(buffer);
+        buffer.writeUtf(TeleportInterfaceType.BOOK.id(), 32);
+    }
+
+    private static void writePayloadIdentity(FriendlyByteBuf buffer) {
         buffer.writeUUID(UUID.fromString("11111111-1111-1111-1111-111111111111"));
         buffer.writeUtf("lodestone", 32);
         buffer.writeUtf("Source", 128);
