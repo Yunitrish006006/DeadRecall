@@ -7,6 +7,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.item.ItemStack;
@@ -67,7 +68,7 @@ public final class AmethystCatalystTeleportGameTest {
         int staleCost = AmethystCatalystDiscount.finalCost(initialBaseCost, 4, 4);
 
         try {
-            SpaceUnitHandler.startTeleport(
+            startTeleport(
                     player,
                     SpaceUnitHandler.SOURCE_TYPE_LODESTONE,
                     source.id(),
@@ -141,7 +142,7 @@ public final class AmethystCatalystTeleportGameTest {
         int expectedCost = baseCost(routeStability);
         SpaceUnitRecord finalTarget = target;
         try {
-            SpaceUnitHandler.startTeleport(
+            startTeleport(
                     player,
                     SpaceUnitHandler.SOURCE_TYPE_PLAYER,
                     player.getUUID(),
@@ -187,7 +188,7 @@ public final class AmethystCatalystTeleportGameTest {
         int expectedCost = AmethystCatalystDiscount.finalCost(baseCost, 4, 4);
 
         try {
-            SpaceUnitHandler.startTeleport(
+            startTeleport(
                     player,
                     SpaceUnitHandler.SOURCE_TYPE_LODESTONE,
                     source.id(),
@@ -254,7 +255,7 @@ public final class AmethystCatalystTeleportGameTest {
         int expectedCost = AmethystCatalystDiscount.finalCost(baseCost, 4, 0);
 
         try {
-            SpaceUnitHandler.startTeleport(
+            startTeleport(
                     requester,
                     SpaceUnitHandler.SOURCE_TYPE_LODESTONE,
                     source.id(),
@@ -314,6 +315,20 @@ public final class AmethystCatalystTeleportGameTest {
         player.getInventory().add(new ItemStack(Items.AMETHYST_SHARD, INITIAL_SHARDS));
         player.getFoodData().setFoodLevel(20);
         player.getFoodData().setSaturation(20.0F);
+    }
+
+    private static void startTeleport(
+            ServerPlayer player,
+            String sourceType,
+            UUID sourceId,
+            UUID targetId) {
+        SpaceUnitHandler.establishInterfaceContext(
+                player,
+                InteractionHand.MAIN_HAND,
+                sourceType,
+                sourceId
+        ).orElseThrow(() -> new IllegalStateException("Could not establish compass interface context"));
+        SpaceUnitHandler.startTeleport(player, sourceType, sourceId, targetId);
     }
 
     private static void placeSafeLanding(ServerLevel level, BlockPos feetPos) {
@@ -420,6 +435,7 @@ public final class AmethystCatalystTeleportGameTest {
             SpaceUnitRecord... records
     ) {
         sessions().remove(player.getUUID());
+        SpaceUnitHandler.clearInterfaceContext(player.getUUID());
         DeadRecallSpaceUnitSavedData units = units(server);
         DeadRecallSpaceDiscoverySavedData discovery = discovery(server);
         for (SpaceUnitRecord record : records) {
@@ -452,6 +468,7 @@ public final class AmethystCatalystTeleportGameTest {
                 .removeRelationship(requester.getUUID(), target.getUUID());
         cleanup(server, requester, source);
         sessions().remove(target.getUUID());
+        SpaceUnitHandler.clearInterfaceContext(target.getUUID());
         if (!target.isRemoved()) {
             target.discard();
         }
