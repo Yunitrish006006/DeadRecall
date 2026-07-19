@@ -26,15 +26,22 @@
 - [x] 4.1 DeadRecall Java 25 build and tests pass.
 - [x] 4.2 Discord Worker syntax/tests pass.
 - [x] 4.3 DeadRecall PR Actions pass.
-- [ ] 4.4 Worker deployment smoke test confirms a temporary message is deleted after 10 minutes.
+- [x] 4.4 Worker deployment smoke test confirms a temporary message is deleted after 10 minutes.
 
 ## Evidence
 
 - Worker implementation: [`Yunitrish006006/discord-bot#1`](https://github.com/Yunitrish006006/discord-bot/pull/1), merged as `112f0fe`.
-- Worker unit tests: 14/14 pass, covering the allowlist, 600-second enqueue policy, failure isolation, and deletion retry/terminal states.
+- Production secret alias compatibility: [`Yunitrish006006/discord-bot#2`](https://github.com/Yunitrish006006/discord-bot/pull/2), merged as `9467b5e`.
+- Production smoke observability and zero-downtime API key rotation: [`Yunitrish006006/discord-bot#3`](https://github.com/Yunitrish006006/discord-bot/pull/3), merged as `31a00ce`.
+- Worker unit tests: 18/18 pass, covering the allowlist, 600-second enqueue policy, failure isolation, deletion retry/terminal states, deployed secret aliases and API key rotation.
 - Worker bundle verification: `wrangler deploy --dry-run` passes with the D1 and Queue producer/consumer bindings recognized.
-- GitHub Actions: the Worker `Validate` workflow passed both checks on the pull request.
+- GitHub Actions: Worker `Validate` passed 2/2 checks on all three pull requests.
 
-## Remaining deployment verification
+## Production deployment verification
 
-Task 4.4 requires production Cloudflare credentials, creation of `discord-message-deletions`, deployment of merge commit `112f0fe`, and an observed Discord message deletion after 600 seconds. It remains open until that external smoke test succeeds.
+- Created `discord-message-deletions` with 86,400-second free-tier retention; Cloudflare reports one producer and one consumer.
+- Deployed Worker `main` merge commit `31a00ce`; `/health` returned HTTP 200 before and after smoke-test cleanup.
+- An authenticated allowlisted `player_join` request returned HTTP 200 with `sent: 1`, `failed: 0`, and `deletionScheduled: 1`.
+- The Worker logged `discord_message_deletion_scheduled` for message `1528233874881118401` at `2026-07-19T02:55:50Z` with `delay_seconds: 600`.
+- The Queue consumer logged `discord_message_deletion_terminal` for the same message at `2026-07-19T03:06:03Z` with Discord HTTP 204, 613.218 seconds after scheduling.
+- The temporary canonical smoke-test API key was deleted from Cloudflare and its local file removed; the original deployed secret aliases remain configured.
