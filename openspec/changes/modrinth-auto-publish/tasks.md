@@ -19,10 +19,13 @@
 - [x] 3.2 Publisher dry run validates the current release JAR.
 - [x] 3.3 Java 25 `./gradlew build --stacktrace` passes.
 - [x] 3.4 Pull request GitHub Actions pass.
-- [ ] 3.5 A configured manual dispatch publishes or safely recognizes the current Modrinth version.
+- [x] 3.5 Configure the repository project ID and token for future Modrinth releases.
+- [ ] 3.6 The first future version bump publishes or safely recognizes its Modrinth version.
 
 ## Evidence
 
 - Shell syntax, workflow YAML parsing, `git diff --check`, secret-pattern scan and the 2.4.1 publisher dry run passed locally.
-- [`Yunitrish006006/DeadRecall#63`](https://github.com/Yunitrish006006/DeadRecall/pull/63) commit `6cffe94` passed Build, Validate and GitGuardian Security Checks.
+- [`Yunitrish006006/DeadRecall#63`](https://github.com/Yunitrish006006/DeadRecall/pull/63) commits `6cffe94` and `9540965` passed Build, Validate and GitGuardian Security Checks.
 - Build included the publisher dry run, Server GameTests and both three-phase Dedicated Server restart probes.
+- GitHub Actions variable `MODRINTH_PROJECT_ID` targets project `AM1TmETA`; repository secret `MODRINTH_TOKEN` is configured without storing its value in repository content.
+- The existing remote 2.4.1 JAR and the current 2.4.1 build have different SHA-512 hashes, so a live dispatch is intentionally deferred until the next version bump instead of attempting to overwrite the published version.
