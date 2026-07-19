@@ -86,6 +86,13 @@
 
 16 色混凝土粉末 ItemEntity 水中硬化核心與 required GameTests 已完成；轉換保留數量、相容 Components、同一 Entity 及其 age／位置／速度／pickup delay。
 
+## Release Automation
+
+- [`openspec/changes/modrinth-auto-publish/`](openspec/changes/modrinth-auto-publish/)
+- [`openspec/changes/modrinth-auto-publish/specs/release-automation/spec.md`](openspec/changes/modrinth-auto-publish/specs/release-automation/spec.md)
+
+`master` 上版本號變更會在完整 build 後發布到 Modrinth；project ID 與 token 由 GitHub Actions variable／secret 提供，且以版本號及 JAR SHA-512 防止重複或覆蓋發布。
+
 ## 模組命名方向
 
 | 模組 | 內容 |

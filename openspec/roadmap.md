@@ -87,6 +87,7 @@
 - 正常 Dedicated Server restart probe 基礎：死亡背包 `runRestartProbe` 與銅傀儡 `runCopperRestartProbe` 使用獨立 world、跨 JVM phase marker、entity region／SavedData reload 與失敗 artifact。
 - 混凝土粉末自動回歸：水源、非水源流動水、未接觸水、雨天、64 格數量、自訂名稱、同一 ItemEntity、age、位置、速度、pickup delay，以及 512 個不可合併 ItemEntity 壓力 fixture；6 個 required GameTests 全部通過。
 - 最新 `master` Dedicated Server 煙霧測試成功：Fabric／Mixin 初始化、1,594 個 recipe、1,699 個 advancement、三維度建立、保存與正常停止均完成。
+- Modrinth 自動發布流程：`master` 版本號變更完成 build 後上傳正式 JAR，並以 project ID／token 隔離與 SHA-512 冪等檢查防止錯誤覆蓋。
 
 ## 進行中
 
