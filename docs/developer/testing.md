@@ -100,6 +100,18 @@ DeadRecall 測試只宣告 `DROP` slot。`KEEP`／`DESTROY` 的選擇由 Trinket
 
 公開 SPI、transaction 順序與 addon 實作要求記錄於 `docs/developer/death-backpack-addon-inventory-api.md`。
 
+## 可攜式容器巢狀回歸
+
+容器安全由 `PortableContainerNestingGameTest`、`PortableContainerDropperGameTest`、`BackpackMenuNestingInteractionGameTest`、死亡交易與 legacy fixture 共同驗證：
+
+- DeadRecall 一般／死亡背包與 Bundle、17 種 Shulker Box 的雙向拒絕矩陣。
+- Shulker Menu 與六個 sided-insertion faces 都拒絕背包。
+- 真實 Hopper→Shulker、Hopper Minecart→Hopper→Shulker 與 Dropper→Shulker 路徑保留拒絕物 exactly once，普通物品 control 仍可移動。
+- Dispenser 保持 Vanilla ejection 語意：背包與普通 control 都成為唯一的世界 ItemEntity，不會被誤當成 Dropper transfer 而寫入 Shulker。
+- 游標、drag、shift-click、number-key、double-click 與兩名玩家同 tick 的 Server 操作都不會插入、刪除、複製或跨玩家污染受限容器。
+- 舊世界中已存在的非法巢狀內容可向外取出、不可重新插入，且 Components 不被改寫。
+- 死亡擷取與失敗 rollback 不會把 Bundle／Shulker 遞迴包進死亡背包，world fallback 維持 exactly once。
+
 ## 好友 PLAYER 傳送回歸
 
 `DirectFriendPlayerTeleportGameTest` 使用同一個 Dedicated GameTest Server 中、已註冊於 `MinecraftServer.getPlayerList()` 的多個真實 `ServerPlayer`，驗證：
@@ -190,7 +202,7 @@ Phase A–D、既有好友 `PLAYER` 多人 GameTests 與紫水晶跨 Dimension G
 - Menu 翻到最後一頁會同步 authoritative page，Comparator 值由 1 上升至 15。
 - 翻頁建立強度 15 的 direct redstone pulse，並在排程兩 tick 後復位；Comparator 頁面訊號不被清除。
 - 經 Menu 取書會 exactly-once 回到玩家 Inventory，並清除 `HAS_BOOK` 與 BlockEntity book slot。
-- 未就業村民會透過 Vanilla Brain／POI 流程自然認領講台並成為圖書管理員。
+- 未就業村民取得真實講台 POI 後，會由 Vanilla `AssignProfessionFromJobSite` Brain 行為確定性認領並成為圖書管理員。
 
 詳細 fixture 與斷言記錄於 `docs/developer/lectern-recipe-testing.md`。
 
