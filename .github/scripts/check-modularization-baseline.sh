@@ -6,6 +6,40 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPOSITORY_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly BASELINE_FILE="${REPOSITORY_ROOT}/openspec/changes/safe-multi-repo-modularization/compatibility-surface.txt"
 
+require_command() {
+    command -v "$1" >/dev/null 2>&1 || {
+        printf 'Required command is unavailable: %s\n' "$1" >&2
+        exit 1
+    }
+}
+
+collect_identifiers() {
+    find src/main/java src/client/java src/main/resources \
+        -type f \
+        \( -name '*.java' -o -name '*.json' -o -name '*.json5' -o -name '*.mcmeta' \
+            -o -name '*.properties' -o -name '*.txt' \) \
+        -print0 \
+        | xargs -0 awk '
+            {
+                remaining = $0
+                while (match(remaining, /deadrecall:[a-z0-9_\.\/-]+/)) {
+                    print "identifier " substr(remaining, RSTART, RLENGTH)
+                    remaining = substr(remaining, RSTART + RLENGTH)
+                }
+
+                remaining = $0
+                factory = "Identifier\\.fromNamespaceAndPath\\(\"deadrecall\",[[:space:]]*\"[a-z0-9_./-]+\"\\)"
+                while (match(remaining, factory)) {
+                    identifier = substr(remaining, RSTART, RLENGTH)
+                    sub(/^.*\"deadrecall\",[[:space:]]*\"/, "", identifier)
+                    sub(/\".*$/, "", identifier)
+                    print "identifier deadrecall:" identifier
+                    remaining = substr(remaining, RSTART + RLENGTH)
+                }
+            }
+        '
+}
+
 collect_surface() {
     cd "${REPOSITORY_ROOT}"
 
@@ -14,16 +48,13 @@ collect_surface() {
             -type f \
             | sed 's#^src/main/resources/#resource #'
 
-        (rg -o --no-filename 'deadrecall:[a-z0-9_./-]+' \
-            src/main/java src/client/java src/main/resources || true) \
-            | sed 's/^/identifier /'
-
-        (rg -o --no-filename \
-            'Identifier\.fromNamespaceAndPath\("deadrecall",[[:space:]]*"[a-z0-9_./-]+"\)' \
-            src/main/java src/client/java || true) \
-            | sed -E 's/.*"deadrecall",[[:space:]]*"([a-z0-9_./-]+)".*/identifier deadrecall:\1/'
+        collect_identifiers
     } | LC_ALL=C sort -u
 }
+
+for required_command in awk diff find mktemp sed sort xargs; do
+    require_command "${required_command}"
+done
 
 if [[ "${1:-}" == "--print" ]]; then
     collect_surface
