@@ -17,6 +17,12 @@
 
 - [x] 3.1 Shell syntax and workflow structure pass static validation.
 - [x] 3.2 Publisher dry run validates the current release JAR.
-- [ ] 3.3 Java 25 `./gradlew build --stacktrace` passes.
-- [ ] 3.4 Pull request GitHub Actions pass.
+- [x] 3.3 Java 25 `./gradlew build --stacktrace` passes.
+- [x] 3.4 Pull request GitHub Actions pass.
 - [ ] 3.5 A configured manual dispatch publishes or safely recognizes the current Modrinth version.
+
+## Evidence
+
+- Shell syntax, workflow YAML parsing, `git diff --check`, secret-pattern scan and the 2.4.1 publisher dry run passed locally.
+- [`Yunitrish006006/DeadRecall#63`](https://github.com/Yunitrish006006/DeadRecall/pull/63) commit `6cffe94` passed Build, Validate and GitGuardian Security Checks.
+- Build included the publisher dry run, Server GameTests and both three-phase Dedicated Server restart probes.
