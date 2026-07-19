@@ -14,8 +14,9 @@
 - [`openspec/changes/direct-friend-player-teleport/`](openspec/changes/direct-friend-player-teleport/)
 - [`openspec/changes/amethyst-catalyst-teleport-discount/`](openspec/changes/amethyst-catalyst-teleport-discount/)
 - [`openspec/changes/teleport-interface-item-specializations/`](openspec/changes/teleport-interface-item-specializations/)
+- [`openspec/future/totem-nexus-adaptive-multiblock.md`](openspec/future/totem-nexus-adaptive-multiblock.md)：模組拆分後再開發的原版方塊、自適應多方塊傳送陣設計。
 
-涵蓋磁石與石碑、探索與權限、傳送 session、成本／偏差／風險、好友、人體磁石、死亡節點、分散重生，以及傳送介面物品特化。
+涵蓋磁石與石碑、探索與權限、傳送 session、成本／偏差／風險、好友、人體磁石、死亡節點、分散重生，以及傳送介面物品特化。Future 文件另記錄目的地負載、逐步擴建、核心 UUID 歸屬、連結力／擴張力／準確力／傳送力、對稱效率、當地材料共鳴與材料遞減收益；不屬於目前 DeadRecall 發行範圍。
 
 ## Totem Nexus / Death Node Administration
 
