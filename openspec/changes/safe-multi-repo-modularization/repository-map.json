@@ -26,7 +26,7 @@
     {
       "id": "discord-bridge",
       "repository": "TotemDiscordBridge",
-      "status": "pilot-repository-initialized",
+      "status": "standalone-ci-validated-awaiting-core-and-bundle-validation",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/DiscordBridge.java",
         "src/main/java/com/adaptor/deadrecall/discord/**",
@@ -50,7 +50,7 @@
     {
       "id": "automata",
       "repository": "TotemAutomata",
-      "status": "repository-initialized-awaiting-extraction",
+      "status": "history-and-compatibility-manifest-ready-awaiting-extraction",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/item/copper/**",
         "Copper Golem payloads and receivers",
