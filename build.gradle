@@ -94,8 +94,10 @@ dependencies {
     runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Optional runtime integration. Neither dependency is declared as required by DeadRecall.
-    modImplementation "eu.pb4:trinkets:4.1.0-beta.2+26.2"
-    modImplementation "dev.yumi.mc.core:yumi-mc-foundation:1.1.1+26.2"
+    compileOnly "eu.pb4:trinkets:4.1.0-beta.2+26.2"
+    runtimeOnly "eu.pb4:trinkets:4.1.0-beta.2+26.2"
+    compileOnly "dev.yumi.mc.core:yumi-mc-foundation:1.1.1+26.2"
+    runtimeOnly "dev.yumi.mc.core:yumi-mc-foundation:1.1.1+26.2"
 
     // Gson for JSON parsing (used in DiscordBridge)
     // Use Minecraft's built-in Gson instead of bundling it
@@ -113,7 +115,11 @@ tasks.register("normalizeFabricApiTweakersForNamedDevRuntime") {
     doLast {
         def jarFiles = new LinkedHashSet<File>()
         jarFiles.addAll(configurations.runtimeClasspath.resolve().findAll { file ->
-            file.name.endsWith(".jar") && file.absolutePath.contains("${File.separator}net.fabricmc.fabric-api${File.separator}")
+            file.name.endsWith(".jar") && (
+                file.absolutePath.contains("${File.separator}net.fabricmc.fabric-api${File.separator}")
+                    || file.name.startsWith("trinkets-")
+                    || file.name.startsWith("yumi-mc-foundation-")
+            )
         })
 
         [gradle.gradleUserHomeDir, new File(System.getProperty("user.home"), ".gradle")].each { File cacheRoot ->

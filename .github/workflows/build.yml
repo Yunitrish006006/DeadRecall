@@ -43,7 +43,10 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          ./gradlew build --no-daemon --stacktrace 2>&1 | tee build.log
+          # GameTest normally terminates its dedicated server itself. Bound that shutdown so a
+          # stuck server still produces the logs and failure artifacts below.
+          timeout --signal=TERM --kill-after=30s 15m \
+            ./gradlew build --no-daemon --stacktrace 2>&1 | tee build.log
 
       - name: Validate Modrinth publish metadata
         shell: bash

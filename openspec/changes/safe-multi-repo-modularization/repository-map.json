@@ -8,7 +8,7 @@
     {
       "id": "core",
       "repository": "TotemCore",
-      "status": "planned",
+      "status": "initialized-api-v1",
       "owns": [
         "versioned public API conventions",
         "event and lifecycle contracts",
@@ -26,7 +26,7 @@
     {
       "id": "discord-bridge",
       "repository": "TotemDiscordBridge",
-      "status": "pilot",
+      "status": "pilot-repository-initialized",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/DiscordBridge.java",
         "src/main/java/com/adaptor/deadrecall/discord/**",
@@ -38,7 +38,7 @@
     {
       "id": "remnant",
       "repository": "TotemRemnant",
-      "status": "planned-after-pilot",
+      "status": "repository-initialized-awaiting-dual-validation",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/api/death/**",
         "src/main/java/com/adaptor/deadrecall/death/**",
@@ -50,7 +50,7 @@
     {
       "id": "automata",
       "repository": "TotemAutomata",
-      "status": "planned-after-remnant",
+      "status": "repository-initialized-awaiting-extraction",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/item/copper/**",
         "Copper Golem payloads and receivers",
@@ -61,7 +61,7 @@
     {
       "id": "nexus",
       "repository": "TotemNexus",
-      "status": "planned-after-automata",
+      "status": "repository-initialized-awaiting-extraction",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/space/**",
         "Space Unit, friend, teleport and death-node payloads",

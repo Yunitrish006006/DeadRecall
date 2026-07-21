@@ -1,0 +1,6 @@
+# source file|source owner|import owner|OpenSpec removal task|reason
+#
+# These two seams predate the boundary check. They are intentionally limited to
+# Remnant -> Nexus and must be removed by the lifecycle-event work in task 4.1.
+src/main/java/com/adaptor/deadrecall/death/DeathBackpackCaptureService.java|remnant|nexus|4.1|Publish death/backpack lifecycle events and move Nexus handling into an optional adapter.
+src/main/java/com/adaptor/deadrecall/death/DeathBackpackRecoveryService.java|remnant|nexus|4.1|Publish death/backpack lifecycle events and move Nexus handling into an optional adapter.

@@ -18,5 +18,6 @@ public final class DeadRecallServerBootstrap {
         TotemNexusBootstrap.register();
         LegacyGameplayBootstrap.registerRecipes();
         TotemDiscordBridgeBootstrap.register(configDir);
+        TotemDiscordBridgeBootstrap.registerRuntime();
     }
 }

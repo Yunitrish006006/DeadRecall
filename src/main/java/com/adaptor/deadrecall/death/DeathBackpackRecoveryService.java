@@ -2,20 +2,13 @@ package com.adaptor.deadrecall.death;
 
 import com.adaptor.deadrecall.Deadrecall;
 import com.adaptor.deadrecall.DiscordBridge;
-import com.adaptor.deadrecall.space.DeadRecallSpaceUnitSavedData;
-import com.adaptor.deadrecall.space.SpaceUnitRecord;
-import com.adaptor.deadrecall.space.SpaceUnitStatus;
-import com.adaptor.deadrecall.space.SpaceUnitType;
-import net.minecraft.core.UUIDUtil;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
+import com.adaptor.deadrecall.core.api.DeathBackpackNodeLifecycle;
+import com.adaptor.deadrecall.api.death.DeathBackpackNodeBinding;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,28 +27,14 @@ public final class DeathBackpackRecoveryService {
     }
 
     public static boolean recoverBoundNode(ServerPlayer recoveringPlayer, ItemStack deathBackpack) {
-        UUID unitId = readDeathNodeId(deathBackpack);
+        UUID unitId = DeathBackpackNodeBinding.read(deathBackpack);
         if (unitId == null) {
             return false;
         }
 
-        DeadRecallSpaceUnitSavedData units = recoveringPlayer.level()
-                .getServer()
-                .overworld()
-                .getDataStorage()
-                .computeIfAbsent(DeadRecallSpaceUnitSavedData.TYPE);
-        Optional<SpaceUnitRecord> unit = units.get(unitId);
-        if (unit.isEmpty()
-                || unit.get().type() != SpaceUnitType.DEATH
-                || unit.get().status() != SpaceUnitStatus.ACTIVE) {
-            return false;
-        }
-
-        boolean disabled = units.disableDeathUnit(
-                unit.get().owner(),
-                unitId,
-                recoveringPlayer.level().getGameTime()
-        );
+        boolean disabled = DeathBackpackNodeLifecycle.current()
+                .map(adapter -> adapter.recover(recoveringPlayer, unitId))
+                .orElse(false);
         if (!disabled) {
             return false;
         }
@@ -70,11 +49,6 @@ public final class DeathBackpackRecoveryService {
 
     static void clearForcedNotificationFailureForTesting(UUID playerId) {
         FORCED_NOTIFICATION_FAILURES.remove(playerId);
-    }
-
-    private static UUID readDeathNodeId(ItemStack stack) {
-        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        return tag.read(TAG_DEATH_NODE_ID, UUIDUtil.CODEC).orElse(null);
     }
 
     private static void notifyRecoveredSafely(ServerPlayer player) {

@@ -1,10 +1,8 @@
 package com.adaptor.deadrecall;
 
 import com.adaptor.deadrecall.bootstrap.DeadRecallServerBootstrap;
-import com.adaptor.deadrecall.discord.DiscordEventNotifications;
-import com.adaptor.deadrecall.item.copper.CopperGolemWrenchHandler;
+import com.adaptor.deadrecall.bootstrap.TotemDiscordBridgeBootstrap;
 import com.adaptor.deadrecall.network.registration.DeadRecallPayloadRegistration;
-import com.adaptor.deadrecall.space.SpaceUnitHandler;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
@@ -58,66 +56,15 @@ public class Deadrecall implements ModInitializer {
         DeadRecallServerBootstrap.register(FabricLoader.getInstance().getConfigDir());
         DeadRecallPayloadRegistration.register();
 
-        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, damageSource, damageAmount) -> {
-            if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
-                CopperGolemWrenchHandler.clearGatheringDisplayedItem(golem);
-            }
-            return true;
-        });
-
         // 註冊死亡背包功能 - 當玩家死亡時收集掉落物品
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
+            TotemDiscordBridgeBootstrap.onEntityDeath(entity, damageSource.getEntity());
             if (entity instanceof ServerPlayer player) {
-                DiscordEventNotifications.death(damageSource.getLocalizedDeathMessage(player));
                 DeathLocationManager.setDeathLocation(player, player.blockPosition(), player.level());
-            } else if (entity instanceof EnderDragon || entity instanceof WitherBoss) {
-                DiscordEventNotifications.bossDefeated(
-                        entity.getDisplayName(),
-                        damageSourcePlayerName(damageSource.getEntity())
-                );
-            } else if (entity instanceof net.minecraft.world.entity.animal.golem.CopperGolem golem) {
-                CopperGolemWrenchHandler.dropGatheringInventory(golem);
             }
         });
 
-        ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, damageSource, baseDamageTaken, damageTaken, blocked) -> {
-            if (entity instanceof ServerPlayer player && damageTaken > 0.0F) {
-                SpaceUnitHandler.cancelTeleport(player, Component.translatable("message.deadrecall.space_unit.teleport_cancelled.damage"));
-            }
-        });
-
-        // 監聽玩家聊天訊息，轉發到 Discord
-        ServerMessageEvents.CHAT_MESSAGE.register((message, sender, params) -> {
-            String username = sender.getName().getString();
-            String content = message.decoratedContent().getString();
-            DiscordBridge.sendChatMessage(username, content);
-        });
-
-        ServerPlayConnectionEvents.JOIN.register((listener, sender, server) -> {
-            ServerPlayer player = listener.getPlayer();
-            if (isFirstJoin(player)) {
-                DiscordBridge.sendPlayerFirstJoined(player.getName().getString());
-            } else {
-                DiscordBridge.sendPlayerJoined(player.getName().getString());
-            }
-        });
-        ServerPlayConnectionEvents.DISCONNECT.register((listener, server) ->
-                DiscordBridge.sendPlayerLeft(listener.getPlayer().getName().getString()));
-
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            if (server.isDedicatedServer()) {
-                notifyServerOpened(server, false);
-            }
-        });
-        ServerLifecycleEvents.SERVER_STOPPING.register(server ->
-                notifyServerClosed(server, true));
-
-        // 清理銅魁儡失效綁定，並在整箱都無法分類時維持原地跳躍
-        ServerTickEvents.START_SERVER_TICK.register(Deadrecall::trackDiscordHealthTickStart);
-        ServerTickEvents.END_SERVER_TICK.register(Deadrecall::trackDiscordHealthTickEnd);
-        ServerTickEvents.END_SERVER_TICK.register(CopperGolemWrenchHandler::tickCopperGolemWrenchState);
-        ServerTickEvents.END_SERVER_TICK.register(SpaceUnitHandler::tickTeleportSessions);
-        ServerTickEvents.END_SERVER_TICK.register(SpaceUnitHandler::tickLodestoneIntegrity);
+        // Discord owns its chat, lifecycle and health hooks through TotemDiscordBridgeBootstrap.
 
         // 生存模式不允許持有一般書櫃：統一替換為書本（每個書櫃 3 本）
         ServerTickEvents.END_SERVER_TICK.register(server -> {
@@ -158,87 +105,7 @@ public class Deadrecall implements ModInitializer {
                 })
             );
 
-            dispatcher.register(
-                    Commands.literal("discordbridge")
-                            .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_ADMIN))
-                            .then(Commands.literal("reload")
-                                    .executes(context -> {
-                                        DiscordBridge.reload();
-                                        context.getSource().sendSuccess(() -> Component.translatable("message.deadrecall.discord_config.reloaded").withStyle(ChatFormatting.GREEN), true);
-                                        return 1;
-                                    }))
-                            .then(Commands.literal("set")
-                                    .then(Commands.argument("enabled", BoolArgumentType.bool())
-                                            .then(Commands.argument("workerUrl", StringArgumentType.string())
-                                                    .then(Commands.argument("apiKey", StringArgumentType.string())
-                                                            .executes(context -> {
-                                                                boolean enabled = BoolArgumentType.getBool(context, "enabled");
-                                                                String workerUrl = StringArgumentType.getString(context, "workerUrl");
-                                                                String apiKey = StringArgumentType.getString(context, "apiKey");
-                                                                try {
-                                                                    DiscordBridge.updateConfig(enabled, workerUrl, apiKey);
-                                                                    context.getSource().sendSuccess(() -> Component.translatable("message.deadrecall.discord_config.settings_updated").withStyle(ChatFormatting.GREEN), true);
-                                                                    return 1;
-                                                                } catch (IllegalArgumentException e) {
-                                                                    context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
-                                                                    return 0;
-                                                                } catch (Exception e) {
-                                                                    context.getSource().sendFailure(Component.translatable("message.deadrecall.discord_config.update_failed", e.getMessage()).withStyle(ChatFormatting.RED));
-                                                                    LOGGER.error("[DiscordBridge] 更新設定失敗", e);
-                                                                    return 0;
-                                                                }
-                                                            })))))
-                            .then(Commands.literal("channel")
-                                    .then(Commands.literal("add")
-                                            .then(Commands.argument("channelId", StringArgumentType.string())
-                                                    .then(Commands.argument("channelName", StringArgumentType.string())
-                                                            .executes(context -> {
-                                                               String channelId = StringArgumentType.getString(context, "channelId");
-                                                               String channelName = StringArgumentType.getString(context, "channelName");
-                                                               try {
-                                                                   DiscordBridge.addChannel(channelId, channelName);
-                                                                   context.getSource().sendSuccess(() -> Component.translatable("message.deadrecall.discord_config.channel_added", channelName).withStyle(ChatFormatting.GREEN), true);
-                                                                   return 1;
-                                                               } catch (IllegalArgumentException e) {
-                                                                   context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
-                                                                   return 0;
-                                                               } catch (Exception e) {
-                                                                   context.getSource().sendFailure(Component.translatable("message.deadrecall.discord_config.channel_add_failed", e.getMessage()).withStyle(ChatFormatting.RED));
-                                                                   LOGGER.error("[DiscordBridge] 添加頻道失敗", e);
-                                                                   return 0;
-                                                               }
-                                                            }))))
-                                    .then(Commands.literal("remove")
-                                            .then(Commands.argument("channelId", StringArgumentType.string())
-                                                    .executes(context -> {
-                                                        String channelId = StringArgumentType.getString(context, "channelId");
-                                                        try {
-                                                            DiscordBridge.removeChannel(channelId);
-                                                            context.getSource().sendSuccess(() -> Component.translatable("message.deadrecall.discord_config.channel_removed", channelId).withStyle(ChatFormatting.GREEN), true);
-                                                            return 1;
-                                                        } catch (IllegalArgumentException e) {
-                                                            context.getSource().sendFailure(Component.literal(e.getMessage()).withStyle(ChatFormatting.RED));
-                                                            return 0;
-                                                        } catch (Exception e) {
-                                                            context.getSource().sendFailure(Component.translatable("message.deadrecall.discord_config.channel_remove_failed", e.getMessage()).withStyle(ChatFormatting.RED));
-                                                            LOGGER.error("[DiscordBridge] 移除頻道失敗", e);
-                                                            return 0;
-                                                        }
-                                                    })))
-                                    .then(Commands.literal("list")
-                                            .executes(context -> {
-                                                var channels = DiscordBridge.getChannels();
-                                                if (channels.isEmpty()) {
-                                                    context.getSource().sendSuccess(() -> Component.translatable("message.deadrecall.discord_config.no_channels_configured").withStyle(ChatFormatting.RED), true);
-                                                } else {
-                                                    context.getSource().sendSuccess(() -> Component.translatable("message.deadrecall.discord_config.configured_channels_count", channels.size()).withStyle(ChatFormatting.GREEN), true);
-                                                    for (var ch : channels) {
-                                                        context.getSource().sendSuccess(() -> Component.literal("  - " + ch.name + " (" + ch.id + ")"), false);
-                                                    }
-                                                }
-                                                return 1;
-                                            })))
-            );
+            TotemDiscordBridgeBootstrap.registerCommands(dispatcher);
         });
     }
 
