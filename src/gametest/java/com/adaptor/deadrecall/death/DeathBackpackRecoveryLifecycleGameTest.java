@@ -2,6 +2,7 @@ package com.adaptor.deadrecall.death;
 
 import com.adaptor.deadrecall.inventory.BackpackInventory;
 import com.adaptor.deadrecall.item.BackpackItemHelper;
+import com.adaptor.deadrecall.core.api.DeathBackpackRecoveryTransport;
 import com.adaptor.deadrecall.mixin.DeadRecallSpaceUnitSavedDataAccessor;
 import com.adaptor.deadrecall.space.DeadRecallSpaceDiscoverySavedData;
 import com.adaptor.deadrecall.space.DeadRecallSpaceUnitSavedData;
@@ -25,6 +26,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +35,31 @@ public final class DeathBackpackRecoveryLifecycleGameTest {
     private static final BlockPos FIRST_DEATH_POS = new BlockPos(2, 2, 2);
     private static final BlockPos SECOND_DEATH_POS = new BlockPos(7, 2, 2);
     private static final BlockPos RECOVERY_POS = new BlockPos(4, 2, 6);
+
+    @SuppressWarnings("removal")
+    @GameTest(maxTicks = 40)
+    public void externalTransportOwnsBoundRecovery(GameTestHelper helper) {
+        prepareGround(helper, RECOVERY_POS);
+        ServerPlayer recoveringPlayer = createPlayerAt(helper, helper.absolutePos(RECOVERY_POS));
+        ItemStack deathBackpack = new ItemStack(Items.DIAMOND);
+        Optional<DeathBackpackRecoveryTransport> previousTransport = DeathBackpackRecoveryTransport.current();
+        boolean[] invoked = {false};
+        DeathBackpackRecoveryTransport.register((transportPlayer, transportBackpack) -> {
+            require(helper, transportPlayer == recoveringPlayer, "External recovery transport received a different player");
+            require(helper, transportBackpack == deathBackpack, "External recovery transport received a copied backpack");
+            invoked[0] = true;
+            return true;
+        });
+        try {
+            require(helper, DeathBackpackRecoveryService.recoverBoundNode(recoveringPlayer, deathBackpack),
+                    "External recovery transport did not report success");
+            require(helper, invoked[0], "External recovery transport was not invoked");
+            helper.succeed();
+        } finally {
+            DeathBackpackRecoveryTransport.register(previousTransport.orElse(null));
+            recoveringPlayer.discard();
+        }
+    }
 
     @SuppressWarnings("removal")
     @GameTest(maxTicks = 80)

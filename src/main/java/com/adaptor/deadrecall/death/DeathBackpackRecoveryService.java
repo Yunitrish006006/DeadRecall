@@ -3,6 +3,7 @@ package com.adaptor.deadrecall.death;
 import com.adaptor.deadrecall.Deadrecall;
 import com.adaptor.deadrecall.DiscordBridge;
 import com.adaptor.deadrecall.core.api.DeathBackpackNodeLifecycle;
+import com.adaptor.deadrecall.core.api.DeathBackpackRecoveryTransport;
 import com.adaptor.deadrecall.api.death.DeathBackpackNodeBinding;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,6 +28,11 @@ public final class DeathBackpackRecoveryService {
     }
 
     public static boolean recoverBoundNode(ServerPlayer recoveringPlayer, ItemStack deathBackpack) {
+        var externalTransport = DeathBackpackRecoveryTransport.current();
+        if (externalTransport.isPresent() && externalTransport.get().recover(recoveringPlayer, deathBackpack)) {
+            return true;
+        }
+
         UUID unitId = DeathBackpackNodeBinding.read(deathBackpack);
         if (unitId == null) {
             return false;
