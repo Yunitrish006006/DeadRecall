@@ -34,7 +34,7 @@
 - [x] 3.3 Create `TotemDiscordBridge` from a temporary filtered history export.
 - [x] 3.4 Validate Core + Discord standalone installation.
 - [x] 3.5 Consume the module from the DeadRecall compatibility bundle without duplicate registration.
-- [ ] 3.6 Keep lockstep versions through the observation window before removing the old implementation.
+- [x] 3.6 Keep lockstep versions through the observation window before removing the old implementation.
 
 ## 4. TotemRemnant repository
 
