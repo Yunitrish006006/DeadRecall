@@ -7,6 +7,7 @@ import com.adaptor.deadrecall.effect.ModMobEffects;
 import com.adaptor.deadrecall.item.ModItemGroups;
 import com.adaptor.deadrecall.item.ModItems;
 import com.adaptor.deadrecall.menu.ModMenus;
+import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Composes registry owners in the legacy all-in-one registration order.
@@ -27,7 +28,9 @@ public final class DeadRecallRegistryBootstrap {
         TotemAutomataMenuRegistration.register();
         ModMenus.registerModMenus();
 
-        TotemRemnantItemRegistration.register();
+        if (!FabricLoader.getInstance().isModLoaded("totem-remnant")) {
+            TotemRemnantItemRegistration.register();
+        }
         LegacyGameplayItemRegistration.register();
         TotemAutomataItemRegistration.register();
         ModItems.registerModItems();
