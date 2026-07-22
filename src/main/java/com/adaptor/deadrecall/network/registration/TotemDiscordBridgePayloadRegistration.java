@@ -14,11 +14,11 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
 
-final class TotemDiscordBridgePayloadRegistration {
+public final class TotemDiscordBridgePayloadRegistration {
     private TotemDiscordBridgePayloadRegistration() {
     }
 
-    static void registerServerboundTypes() {
+    public static void registerServerboundTypes() {
         PayloadTypeRegistry.serverboundPlay().register(
                 RequestDiscordConfigPayload.TYPE, RequestDiscordConfigPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(
@@ -27,12 +27,12 @@ final class TotemDiscordBridgePayloadRegistration {
                 ManageDiscordChannelPayload.TYPE, ManageDiscordChannelPayload.CODEC);
     }
 
-    static void registerClientboundTypes() {
+    public static void registerClientboundTypes() {
         PayloadTypeRegistry.clientboundPlay().register(
                 DiscordConfigSyncPayload.TYPE, DiscordConfigSyncPayload.CODEC);
     }
 
-    static void registerReceivers() {
+    public static void registerReceivers() {
         // 收到客戶端請求時，回傳目前設定
         ServerPlayNetworking.registerGlobalReceiver(RequestDiscordConfigPayload.TYPE,
                 (payload, context) -> {

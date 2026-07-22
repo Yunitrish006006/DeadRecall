@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall;
 
 import com.adaptor.deadrecall.discord.DiscordEventNotifications;
+import com.adaptor.deadrecall.core.api.DiscordEventTransport;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -226,6 +227,11 @@ public class DiscordBridge {
     }
 
     public static void sendMinecraftEvent(String event, String username, String message) {
+        var externalTransport = DiscordEventTransport.current();
+        if (externalTransport.isPresent()) {
+            externalTransport.get().send(event, username, message);
+            return;
+        }
         if (!enabled || username == null || username.isBlank() || message == null || message.isBlank()) return;
 
         EXECUTOR.submit(() -> {

@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.bootstrap;
 
 import com.adaptor.deadrecall.registry.DeadRecallRegistryBootstrap;
+import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;
 
@@ -17,7 +18,9 @@ public final class DeadRecallServerBootstrap {
         TotemAutomataBootstrap.register();
         TotemNexusBootstrap.register();
         LegacyGameplayBootstrap.registerRecipes();
-        TotemDiscordBridgeBootstrap.register(configDir);
-        TotemDiscordBridgeBootstrap.registerRuntime();
+        if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
+            TotemDiscordBridgeBootstrap.register(configDir);
+            TotemDiscordBridgeBootstrap.registerRuntime();
+        }
     }
 }

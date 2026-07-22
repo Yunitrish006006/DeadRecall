@@ -58,7 +58,9 @@ public class Deadrecall implements ModInitializer {
 
         // 註冊死亡背包功能 - 當玩家死亡時收集掉落物品
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
-            TotemDiscordBridgeBootstrap.onEntityDeath(entity, damageSource.getEntity());
+            if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
+                TotemDiscordBridgeBootstrap.onEntityDeath(entity, damageSource.getEntity());
+            }
             if (entity instanceof ServerPlayer player) {
                 DeathLocationManager.setDeathLocation(player, player.blockPosition(), player.level());
             }
@@ -105,7 +107,9 @@ public class Deadrecall implements ModInitializer {
                 })
             );
 
-            TotemDiscordBridgeBootstrap.registerCommands(dispatcher);
+            if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
+                TotemDiscordBridgeBootstrap.registerCommands(dispatcher);
+            }
         });
     }
 

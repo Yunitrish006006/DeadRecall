@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.discord;
 
 import com.adaptor.deadrecall.DiscordBridge;
+import com.adaptor.deadrecall.core.api.DiscordEventTransport;
 import com.sun.net.httpserver.HttpServer;
 import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
@@ -14,11 +15,31 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DiscordWorkerFailureIsolationTest {
     @TempDir
     Path tempDir;
+
+    @Test
+    void legacyDiscordBridgeMethodsDelegateToRegisteredExternalTransport() {
+        AtomicReference<String> captured = new AtomicReference<>();
+        DiscordEventTransport.register((event, username, message) ->
+                captured.set(event + "|" + username + "|" + message)
+        );
+
+        try {
+            DiscordBridge.sendDeathBackpackCreated("Alex");
+
+            assertEquals(
+                    "death_backpack_created|Alex|Alex 的死亡背包已建立",
+                    captured.get()
+            );
+        } finally {
+            DiscordEventTransport.register(null);
+        }
+    }
 
     @Test
     void workerHttpFailureDoesNotEscapeLocalizedMinecraftEvent() throws Exception {

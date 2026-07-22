@@ -1,5 +1,7 @@
 package com.adaptor.deadrecall.network.registration;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 public final class DeadRecallPayloadRegistration {
     private DeadRecallPayloadRegistration() {
     }
@@ -11,21 +13,31 @@ public final class DeadRecallPayloadRegistration {
 
     private static void registerTypes() {
         // Keep this sequence aligned with the legacy monolithic initializer.
-        TotemDiscordBridgePayloadRegistration.registerServerboundTypes();
+        if (!usesExternalDiscordBridge()) {
+            TotemDiscordBridgePayloadRegistration.registerServerboundTypes();
+        }
         LegacyContainerPayloadRegistration.registerServerboundTypes();
         TotemAutomataPayloadRegistration.registerServerboundTypes();
         TotemNexusPayloadRegistration.registerServerboundTypes();
 
-        TotemDiscordBridgePayloadRegistration.registerClientboundTypes();
+        if (!usesExternalDiscordBridge()) {
+            TotemDiscordBridgePayloadRegistration.registerClientboundTypes();
+        }
         TotemAutomataPayloadRegistration.registerClientboundTypes();
         TotemNexusPayloadRegistration.registerClientboundTypes();
     }
 
     private static void registerReceivers() {
         // Receiver order is also part of the compatibility-preserving extraction.
-        TotemDiscordBridgePayloadRegistration.registerReceivers();
+        if (!usesExternalDiscordBridge()) {
+            TotemDiscordBridgePayloadRegistration.registerReceivers();
+        }
         LegacyContainerPayloadRegistration.registerReceivers();
         TotemAutomataPayloadRegistration.registerReceivers();
         TotemNexusPayloadRegistration.registerReceivers();
+    }
+
+    private static boolean usesExternalDiscordBridge() {
+        return FabricLoader.getInstance().isModLoaded("totem-discord-bridge");
     }
 }

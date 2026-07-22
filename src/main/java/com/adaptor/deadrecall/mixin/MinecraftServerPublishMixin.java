@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.mixin;
 
 import com.adaptor.deadrecall.Deadrecall;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MinecraftServerPublishMixin {
     @Inject(method = "publishServer", at = @At("RETURN"))
     private void deadrecall$notifyPublishedServer(MinecraftServer.MultiplayerScope scope, GameType gameMode, boolean cheats, int port, CallbackInfoReturnable<Boolean> cir) {
+        if (FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
+            return;
+        }
         if (Boolean.TRUE.equals(cir.getReturnValue())) {
             Deadrecall.notifyServerOpened((MinecraftServer) (Object) this, false);
         }
@@ -19,6 +23,9 @@ public abstract class MinecraftServerPublishMixin {
 
     @Inject(method = "unpublishServer", at = @At("RETURN"))
     private void deadrecall$notifyUnpublishedServer(CallbackInfoReturnable<Boolean> cir) {
+        if (FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
+            return;
+        }
         if (Boolean.TRUE.equals(cir.getReturnValue())) {
             Deadrecall.notifyServerClosed((MinecraftServer) (Object) this, true);
         }

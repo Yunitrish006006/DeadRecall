@@ -2,6 +2,7 @@ package com.adaptor.deadrecall.client;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
+import net.fabricmc.loader.api.FabricLoader;
 
 /**
  * Composes the client-side feature bootstraps in the legacy registration order.
@@ -16,12 +17,22 @@ public final class DeadRecallClientBootstrap {
         KeyMapping.Category category = KeyMapping.Category.register(
                 Identifier.fromNamespaceAndPath("deadrecall", "category")
         );
-        DeadrecallClient.openDiscordConfigKey = TotemDiscordBridgeClientBootstrap.createKeyMapping(category);
+        if (!usesExternalDiscordBridge()) {
+            DeadrecallClient.openDiscordConfigKey = TotemDiscordBridgeClientBootstrap.createKeyMapping(category);
+        }
         DeadrecallClient.sortBackpackKey = LegacyContainerClientBootstrap.createKeyMapping(category);
 
-        TotemDiscordBridgeClientBootstrap.registerRuntime();
+        if (!usesExternalDiscordBridge()) {
+            TotemDiscordBridgeClientBootstrap.registerRuntime();
+        }
         TotemAutomataClientBootstrap.registerNetworking();
         TotemNexusClientBootstrap.registerNetworking();
-        TotemDiscordBridgeClientBootstrap.registerCommands();
+        if (!usesExternalDiscordBridge()) {
+            TotemDiscordBridgeClientBootstrap.registerCommands();
+        }
+    }
+
+    private static boolean usesExternalDiscordBridge() {
+        return FabricLoader.getInstance().isModLoaded("totem-discord-bridge");
     }
 }

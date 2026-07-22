@@ -32,8 +32,8 @@
 - [x] 3.1 Replace root-initializer Discord registration with a feature bootstrap.
 - [x] 3.2 Isolate Discord Payload, Mixin, client config UI, language and config ownership.
 - [x] 3.3 Create `TotemDiscordBridge` from a temporary filtered history export.
-- [ ] 3.4 Validate Core + Discord standalone installation.
-- [ ] 3.5 Consume the module from the DeadRecall compatibility bundle without duplicate registration.
+- [x] 3.4 Validate Core + Discord standalone installation.
+- [x] 3.5 Consume the module from the DeadRecall compatibility bundle without duplicate registration.
 - [ ] 3.6 Keep lockstep versions through the observation window before removing the old implementation.
 
 ## 4. TotemRemnant repository

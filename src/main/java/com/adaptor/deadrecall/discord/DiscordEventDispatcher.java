@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.discord;
 
 import com.adaptor.deadrecall.DiscordBridge;
+import com.adaptor.deadrecall.core.api.DiscordEventTransport;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -21,7 +22,11 @@ public final class DiscordEventDispatcher {
         if (observer != null) {
             observer.accept(payload);
         }
-        DiscordBridge.sendMinecraftEvent(payload.event(), payload.username(), payload.message());
+        DiscordEventTransport.current()
+                .ifPresentOrElse(
+                        transport -> transport.send(payload.event(), payload.username(), payload.message()),
+                        () -> DiscordBridge.sendMinecraftEvent(payload.event(), payload.username(), payload.message())
+                );
     }
 
     public static AutoCloseable observeForTesting(Consumer<DiscordEventPayload> observer) {
