@@ -8,6 +8,7 @@ import com.adaptor.deadrecall.registry.TotemRemnantItemGroupRegistration;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTabOutput;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -42,7 +43,9 @@ public final class ModItemGroups {
 
     private static void addDeadRecallItems(FabricCreativeModeTabOutput output) {
         TotemAutomataItemGroupRegistration.addItems(output);
-        TotemRemnantItemGroupRegistration.addItems(output);
+        if (!FabricLoader.getInstance().isModLoaded("totem-remnant")) {
+            TotemRemnantItemGroupRegistration.addItems(output);
+        }
         LegacyGameplayItemGroupRegistration.addItems(output);
     }
 }

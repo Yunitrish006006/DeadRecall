@@ -5,7 +5,6 @@ import com.adaptor.deadrecall.block.ModBlocks;
 import com.adaptor.deadrecall.block.entity.ModBlockEntities;
 import com.adaptor.deadrecall.effect.ModMobEffects;
 import com.adaptor.deadrecall.item.ModItemGroups;
-import com.adaptor.deadrecall.item.ModItems;
 import com.adaptor.deadrecall.menu.ModMenus;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -33,7 +32,7 @@ public final class DeadRecallRegistryBootstrap {
         }
         LegacyGameplayItemRegistration.register();
         TotemAutomataItemRegistration.register();
-        ModItems.registerModItems();
+        DeadRecallItemRegistrationLog.register();
 
         ModItemGroups.registerModItemGroups();
     }
