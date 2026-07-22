@@ -3,6 +3,7 @@ package com.adaptor.deadrecall.death;
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonInventoryProvider;
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonInventoryRegistry;
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonSlot;
+import com.adaptor.deadrecall.core.api.DeathBackpackCaptureTransport;
 import com.adaptor.deadrecall.integration.trinkets.TrinketsDeathBackpackInventoryProvider;
 import com.adaptor.deadrecall.item.BackpackItemHelper;
 import com.adaptor.deadrecall.item.ModItems;
@@ -24,6 +25,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -150,6 +152,38 @@ public final class DeathBackpackAddonInventoryGameTest {
             helper.succeed();
         } finally {
             TEST_PROVIDER.states.remove(player.getUUID());
+            player.discard();
+        }
+    }
+
+    @SuppressWarnings("removal")
+    @GameTest(maxTicks = 40)
+    public void externalTransportCommitsCapturedContentsWithoutLegacyEntity(GameTestHelper helper) {
+        ServerPlayer player = createPlayer(helper);
+        ItemStack expected = namedDiamonds(9);
+        player.getInventory().setItem(0, expected);
+        Optional<DeathBackpackCaptureTransport> previousTransport = DeathBackpackCaptureTransport.current();
+        List<ItemStack> committedContents = new java.util.ArrayList<>();
+
+        DeathBackpackCaptureTransport.register((transportPlayer, transportLevel, position, contents) -> {
+            require(helper, transportPlayer == player, "External transport received a different player");
+            require(helper, transportLevel == helper.getLevel(), "External transport received a different level");
+            require(helper, position.equals(player.blockPosition()), "External transport received an incorrect death position");
+            contents.stream().map(ItemStack::copy).forEach(committedContents::add);
+            return true;
+        });
+        try {
+            boolean captured = DeathBackpackCaptureService.captureBeforeVanillaDrop(player, helper.getLevel());
+            require(helper, captured, "External transport capture did not report success");
+            require(helper, player.getInventory().getItem(0).isEmpty(),
+                    "Captured Inventory stack was not removed before external commit");
+            require(helper, committedContents.size() == 1 && sameExactStack(committedContents.getFirst(), expected),
+                    "External transport did not receive the exact captured stack");
+            require(helper, deathBackpacks(helper, player.blockPosition()).isEmpty(),
+                    "Legacy death backpack entity was created while external transport was active");
+            helper.succeed();
+        } finally {
+            DeathBackpackCaptureTransport.register(previousTransport.orElse(null));
             player.discard();
         }
     }
