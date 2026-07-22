@@ -6,6 +6,7 @@ import com.adaptor.deadrecall.api.death.DeathBackpackAddonInventoryProvider;
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonInventoryRegistry;
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonSlot;
 import com.adaptor.deadrecall.core.api.DeathBackpackNodeLifecycle;
+import com.adaptor.deadrecall.core.api.DeathBackpackCaptureTransport;
 import com.adaptor.deadrecall.api.death.DeathBackpackNodeBinding;
 import com.adaptor.deadrecall.inventory.PortableContainerPolicy;
 import com.adaptor.deadrecall.registry.TotemRemnantItemRegistration;
@@ -91,6 +92,15 @@ public final class DeathBackpackCaptureService {
             removeCapturedTransientStacks(capturedTransientStacks);
             removeCapturedAddonSlots(capturedAddonSlots, removedAddonSlots);
             failIfRequested(player, CaptureFailurePoint.AFTER_SLOT_REMOVAL);
+
+            var externalTransport = DeathBackpackCaptureTransport.current();
+            if (externalTransport.isPresent()) {
+                if (!externalTransport.get().commit(player, level, deathPos, contents)) {
+                    throw new IllegalStateException("External death backpack capture transaction failed");
+                }
+                clearForcedFailureForTesting(player.getUUID());
+                return true;
+            }
 
             backpackEntity = new ItemEntity(
                     level,
