@@ -41,7 +41,7 @@
 - [x] 4.1 Replace direct death-to-Nexus calls with versioned lifecycle events and optional adapters.
 - [x] 4.2 Assign backpack items, inventory, addon API, Trinkets adapter, Payload and death Mixin ownership.
 - [x] 4.3 Create `TotemRemnant` and preserve existing addon API compatibility.
-- [ ] 4.4 Pass death capture/recovery, restart, legacy world, multi-player and Dedicated Server tests.
+- [x] 4.4 Pass death capture/recovery, restart, legacy world, multi-player and Dedicated Server tests.
 - [ ] 4.5 Cut the bundle over and remove the old implementation only after dual validation.
 
 ## 5. TotemAutomata repository
