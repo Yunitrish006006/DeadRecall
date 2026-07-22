@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.bootstrap;
 
 import com.adaptor.deadrecall.registry.DeadRecallRegistryBootstrap;
+import com.adaptor.deadrecall.death.RemnantNotificationBridge;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;
@@ -22,5 +23,6 @@ public final class DeadRecallServerBootstrap {
             TotemDiscordBridgeBootstrap.register(configDir);
             TotemDiscordBridgeBootstrap.registerRuntime();
         }
+        RemnantNotificationBridge.installIfPresent();
     }
 }

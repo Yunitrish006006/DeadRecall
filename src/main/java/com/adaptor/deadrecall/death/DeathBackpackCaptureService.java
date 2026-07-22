@@ -167,7 +167,7 @@ public final class DeathBackpackCaptureService {
         throw new IllegalStateException("Forced death-backpack capture failure at " + failurePoint);
     }
 
-    private static void notifyCaptureCompleted(ServerPlayer player, int stackCount, BlockPos deathPos) {
+    static void notifyCaptureCompleted(ServerPlayer player, int stackCount, BlockPos deathPos) {
         try {
             DiscordBridge.sendDeathBackpackCreated(player.getName().getString());
         } catch (RuntimeException exception) {

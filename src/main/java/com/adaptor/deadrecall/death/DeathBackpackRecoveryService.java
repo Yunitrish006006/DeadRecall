@@ -71,6 +71,10 @@ public final class DeathBackpackRecoveryService {
             );
         }
 
+        notifyRecoveredFromExternalAdapter(player);
+    }
+
+    static void notifyRecoveredFromExternalAdapter(ServerPlayer player) {
         try {
             DiscordBridge.sendDeathBackpackRecovered(player.getName().getString());
         } catch (RuntimeException exception) {
