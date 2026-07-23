@@ -26,6 +26,11 @@ The compatibility bundle consumed the GitHub Packages `0.1.0` artifacts directly
 
 The second immutable graph consumed GitHub Packages `0.1.1` artifacts (Core SHA-512 `c6f8ded2e184b44eda917c956a01f89feb6722ba8c9a604812a23ff8a9bbfd6758fcf78dc6d77915085a2c18dee5f3c768b865bcbe8f2dd981b460c07bd3eef2`; Discord SHA-512 `ce84021bafbfe99aedc72a640b228bf3916b80e384080833b807d9c49e7c32587d113324a36cfbb98a71478d84cea61ec0ea19ff1591130e34fa35718f50eb0b`). The same official bundle reached `Done (0.611s)` and saved all dimensions. The retained `0.1.0` artifact hashes and its successful official-server verification above are the rollback baseline.
 
+`lockstep-manifest.json` now records these current and rollback pins in a
+machine-readable form. `assemble-lockstep-bundle.sh` rejects missing, extra or
+checksum-mismatched JARs before staging a local compatibility-bundle mods
+directory.
+
 ## Remnant bundle cutover verification
 
 The compatibility bundle was assembled with the current DeadRecall JAR and
