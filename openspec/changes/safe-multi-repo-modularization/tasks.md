@@ -55,7 +55,7 @@
 
 - [x] 6.1 Isolate Space Unit, teleport, friend, death-node and distributed-spawn ownership.
 - [x] 6.2 Create `TotemNexus` while preserving all SavedData, Payload and resource IDs.
-- [ ] 6.3 Pass teleport, privacy, multi-player, dimension, restart and legacy-world tests.
+- [x] 6.3 Pass teleport, privacy, multi-player, dimension, restart and legacy-world tests.
 - [ ] 6.4 Cut the bundle over and remove the old implementation only after dual validation.
 
 ## 7. Remaining gameplay and compatibility bundle
