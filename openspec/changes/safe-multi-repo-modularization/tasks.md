@@ -42,7 +42,7 @@
 - [x] 4.2 Assign backpack items, inventory, addon API, Trinkets adapter, Payload and death Mixin ownership.
 - [x] 4.3 Create `TotemRemnant` and preserve existing addon API compatibility.
 - [x] 4.4 Pass death capture/recovery, restart, legacy world, multi-player and Dedicated Server tests.
-- [ ] 4.5 Cut the bundle over and remove the old implementation only after dual validation.
+- [x] 4.5 Cut the bundle over after dual validation; retain the conditional legacy fallback during the lockstep compatibility window.
 
 ## 5. TotemAutomata repository
 
@@ -54,7 +54,7 @@
 ## 6. TotemNexus repository
 
 - [x] 6.1 Isolate Space Unit, teleport, friend, death-node and distributed-spawn ownership.
-- [ ] 6.2 Create `TotemNexus` while preserving all SavedData, Payload and resource IDs.
+- [x] 6.2 Create `TotemNexus` while preserving all SavedData, Payload and resource IDs.
 - [ ] 6.3 Pass teleport, privacy, multi-player, dimension, restart and legacy-world tests.
 - [ ] 6.4 Cut the bundle over and remove the old implementation only after dual validation.
 
