@@ -31,8 +31,8 @@ collect_identifiers() {
                 factory = "Identifier\\.fromNamespaceAndPath\\(\"deadrecall\",[[:space:]]*\"[a-z0-9_./-]+\"\\)"
                 while (match(remaining, factory)) {
                     identifier = substr(remaining, RSTART, RLENGTH)
-                    sub(/^.*\"deadrecall\",[[:space:]]*\"/, "", identifier)
-                    sub(/\".*$/, "", identifier)
+                    sub(/^.*"deadrecall",[[:space:]]*"/, "", identifier)
+                    sub(/".*$/, "", identifier)
                     print "identifier deadrecall:" identifier
                     remaining = substr(remaining, RSTART + RLENGTH)
                 }
