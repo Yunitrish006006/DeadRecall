@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "purpose": "immutable compatibility-bundle release graph",
+  "bundle": {
+    "repository": "DeadRecall",
+    "modId": "deadrecall",
+    "version": "2.4.1",
+    "minecraft": "26.2",
+    "fabricLoader": "0.19.3",
+    "fabricApi": "0.154.2+26.2",
+    "java": 25
+  },
+  "modules": [
+    {
+      "id": "totem-core",
+      "version": "0.1.1",
+      "repository": "GitHub Packages",
+      "sha512": "c6f8ded2e184b44eda917c956a01f89feb6722ba8c9a604812a23ff8a9bbfd6758fcf78dc6d77915085a2c18dee5f3c768b865bcbe8f2dd981b460c07bd3eef2"
+    },
+    {
+      "id": "totem-discord-bridge",
+      "version": "0.1.1",
+      "repository": "GitHub Packages",
+      "sha512": "ce84021bafbfe99aedc72a640b228bf3916b80e384080833b807d9c49e7c32587d113324a36cfbb98a71478d84cea61ec0ea19ff1591130e34fa35718f50eb0b"
+    }
+  ],
+  "rollback": {
+    "bundleVersion": "2.4.1",
+    "modules": [
+      {
+        "id": "totem-core",
+        "version": "0.1.0",
+        "sha512": "7e9b8bcb6f9ee1b7687d607f6a4e8f7d385af608a549ddd635e541d6f4f3c9ab9ab21a2e701e0ee6467691ee38a6ba7c17a8de5e61f1236a4073e14f9b2ba2cc"
+      },
+      {
+        "id": "totem-discord-bridge",
+        "version": "0.1.0",
+        "sha512": "f379687d56e4af1128d972fb57fa318b427d6c007859547e5156a9f110f0a0057626fc0754f58c169073bcabcf876b2181bb6211ebaf518e5ee4669c099b8a69"
+      }
+    ]
+  }
+}

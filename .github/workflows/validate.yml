@@ -27,6 +27,9 @@ jobs:
       - name: Check feature dependency boundaries
         run: bash .github/scripts/check-feature-dependency-boundaries.sh
 
+      - name: Check lockstep compatibility manifest
+        run: bash .github/scripts/check-lockstep-manifest.sh
+
       - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
