@@ -342,3 +342,7 @@ jobs:
             ${{ runner.temp }}/deadrecall-lockstep-*/server/crash-reports/**
             ${{ runner.temp }}/legacy-automata-*/**
             ${{ runner.temp }}/legacy-nexus-*/**
+            .lockstep/TotemCore/build/libs/*.jar
+            .lockstep/TotemDiscordBridge/build/libs/*.jar
+            .lockstep/TotemAutomata/build/libs/*.jar
+            .lockstep/TotemNexus/build/libs/*.jar
