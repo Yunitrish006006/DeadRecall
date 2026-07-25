@@ -83,7 +83,9 @@ for id in "${!expected[@]}"; do
     [[ -f "${jar}" ]] || { printf 'Artifact does not exist: %s\n' "${jar}" >&2; exit 1; }
     actual="$(sha512sum "${jar}" | awk '{print $1}')"
     [[ "${actual}" == "${expected[${id}]}" ]] || {
-        printf 'SHA-512 mismatch for %s.\n' "${id}" >&2; exit 1;
+        printf 'SHA-512 mismatch for %s. Expected %s but built %s.\n' \
+            "${id}" "${expected[${id}]}" "${actual}" >&2
+        exit 1
     }
     cp "${jar}" "${output}/$(basename "${jar}")"
 done
