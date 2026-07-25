@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.advancement;
 
 import com.adaptor.deadrecall.Deadrecall;
+import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.registry.LegacyGameplayCriteriaRegistration;
 import com.adaptor.deadrecall.registry.TotemAutomataCriteriaRegistration;
 
@@ -10,7 +11,7 @@ public final class ModCriteriaTriggers {
     public static final SimplePlayerCriterionTrigger PIG_MANURE_GOT_HIT =
             LegacyGameplayCriteriaRegistration.PIG_MANURE_GOT_HIT;
     public static final SimplePlayerCriterionTrigger FIRST_COPPER_GOLEM_BINDING =
-            TotemAutomataCriteriaRegistration.FIRST_COPPER_GOLEM_BINDING;
+            AutomataCutover.usesExternalAuthority() ? null : TotemAutomataCriteriaRegistration.FIRST_COPPER_GOLEM_BINDING;
 
     private ModCriteriaTriggers() {
     }

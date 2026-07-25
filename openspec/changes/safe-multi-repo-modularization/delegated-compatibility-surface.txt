@@ -1,0 +1,21 @@
+# Compatibility resources supplied by an exact-version external bundle module.
+# They remain in compatibility-surface.txt and are verified against the
+# assembled bundle, not against DeadRecall's source JAR.
+identifier deadrecall:item/copper_wrench
+resource assets/deadrecall/items/copper_wrench.json
+resource assets/deadrecall/lang/discord_zh_tw/adventure.json
+resource assets/deadrecall/lang/discord_zh_tw/end.json
+resource assets/deadrecall/lang/discord_zh_tw/events.json
+resource assets/deadrecall/lang/discord_zh_tw/husbandry.json
+resource assets/deadrecall/lang/discord_zh_tw/nether.json
+resource assets/deadrecall/lang/discord_zh_tw/story.json
+resource assets/deadrecall/lang/discord_zh_tw/system.json
+resource assets/deadrecall/models/item/copper_wrench.json
+resource assets/deadrecall/textures/item/copper_wrench.png
+resource data/deadrecall/advancement/first_copper_golem_binding.json
+resource data/deadrecall/recipe/copper_wrench.json
+resource data/deadrecall/deadrecall/space_unit_degradation/vanilla.json
+resource data/deadrecall/tags/block/space_unit_amethyst_catalysts.json
+resource data/deadrecall/tags/block/space_unit_structure_blocks.json
+resource data/deadrecall/tags/block/space_unit_structure_degradable_blocks.json
+resource data/deadrecall/tags/block/space_unit_structure_worn_blocks.json

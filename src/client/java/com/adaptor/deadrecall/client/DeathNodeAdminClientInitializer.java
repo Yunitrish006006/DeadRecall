@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall.client;
 
+import com.adaptor.deadrecall.bootstrap.NexusCutover;
 import com.adaptor.deadrecall.network.DeathNodeAdminPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -7,6 +8,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 public final class DeathNodeAdminClientInitializer implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        if (NexusCutover.usesExternalAuthority()) {
+            return;
+        }
         ClientPlayNetworking.registerGlobalReceiver(DeathNodeAdminPayload.TYPE, (payload, context) -> {
             net.minecraft.client.Minecraft minecraft = context.client();
             minecraft.execute(() -> {

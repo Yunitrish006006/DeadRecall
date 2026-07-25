@@ -8,7 +8,14 @@ readonly MANIFEST="${SCRIPT_DIR}/../../openspec/changes/safe-multi-repo-modulari
 [[ -f "${MANIFEST}" ]] || { printf 'Missing lockstep manifest: %s\n' "${MANIFEST}" >&2; exit 1; }
 
 awk '
-    BEGIN { module_count = 0; rollback_count = 0; in_rollback = 0; valid = 1 }
+    BEGIN {
+        module_count = 0
+        rollback_count = 0
+        source_repository_count = 0
+        source_commit_count = 0
+        in_rollback = 0
+        valid = 1
+    }
     /"rollback"[[:space:]]*:/ { in_rollback = 1 }
     /"id"[[:space:]]*:[[:space:]]*"[a-z0-9-]+"/ {
         if (in_rollback) rollback_count++; else module_count++
@@ -24,9 +31,32 @@ awk '
             printf "Lockstep manifest contains an invalid SHA-512: %s\n", value > "/dev/stderr"; valid = 0
         }
     }
+    !in_rollback && /"sourceRepository"[[:space:]]*:/ {
+        value = $0
+        sub(/^.*"sourceRepository"[[:space:]]*:[[:space:]]*"/, "", value)
+        sub(/".*$/, "", value)
+        if (value !~ /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\.git$/) {
+            printf "Lockstep manifest contains an invalid source repository: %s\n", value > "/dev/stderr"
+            valid = 0
+        }
+        source_repository_count++
+    }
+    !in_rollback && /"sourceCommit"[[:space:]]*:/ {
+        value = $0
+        sub(/^.*"sourceCommit"[[:space:]]*:[[:space:]]*"/, "", value)
+        sub(/".*$/, "", value)
+        if (value !~ /^[0-9a-f]{40}$/) {
+            printf "Lockstep manifest contains an invalid source commit: %s\n", value > "/dev/stderr"
+            valid = 0
+        }
+        source_commit_count++
+    }
     END {
         if (module_count == 0 || rollback_count == 0) {
             print "Lockstep manifest must pin current and rollback module graphs." > "/dev/stderr"; valid = 0
+        }
+        if (source_repository_count != module_count || source_commit_count != module_count) {
+            print "Every current lockstep module must pin its source repository and exact source commit." > "/dev/stderr"; valid = 0
         }
         exit !valid
     }

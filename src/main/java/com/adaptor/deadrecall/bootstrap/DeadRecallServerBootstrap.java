@@ -16,13 +16,18 @@ public final class DeadRecallServerBootstrap {
     public static void register(Path configDir) {
         DeadRecallRegistryBootstrap.registerContent();
         LegacyGameplayBootstrap.registerInteractions();
-        TotemAutomataBootstrap.register();
-        TotemNexusBootstrap.register();
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataBootstrap.register();
+        }
+        if (!NexusCutover.usesExternalAuthority()) {
+            TotemNexusBootstrap.register();
+        }
         LegacyGameplayBootstrap.registerRecipes();
         if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
             TotemDiscordBridgeBootstrap.register(configDir);
             TotemDiscordBridgeBootstrap.registerRuntime();
         }
+        NexusDiscordIntegrationBootstrap.installIfExternalAuthority();
         RemnantNotificationBridge.installIfPresent();
     }
 }

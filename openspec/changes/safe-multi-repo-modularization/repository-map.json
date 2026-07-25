@@ -38,7 +38,7 @@
     {
       "id": "remnant",
       "repository": "TotemRemnant",
-      "status": "bundle-cutover-validated-with-legacy-fallback",
+      "status": "bundle-cutover-lockstep-observation-in-progress",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/api/death/**",
         "src/main/java/com/adaptor/deadrecall/death/**",
@@ -50,7 +50,7 @@
     {
       "id": "automata",
       "repository": "TotemAutomata",
-      "status": "repository-initialized-additive-extraction-in-progress",
+      "status": "test-qualified-pending-bundle-cutover",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/item/copper/**",
         "Copper Golem payloads and receivers",

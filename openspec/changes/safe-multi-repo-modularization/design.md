@@ -50,6 +50,14 @@ Every feature repository uses the same sequence:
 
 At no point may two implementations register the same registry or Payload ID in one runtime.
 
+An external repository reaching a standalone build, extracted primitive tests, or
+an inactive cutover seam is not a bundle cutover.  A feature is cut over only
+when its external implementation is the sole live owner of its complete
+authority and registration surface in the assembled DeadRecall runtime.  The
+matching legacy implementation remains source-visible but disabled throughout
+the lockstep observation window, so a previous immutable bundle pin can restore
+it without changing persisted world data.
+
 ## 4. Initial ordering
 
 ### TotemCore
@@ -97,7 +105,43 @@ Each module repository eventually runs:
 
 DeadRecall additionally runs the assembled bundle, legacy-world fixtures and cross-module combinations. Independent Modrinth publishing is enabled only after the bundle has consumed two successful lockstep releases.
 
-## 7. Installation matrix
+### Locked verification runtime
+
+Every module build, GameTest and assembled-bundle verification uses **Java
+25**.  The verifier rejects another Java major version before it stages a
+world, so a workstation's default Java 17 installation cannot produce
+misleading lockstep evidence.
+
+The isolated exact-version Dedicated Server always writes
+`server-port=25570`.  A legacy-world seed run which is executed alongside it
+uses `server-port=25571`.  Compatibility probes must not rely on Minecraft's
+default `25565`, because a developer server or another probe may already own
+that port.  The port numbers are test-harness isolation settings, not part of
+the persisted world or public mod protocol.
+
+## 7. Visual test evidence
+
+Tests which validate a client screen, rendering, mouse/keyboard interaction or a
+manual visual acceptance criterion must save screenshot evidence in the current
+repository working directory.  The required location is
+`test-artifacts/screenshots/<change-id>/<test-id>-<stage>.png`; `<stage>` is at
+least `before` and `after`, and includes an asserted error or confirmation state
+when that state is the subject of the test.  A deterministic name is required so
+that a re-run replaces only evidence for the same test case.
+
+The screenshot must show the relevant game state and must not include secrets,
+tokens, private chat, or unrelated desktop windows.  Tests running under a
+virtual display capture that display; manual tests capture the game window.
+The test report records the command, test ID, and relative screenshot paths.
+
+Pure JVM tests and headless Fabric Server GameTests have no meaningful client
+framebuffer and therefore continue to provide their JUnit/GameTest reports
+instead of fabricated screenshots.  A visual requirement must be covered by a
+Client GameTest or an explicitly documented manual test case.  CI uploads
+`test-artifacts/screenshots/**` with the normal validation reports, including
+when the test fails.
+
+## 8. Installation matrix
 
 For each extracted feature, CI must cover:
 
@@ -112,7 +156,7 @@ For each extracted feature, CI must cover:
 
 Pairwise feature combinations are required only where an explicit integration exists. The full bundle remains the authoritative end-to-end combination.
 
-## 8. Rollback
+## 9. Rollback
 
 - Every cutover is one feature and one reversible PR.
 - The old DeadRecall implementation is not deleted in the same commit that first consumes a new external module.

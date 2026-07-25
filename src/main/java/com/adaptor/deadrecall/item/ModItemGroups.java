@@ -1,9 +1,9 @@
 package com.adaptor.deadrecall.item;
 
 import com.adaptor.deadrecall.Deadrecall;
+import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.registry.LegacyGameplayItemGroupRegistration;
 import com.adaptor.deadrecall.registry.TotemAutomataItemGroupRegistration;
-import com.adaptor.deadrecall.registry.TotemAutomataItemRegistration;
 import com.adaptor.deadrecall.registry.TotemRemnantItemGroupRegistration;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
@@ -29,7 +29,7 @@ public final class ModItemGroups {
             DEADRECALL_TAB_KEY,
             FabricCreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.deadrecall.main"))
-                    .icon(() -> new ItemStack(TotemAutomataItemRegistration.COPPER_WRENCH))
+                    .icon(ModItemGroups::copperWrenchIcon)
                     .build()
     );
 
@@ -42,10 +42,18 @@ public final class ModItemGroups {
     }
 
     private static void addDeadRecallItems(FabricCreativeModeTabOutput output) {
-        TotemAutomataItemGroupRegistration.addItems(output);
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataItemGroupRegistration.addItems(output);
+        }
         if (!FabricLoader.getInstance().isModLoaded("totem-remnant")) {
             TotemRemnantItemGroupRegistration.addItems(output);
         }
         LegacyGameplayItemGroupRegistration.addItems(output);
+    }
+
+    private static ItemStack copperWrenchIcon() {
+        return BuiltInRegistries.ITEM.get(Identifier.fromNamespaceAndPath("deadrecall", "copper_wrench"))
+                .map(ItemStack::new)
+                .orElse(ItemStack.EMPTY);
     }
 }

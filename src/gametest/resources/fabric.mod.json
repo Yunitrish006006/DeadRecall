@@ -7,7 +7,9 @@
   "entrypoints": {
     "main": [
       "com.adaptor.deadrecall.gametest.DeathBackpackRestartProbe",
-      "com.adaptor.deadrecall.item.copper.CopperGolemRestartProbe"
+      "com.adaptor.deadrecall.item.copper.CopperGolemRestartProbe",
+      "com.adaptor.deadrecall.gametest.LegacyAutomataMigrationProbe",
+      "com.adaptor.deadrecall.gametest.LegacyNexusMigrationProbe"
     ],
     "fabric-gametest": [
       "com.adaptor.deadrecall.death.DeathBackpackAddonInventoryGameTest",

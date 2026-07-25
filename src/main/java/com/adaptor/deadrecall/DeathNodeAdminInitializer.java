@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall;
 
+import com.adaptor.deadrecall.bootstrap.NexusCutover;
 import com.adaptor.deadrecall.network.DeathNodeAdminPayload;
 import com.adaptor.deadrecall.network.ManageDeathNodeAdminPayload;
 import com.adaptor.deadrecall.network.RequestDeathNodeAdminPayload;
@@ -14,6 +15,9 @@ import net.minecraft.server.permissions.Permissions;
 public final class DeathNodeAdminInitializer implements ModInitializer {
     @Override
     public void onInitialize() {
+        if (NexusCutover.usesExternalAuthority()) {
+            return;
+        }
         PayloadTypeRegistry.clientboundPlay().register(DeathNodeAdminPayload.TYPE, DeathNodeAdminPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(RequestDeathNodeAdminPayload.TYPE, RequestDeathNodeAdminPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(ManageDeathNodeAdminPayload.TYPE, ManageDeathNodeAdminPayload.CODEC);

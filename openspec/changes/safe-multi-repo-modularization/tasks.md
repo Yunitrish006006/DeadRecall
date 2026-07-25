@@ -8,6 +8,7 @@
 - [x] 0.4 Add an automated CI check that rejects an unexplained compatibility-surface change.
 - [x] 0.5 Define the copy, dual-validation, cutover, deletion, observation and rollback protocol.
 - [x] 0.6 Record current shared seams and unassigned gameplay instead of assigning them to Core.
+- [x] 0.7 Define visual-test screenshot evidence in the repository working directory and retain it in CI artifacts.
 
 ## 1. Internal boundaries inside DeadRecall
 
@@ -48,20 +49,34 @@
 
 - [x] 5.1 Isolate copper item/menu/registry/client/Payload/Mixin registration.
 - [x] 5.2 Create `TotemAutomata` with no required Cognition dependency.
-- [ ] 5.3 Pass sorting, gathering, pressure, restart and standalone installation tests.
-- [ ] 5.4 Cut the bundle over and remove the old implementation only after dual validation.
+- [x] 5.3 Pass sorting, gathering, pressure, restart and standalone installation tests.
+- [ ] 5.4 Cut the bundle over only after all Automata cutover gates pass; retain the disabled legacy implementation for the observation window.
+  - Implementation boundary: [`totem-automata-cutover-contract.md`](totem-automata-cutover-contract.md).
+  - [x] 5.4.1 Move the complete Copper Wrench authority (interaction callbacks, menu opening, sorting/gathering runtime, persistence, permissions and server ticks) into `TotemAutomata` without a direct DeadRecall feature dependency.
+  - [x] 5.4.2 Activate Automata-owned item, menu, criterion, Payload, client-screen and Mixin registrations as one atomic path, while gating the matching legacy registrations when `totem-automata` is present.
+  - [x] 5.4.3 Prove the assembled bundle has exactly one registration for every preserved identifier, payload receiver, event callback and Mixin, and pass standalone, bundle, legacy-world, restart and Dedicated Server gates.
+  - [x] 5.4.4 Publish or stage an immutable Automata artifact, pin it in the exact-version bundle manifest, and retain the previous pin as the rollback target through the observation window.
 
 ## 6. TotemNexus repository
 
 - [x] 6.1 Isolate Space Unit, teleport, friend, death-node and distributed-spawn ownership.
 - [x] 6.2 Create `TotemNexus` while preserving all SavedData, Payload and resource IDs.
 - [x] 6.3 Pass teleport, privacy, multi-player, dimension, restart and legacy-world tests.
-- [ ] 6.4 Cut the bundle over and remove the old implementation only after dual validation.
+- [ ] 6.4 Cut the bundle over only after all Nexus cutover gates pass; retain the disabled legacy implementation for the observation window.
+  - [x] 6.4.1 Move the complete Space Unit authority (SavedData ownership, death-node lifecycle, friends/map projection, lodestone management, teleport sessions, item/block hooks and server ticks) into `TotemNexus` without a direct DeadRecall feature dependency.
+  - [x] 6.4.2 Activate Nexus-owned payload, client UI, interaction and Mixin registrations as one atomic path, while gating the matching legacy registrations when `totem-nexus` is present.
+  - [x] 6.4.3 Prove the assembled bundle has exactly one registration for every preserved identifier, payload receiver, event callback and Mixin, and pass standalone, bundle, legacy-world, restart, multi-player and Dedicated Server gates.
+  - [x] 6.4.4 Publish or stage an immutable Nexus artifact, pin it in the exact-version bundle manifest, and retain the previous pin as the rollback target through the observation window.
 
 ## 7. Remaining gameplay and compatibility bundle
 
 - [x] 7.1 Propose explicit repositories for each remaining bounded context.
 - [x] 7.2 Keep unassigned gameplay in DeadRecall and out of Core until approved.
-- [ ] 7.3 Convert DeadRecall into an exact-version compatibility bundle and E2E test repository.
-- [ ] 7.4 Validate at least two lockstep releases with rollback evidence.
+- [x] 7.3 Convert DeadRecall into an exact-version compatibility bundle and E2E test repository.
+  - [x] 7.3.1 Stage content-addressed Core, Discord, Automata and Nexus artifacts with immutable versions and source commits.
+  - [x] 7.3.2 Assemble the staged graph and prove it starts as one dedicated-server compatibility bundle without duplicate registration.
+  - [x] 7.3.3 Make CI build the pinned graph from exact source revisions or published artifacts before its assembled-bundle E2E gate.
+- [x] 7.4 Validate at least two lockstep releases with rollback evidence.
 - [ ] 7.5 Enable independent versions and Modrinth publishing for stable repositories.
+  - [ ] 7.5.1 Complete the Automata and Nexus cutover gates and two-release observation windows before declaring either repository stable.
+  - [ ] 7.5.2 Configure independent release/version metadata and Modrinth publication only for modules with completed observation windows.

@@ -5,6 +5,7 @@ set -euo pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPOSITORY_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly BASELINE_FILE="${REPOSITORY_ROOT}/openspec/changes/safe-multi-repo-modularization/compatibility-surface.txt"
+readonly DELEGATED_SURFACE_FILE="${REPOSITORY_ROOT}/openspec/changes/safe-multi-repo-modularization/delegated-compatibility-surface.txt"
 
 require_command() {
     command -v "$1" >/dev/null 2>&1 || {
@@ -46,10 +47,18 @@ collect_surface() {
     {
         find src/main/resources/assets/deadrecall src/main/resources/data/deadrecall \
             -type f \
+            ! -path 'src/main/resources/assets/deadrecall/lang/legacy_discord_zh_tw/*' \
             | sed 's#^src/main/resources/#resource #'
 
         collect_identifiers
-    } | LC_ALL=C sort -u
+
+        # Extracted resources remain part of the compatibility contract, but
+        # are supplied by the exact-version assembled bundle rather than this
+        # source JAR.  The assembled-surface gate verifies their actual JAR.
+        # The legacy Discord translations use a private classpath prefix; they
+        # are rollback fallback inputs rather than `deadrecall` resource IDs.
+        cat "${DELEGATED_SURFACE_FILE}"
+    } | awk '/^[[:space:]]*(#|$)/ { next } { print }' | LC_ALL=C sort -u
 }
 
 for required_command in awk diff find mktemp sed sort xargs; do
@@ -64,6 +73,11 @@ fi
 [[ -f "${BASELINE_FILE}" ]] || {
     printf 'Missing modularization compatibility baseline: %s\n' "${BASELINE_FILE}" >&2
     printf 'Generate candidate content with: %s --print\n' "$0" >&2
+    exit 1
+}
+
+[[ -f "${DELEGATED_SURFACE_FILE}" ]] || {
+    printf 'Missing delegated compatibility surface register: %s\n' "${DELEGATED_SURFACE_FILE}" >&2
     exit 1
 }
 

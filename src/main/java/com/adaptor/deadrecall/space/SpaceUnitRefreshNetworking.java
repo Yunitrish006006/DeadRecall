@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall.space;
 
+import com.adaptor.deadrecall.bootstrap.NexusCutover;
 import com.adaptor.deadrecall.network.RefreshSpaceUnitQuotePayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -8,6 +9,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 public final class SpaceUnitRefreshNetworking implements ModInitializer {
     @Override
     public void onInitialize() {
+        if (NexusCutover.usesExternalAuthority()) {
+            return;
+        }
         PayloadTypeRegistry.serverboundPlay().register(
                 RefreshSpaceUnitQuotePayload.TYPE,
                 RefreshSpaceUnitQuotePayload.CODEC

@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.registry;
 
 import com.adaptor.deadrecall.advancement.ModCriteriaTriggers;
+import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.block.ModBlocks;
 import com.adaptor.deadrecall.block.entity.ModBlockEntities;
 import com.adaptor.deadrecall.effect.ModMobEffects;
@@ -20,18 +21,25 @@ public final class DeadRecallRegistryBootstrap {
         ModBlockEntities.registerModBlockEntities();
         ModMobEffects.registerModEffects();
 
+        boolean externalAutomata = AutomataCutover.usesExternalAuthority();
         LegacyGameplayCriteriaRegistration.register();
-        TotemAutomataCriteriaRegistration.register();
+        if (!externalAutomata) {
+            TotemAutomataCriteriaRegistration.register();
+        }
         ModCriteriaTriggers.registerModCriteriaTriggers();
 
-        TotemAutomataMenuRegistration.register();
+        if (!externalAutomata) {
+            TotemAutomataMenuRegistration.register();
+        }
         ModMenus.registerModMenus();
 
         if (!FabricLoader.getInstance().isModLoaded("totem-remnant")) {
             TotemRemnantItemRegistration.register();
         }
         LegacyGameplayItemRegistration.register();
-        TotemAutomataItemRegistration.register();
+        if (!externalAutomata) {
+            TotemAutomataItemRegistration.register();
+        }
         DeadRecallItemRegistrationLog.register();
 
         ModItemGroups.registerModItemGroups();

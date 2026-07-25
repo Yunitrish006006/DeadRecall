@@ -1,5 +1,7 @@
 package com.adaptor.deadrecall.client;
 
+import com.adaptor.deadrecall.bootstrap.AutomataCutover;
+import com.adaptor.deadrecall.bootstrap.NexusCutover;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import net.fabricmc.loader.api.FabricLoader;
@@ -12,7 +14,9 @@ public final class DeadRecallClientBootstrap {
     }
 
     public static void register() {
-        TotemAutomataClientBootstrap.registerScreens();
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataClientBootstrap.registerScreens();
+        }
 
         KeyMapping.Category category = KeyMapping.Category.register(
                 Identifier.fromNamespaceAndPath("deadrecall", "category")
@@ -25,8 +29,12 @@ public final class DeadRecallClientBootstrap {
         if (!usesExternalDiscordBridge()) {
             TotemDiscordBridgeClientBootstrap.registerRuntime();
         }
-        TotemAutomataClientBootstrap.registerNetworking();
-        TotemNexusClientBootstrap.registerNetworking();
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataClientBootstrap.registerNetworking();
+        }
+        if (!NexusCutover.usesExternalAuthority()) {
+            TotemNexusClientBootstrap.registerNetworking();
+        }
         if (!usesExternalDiscordBridge()) {
             TotemDiscordBridgeClientBootstrap.registerCommands();
         }

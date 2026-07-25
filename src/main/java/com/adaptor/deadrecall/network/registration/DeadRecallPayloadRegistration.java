@@ -1,5 +1,7 @@
 package com.adaptor.deadrecall.network.registration;
 
+import com.adaptor.deadrecall.bootstrap.AutomataCutover;
+import com.adaptor.deadrecall.bootstrap.NexusCutover;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class DeadRecallPayloadRegistration {
@@ -17,14 +19,22 @@ public final class DeadRecallPayloadRegistration {
             TotemDiscordBridgePayloadRegistration.registerServerboundTypes();
         }
         LegacyContainerPayloadRegistration.registerServerboundTypes();
-        TotemAutomataPayloadRegistration.registerServerboundTypes();
-        TotemNexusPayloadRegistration.registerServerboundTypes();
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataPayloadRegistration.registerServerboundTypes();
+        }
+        if (!NexusCutover.usesExternalAuthority()) {
+            TotemNexusPayloadRegistration.registerServerboundTypes();
+        }
 
         if (!usesExternalDiscordBridge()) {
             TotemDiscordBridgePayloadRegistration.registerClientboundTypes();
         }
-        TotemAutomataPayloadRegistration.registerClientboundTypes();
-        TotemNexusPayloadRegistration.registerClientboundTypes();
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataPayloadRegistration.registerClientboundTypes();
+        }
+        if (!NexusCutover.usesExternalAuthority()) {
+            TotemNexusPayloadRegistration.registerClientboundTypes();
+        }
     }
 
     private static void registerReceivers() {
@@ -33,8 +43,12 @@ public final class DeadRecallPayloadRegistration {
             TotemDiscordBridgePayloadRegistration.registerReceivers();
         }
         LegacyContainerPayloadRegistration.registerReceivers();
-        TotemAutomataPayloadRegistration.registerReceivers();
-        TotemNexusPayloadRegistration.registerReceivers();
+        if (!AutomataCutover.usesExternalAuthority()) {
+            TotemAutomataPayloadRegistration.registerReceivers();
+        }
+        if (!NexusCutover.usesExternalAuthority()) {
+            TotemNexusPayloadRegistration.registerReceivers();
+        }
     }
 
     private static boolean usesExternalDiscordBridge() {

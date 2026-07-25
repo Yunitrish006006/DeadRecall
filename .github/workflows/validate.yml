@@ -50,7 +50,15 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m \
             ./gradlew build --no-daemon --stacktrace
 
-      - name: Upload test and GameTest reports
+      - name: Check assembled compatibility surface
+        shell: bash
+        run: |
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          bash .github/scripts/check-assembled-compatibility-surface.sh \
+            --jar "build/libs/deadrecall-${version}.jar" \
+            --source-root .
+
+      - name: Upload test, GameTest and visual evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -60,3 +68,269 @@ jobs:
             build/reports/**
             build/test-results/**
             run/gametest/**
+            test-artifacts/screenshots/**
+
+  assembled-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout DeadRecall compatibility bundle
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned TotemCore source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemCore
+          ref: 1d055144f9f2b9dcd79d8bb44479ce76e3c242bc
+          path: .lockstep/TotemCore
+          persist-credentials: false
+
+      - name: Checkout pinned TotemDiscordBridge source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemDiscordBridge
+          ref: 0ba1e98d06c936a8032fa16eb84498453a3d5018
+          path: .lockstep/TotemDiscordBridge
+          persist-credentials: false
+
+      - name: Checkout pinned TotemAutomata source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemAutomata
+          ref: f96094193a347795a6c14320e8c8112497db18ed
+          path: .lockstep/TotemAutomata
+          persist-credentials: false
+
+      - name: Checkout pinned TotemNexus source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemNexus
+          ref: 6a11ece1588897ca5122130a7c0caf65912f9718
+          path: .lockstep/TotemNexus
+          persist-credentials: false
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Build exact pinned graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew
+          # Discord's pinned source uses Core as a source set.  Copy this
+          # detached Core checkout only into the disposable CI worktree.
+          mkdir -p .lockstep/TotemDiscordBridge/TotemCore
+          cp -a .lockstep/TotemCore/. .lockstep/TotemDiscordBridge/TotemCore/
+
+          ./gradlew jar remapGametestJar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemDiscordBridge jar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemAutomata \
+            -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
+            jar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemNexus \
+            -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
+            jar --no-daemon --stacktrace
+
+      - name: Verify module-owned resources survive artifact packaging
+        shell: bash
+        run: |
+          bash .github/scripts/check-module-artifact-resources.sh \
+            --source-root .lockstep/TotemDiscordBridge \
+            --jar .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
+          bash .github/scripts/check-module-artifact-resources.sh \
+            --source-root .lockstep/TotemAutomata \
+            --jar .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
+          bash .github/scripts/check-module-artifact-resources.sh \
+            --source-root .lockstep/TotemNexus \
+            --jar .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+
+      - name: Download Fabric Dedicated Server launcher
+        shell: bash
+        run: |
+          curl -fL --retry 3 \
+            --output "${RUNNER_TEMP}/fabric-server-launch.jar" \
+            https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.0/fabric-installer-1.1.0.jar
+
+      - name: Verify exact-version assembled compatibility bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          fabric_api_jar="$(find "${HOME}/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-api/0.154.2+26.2" \
+            -name 'fabric-api-0.154.2+26.2.jar' -print -quit)"
+          test -n "${fabric_api_jar}"
+          test -f "${fabric_api_jar}"
+          bundle_root="${RUNNER_TEMP}/deadrecall-lockstep-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          bash .github/scripts/verify-lockstep-bundle.sh \
+            --output "${bundle_root}" \
+            --java java \
+            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --fabric-api "${fabric_api_jar}" \
+            --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
+            --source totem-core=.lockstep/TotemCore \
+            --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
+            --source totem-automata=.lockstep/TotemAutomata \
+            --source totem-nexus=.lockstep/TotemNexus \
+            --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+
+      - name: Verify legacy Copper Golem world through Automata cutover
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker_root="${RUNNER_TEMP}/legacy-automata-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          legacy_marker="${marker_root}/legacy"
+          migration_marker="${marker_root}/migration"
+          legacy_run="run/copperRestartProbe"
+          migration_bundle="${RUNNER_TEMP}/legacy-automata-migrate-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          verification_bundle="${RUNNER_TEMP}/legacy-automata-verify-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf "${marker_root}" "${legacy_run}" "${migration_bundle}" "${verification_bundle}"
+          mkdir -p "${legacy_marker}" "${migration_marker}" "${legacy_run}"
+          printf '%s\n' 'eula=true' > "${legacy_run}/eula.txt"
+          printf '%s\n' 'server-port=25571' > "${legacy_run}/server.properties"
+
+          DEADRECALL_COPPER_RESTART_PROBE_PHASE=seed \
+          DEADRECALL_COPPER_RESTART_PROBE_MARKER_DIR="${legacy_marker}" \
+            ./gradlew runCopperRestartProbe --no-daemon --stacktrace
+          test -f "${legacy_marker}/seed.ok"
+          test ! -f "${legacy_marker}/seed.failure"
+
+          fabric_api_jar="$(find "${HOME}/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-api/0.154.2+26.2" \
+            -name 'fabric-api-0.154.2+26.2.jar' -print -quit)"
+          test -n "${fabric_api_jar}"
+          test -f "${fabric_api_jar}"
+
+          bash .github/scripts/verify-lockstep-bundle.sh \
+            --output "${migration_bundle}" \
+            --java java \
+            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --fabric-api "${fabric_api_jar}" \
+            --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
+            --world "${legacy_run}/world" \
+            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --environment "DEADRECALL_LEGACY_AUTOMATA_MIGRATION_PHASE=migrate" \
+            --environment "DEADRECALL_LEGACY_AUTOMATA_LEGACY_MARKER_DIR=${legacy_marker}" \
+            --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
+            --completion-marker "${migration_marker}/migrate.ok" \
+            --source totem-core=.lockstep/TotemCore \
+            --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
+            --source totem-automata=.lockstep/TotemAutomata \
+            --source totem-nexus=.lockstep/TotemNexus \
+            --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+
+          bash .github/scripts/verify-lockstep-bundle.sh \
+            --output "${verification_bundle}" \
+            --java java \
+            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --fabric-api "${fabric_api_jar}" \
+            --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
+            --world "${migration_bundle}/server/world" \
+            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --environment "DEADRECALL_LEGACY_AUTOMATA_MIGRATION_PHASE=verify" \
+            --environment "DEADRECALL_LEGACY_AUTOMATA_LEGACY_MARKER_DIR=${legacy_marker}" \
+            --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
+            --completion-marker "${migration_marker}/verify.ok" \
+            --source totem-core=.lockstep/TotemCore \
+            --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
+            --source totem-automata=.lockstep/TotemAutomata \
+            --source totem-nexus=.lockstep/TotemNexus \
+            --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+          test -f "${migration_marker}/migrate.ok"
+          test -f "${migration_marker}/verify.ok"
+          test ! -f "${migration_marker}/migrate.failure"
+          test ! -f "${migration_marker}/verify.failure"
+
+      - name: Verify legacy Nexus world through Nexus cutover
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker_root="${RUNNER_TEMP}/legacy-nexus-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          legacy_run="run/nexusRestartProbe"
+          migration_bundle="${RUNNER_TEMP}/legacy-nexus-migrate-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          verification_bundle="${RUNNER_TEMP}/legacy-nexus-verify-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          rm -rf "${marker_root}" "${legacy_run}" "${migration_bundle}" "${verification_bundle}"
+          mkdir -p "${marker_root}" "${legacy_run}"
+          printf '%s\n' 'eula=true' > "${legacy_run}/eula.txt"
+          printf '%s\n' 'server-port=25571' > "${legacy_run}/server.properties"
+
+          DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=seed \
+          DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR="${marker_root}" \
+            ./gradlew runNexusRestartProbe --no-daemon --stacktrace
+          test -f "${marker_root}/seed.ok"
+          test ! -f "${marker_root}/seed.failure"
+
+          fabric_api_jar="$(find "${HOME}/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-api/0.154.2+26.2" \
+            -name 'fabric-api-0.154.2+26.2.jar' -print -quit)"
+          test -n "${fabric_api_jar}"
+          test -f "${fabric_api_jar}"
+
+          bash .github/scripts/verify-lockstep-bundle.sh \
+            --output "${migration_bundle}" \
+            --java java \
+            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --fabric-api "${fabric_api_jar}" \
+            --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
+            --world "${legacy_run}/world" \
+            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --environment "DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=migrate" \
+            --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
+            --completion-marker "${marker_root}/migrate.ok" \
+            --source totem-core=.lockstep/TotemCore \
+            --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
+            --source totem-automata=.lockstep/TotemAutomata \
+            --source totem-nexus=.lockstep/TotemNexus \
+            --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+
+          bash .github/scripts/verify-lockstep-bundle.sh \
+            --output "${verification_bundle}" \
+            --java java \
+            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --fabric-api "${fabric_api_jar}" \
+            --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
+            --world "${migration_bundle}/server/world" \
+            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --environment "DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=verify" \
+            --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
+            --completion-marker "${marker_root}/verify.ok" \
+            --source totem-core=.lockstep/TotemCore \
+            --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
+            --source totem-automata=.lockstep/TotemAutomata \
+            --source totem-nexus=.lockstep/TotemNexus \
+            --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+          test -f "${marker_root}/migrate.ok"
+          test -f "${marker_root}/verify.ok"
+          test ! -f "${marker_root}/migrate.failure"
+          test ! -f "${marker_root}/verify.failure"
+
+      - name: Upload assembled-bundle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: assembled-bundle-evidence
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}/deadrecall-lockstep-*/server/console.log
+            ${{ runner.temp }}/deadrecall-lockstep-*/server/logs/**
+            ${{ runner.temp }}/deadrecall-lockstep-*/server/crash-reports/**
+            ${{ runner.temp }}/legacy-automata-*/**
+            ${{ runner.temp }}/legacy-nexus-*/**

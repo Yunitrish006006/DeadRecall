@@ -91,10 +91,11 @@
 
 ## 進行中
 
+- **最高優先：安全多 repository 拆分與 compatibility-bundle 收斂。** 在 Automata、Nexus 完成可逆 cutover、DeadRecall 成為 exact-version compatibility bundle、完成跨 repository E2E／rollback 驗證前，不新增或擴大其他功能工作；既有功能僅處理阻礙拆分、資料相容或發布安全的修正。
 - 離線玩家身體 OpenSpec 與實作：登出保留身體、重連接回、死亡處理與防複製。
 - OpenSpec 統一與平台架構整理。
 - DeadRecall 向 Totem 模組化架構過渡。
-- 安全多 repository 拆分 Phase 0：repository ownership、相容 identifier/resource 基線、CI 護欄與逐模組 rollback protocol 已建立；下一步先在單一 artifact 內拆 bootstrap、Payload、Mixin 與 registry ownership。
+- 安全多 repository 拆分：repository ownership、相容 identifier/resource 基線、CI 護欄、內部 bootstrap／Payload／Mixin／registry ownership 拆分與 Core、Discord、Remnant、Automata、Nexus repository 初始化已完成。Discord 已完成兩個 lockstep release 與 rollback baseline；Remnant、Automata 與 Nexus 仍處於 additive extraction，下一步是各模組的完整資格驗證與 cutover，以及 DeadRecall 的 exact-version compatibility bundle／E2E 驗收。
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
 - 混凝土粉末掉落物硬化：Server GameTest 與 512 個 ItemEntity 壓力回歸已完成；只剩兩名以上真人玩家水流驗收。
 - 傳送介面物品特化：Phase A–D 自動化排程完成；只剩兩名以上真人 Client 的 UI、動態目標與多人驗收。
@@ -105,11 +106,11 @@
 
 ### 短週期完成順序
 
-1. 完成混凝土粉末的真人多人水流驗收；此人工項目與後續開發平行待辦，512 個 ItemEntity 壓力測試、水源、流動水、雨天、Components 與實體狀態已由 GameTest 驗證。
-2. 傳送介面 Phase A：已完成共用介面類型、Server context、四物品開啟 UI 與普通羅盤專屬能力分流。
-3. 傳送介面 Phase B：已完成回生羅盤死亡節點偏差特化、書本固定磁石路線特化與第一階段 UI。
-4. 傳送介面 Phase C：已完成已繪製地圖覆蓋範圍、食物成本／偏差特化、動態玩家目標與隱私驗證。
-5. 傳送介面 Phase D：已完成 base／final 報價明細、完整 Payload／GUI、Dedicated Server 與自動化多人回歸；真人多人 UI 驗收保持待辦。
+1. 合併並發行 Automata、Nexus 的不可變 module artifacts，將它們加入 DeadRecall lockstep manifest。
+2. 完成 TotemAutomata 與 TotemNexus 的可逆 compatibility-bundle cutover、standalone／legacy-world／restart 驗證與 rollback evidence。
+3. 將 DeadRecall 收斂為 exact-version compatibility bundle 與跨 repository E2E repository，完成兩個 lockstep release observation 後才開放獨立版本與發布。
+4. 僅在不影響上述拆分工作時，執行混凝土粉末、傳送介面與 Copper Golem 的真人 Client 驗收。
+5. 在 modularization 收斂後，才恢復離線玩家身體、Nexus UX 與其他新功能開發。
 
 ## 尚未完成
 
@@ -159,13 +160,10 @@
 
 ## 建議開發順序
 
-1. 在混凝土粉末真人多人驗收平行待辦期間，實作傳送介面物品特化 Phase A–D，完成目前 Nexus 使用者介面主線。
-2. 完成真人多人可用時才能執行的混凝土粉末水流驗收。
-3. 實作 Remnant 離線玩家身體及其死亡背包、死亡節點與 Discord 整合。
-4. 先在 DeadRecall 內切分 bootstrap、Payload、Mixin、registry 與 resource ownership，再抽出 Totem Core 最小共用層及穩定公開 API／migration framework。
-5. 依 Discord Bridge pilot、Remnant、Automata、Nexus 的順序建立獨立 repository；DeadRecall 保留為精確版本 compatibility bundle 與跨 repository E2E 驗收。
-6. 移植 Excavation。
-7. 最後建立 Cognition Agent Framework，作為可選模組。
+1. 完成 Remnant、Automata 與 Nexus 的完整資格驗證與 compatibility-bundle cutover。
+2. 將 DeadRecall 收斂為 exact-version compatibility bundle 與跨 repository E2E 驗收；Discord 的兩個 lockstep releases 與 rollback evidence 已完成，後續 feature cutover 必須保留同等觀察與 rollback 證據後才開放獨立版本與發布。
+3. 在 lockstep observation 與 rollback evidence 完備前，只處理會阻礙 modularization 的相容性、安全性或建置問題。
+4. Modularization 收斂後，再依序進行真人 Client 驗收、Remnant 離線玩家身體、Nexus UX、Excavation 與可選 Cognition。
 
 ## 重新命名策略
 

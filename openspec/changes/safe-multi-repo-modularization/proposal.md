@@ -6,6 +6,10 @@ DeadRecall 目前以單一 Fabric mod、單一 Gradle project 與單一 reposito
 
 拆分採漸進式 strangler 流程：先在 DeadRecall 內建立明確邊界，再一次抽出一個 repository。新模組必須先通過獨立安裝、DeadRecall compatibility bundle、舊世界 migration、Dedicated Server 與跨模組整合驗證，DeadRecall 才能刪除原實作。
 
+## Priority
+
+本變更是目前平台的**最高優先事項**。在 Automata、Nexus 的 compatibility-bundle cutover、DeadRecall exact-version bundle／E2E 收斂與 lockstep rollback evidence 全部完成前，不排入新的 gameplay 功能；僅接受解除拆分阻塞、相容性風險、安全性或發布驗證所需的修正。
+
 ## Motivation
 
 - `Deadrecall` server initializer 已集中約 894 行初始化、Payload receiver 與跨功能事件。
