@@ -128,14 +128,21 @@ jobs:
           cp -a .lockstep/TotemCore/. .lockstep/TotemDiscordBridge/TotemCore/
 
           ./gradlew jar remapGametestJar --no-daemon --stacktrace
-          ./gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
-          ./gradlew -p .lockstep/TotemDiscordBridge jar --no-daemon --stacktrace
+          # Loom's `jar` task only writes the development artifact under
+          # build/devlibs.  The exact compatibility graph consumes the
+          # remapped production artifacts from build/libs instead.
+          ./gradlew -p .lockstep/TotemCore remapJar --no-daemon --stacktrace
+          test -f .lockstep/TotemCore/build/libs/totem-core-0.1.2.jar
+          ./gradlew -p .lockstep/TotemDiscordBridge remapJar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemAutomata \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
-            jar --no-daemon --stacktrace
+            remapJar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemNexus \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
-            jar --no-daemon --stacktrace
+            remapJar --no-daemon --stacktrace
+          test -f .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
+          test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
+          test -f .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
       - name: Verify module-owned resources survive artifact packaging
         shell: bash

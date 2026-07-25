@@ -319,3 +319,12 @@ The Nexus 6.4 implementation and evidence sub-tasks are complete. Its parent
 task remains open for the two-release observation window and documented
 in-game client visual-parity inspection; the gated root fallback and rollback
 pin remain in place during that window.
+
+The root-only GameTest fixture deliberately carries the five Nexus rule and
+tag resources under `src/gametest/resources`. They let the legacy root
+authority tests run without the external Nexus JAR, but are excluded from the
+production DeadRecall JAR and the normal exact compatibility bundle, so the
+production resource-ownership check continues to see exactly one Nexus owner.
+The assembled-bundle CI builds each pinned Loom module with `remapJar` rather
+than `jar`: the latter only produces a development artifact in `build/devlibs`,
+whereas the exact graph verifies the remapped production JAR in `build/libs`.
