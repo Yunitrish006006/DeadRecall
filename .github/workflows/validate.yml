@@ -56,7 +56,8 @@ jobs:
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
           bash .github/scripts/check-assembled-compatibility-surface.sh \
             --jar "build/libs/deadrecall-${version}.jar" \
-            --source-root .
+            --source-root . \
+            --allow-delegated-surface
 
       - name: Upload test, GameTest and visual evidence
         if: always()
@@ -128,18 +129,18 @@ jobs:
           cp -a .lockstep/TotemCore/. .lockstep/TotemDiscordBridge/TotemCore/
 
           ./gradlew jar remapGametestJar --no-daemon --stacktrace
-          # Core, Automata and Nexus need Loom's remapped production JARs in
-          # build/libs. Discord Bridge is a dual-source-set compatibility
-          # project and deliberately publishes its production JAR via `jar`.
+          # Core needs Loom's remapped production JAR in build/libs. The other
+          # split-source-set compatibility projects publish their production
+          # JARs directly through `jar` and do not expose a remapJar task.
           ./gradlew -p .lockstep/TotemCore remapJar --no-daemon --stacktrace
           test -f .lockstep/TotemCore/build/libs/totem-core-0.1.2.jar
           ./gradlew -p .lockstep/TotemDiscordBridge jar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemAutomata \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
-            remapJar --no-daemon --stacktrace
+            jar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemNexus \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
-            remapJar --no-daemon --stacktrace
+            jar --no-daemon --stacktrace
           test -f .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
           test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
           test -f .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar

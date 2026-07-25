@@ -325,9 +325,10 @@ tag resources under `src/gametest/resources`. They let the legacy root
 authority tests run without the external Nexus JAR, but are excluded from the
 production DeadRecall JAR and the normal exact compatibility bundle, so the
 production resource-ownership check continues to see exactly one Nexus owner.
-The assembled-bundle CI builds Core, Automata and Nexus with `remapJar`: their
-plain `jar` task only produces a development artifact in `build/devlibs`,
-whereas the exact graph verifies the remapped production JAR in `build/libs`.
-Discord Bridge deliberately retains `jar`, because its dual source-set
-compatibility project has no `remapJar` task and writes its production JAR
-directly to `build/libs`.
+The assembled-bundle CI builds Core with `remapJar`, because its plain `jar`
+task only produces a development artifact in `build/devlibs`. Discord Bridge,
+Automata and Nexus deliberately retain `jar`: their split-source-set
+compatibility projects have no `remapJar` task and write their production JARs
+directly to `build/libs`. The root-JAR surface check excludes only entries in
+`delegated-compatibility-surface.txt`; the exact multi-JAR bundle continues to
+require those entries and rejects duplicate resource owners.
