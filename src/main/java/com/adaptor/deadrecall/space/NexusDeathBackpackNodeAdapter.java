@@ -16,11 +16,11 @@ public final class NexusDeathBackpackNodeAdapter implements DeathBackpackNodeLif
 
     @Override
     public void rollback(ServerPlayer owner, ServerLevel level, UUID nodeId) {
-        SpaceUnitHandler.disableDeathNode(owner, level, nodeId);
+        SpaceUnitHandler.rollbackDeathNode(owner, level, nodeId);
     }
 
     @Override
     public boolean recover(ServerPlayer recoveringPlayer, UUID nodeId) {
-        return SpaceUnitHandler.disableDeathNode(recoveringPlayer, recoveringPlayer.level(), nodeId);
+        return SpaceUnitHandler.recoverDeathNode(recoveringPlayer, nodeId);
     }
 }

@@ -128,12 +128,12 @@ jobs:
           cp -a .lockstep/TotemCore/. .lockstep/TotemDiscordBridge/TotemCore/
 
           ./gradlew jar remapGametestJar --no-daemon --stacktrace
-          # Loom's `jar` task only writes the development artifact under
-          # build/devlibs.  The exact compatibility graph consumes the
-          # remapped production artifacts from build/libs instead.
+          # Core, Automata and Nexus need Loom's remapped production JARs in
+          # build/libs. Discord Bridge is a dual-source-set compatibility
+          # project and deliberately publishes its production JAR via `jar`.
           ./gradlew -p .lockstep/TotemCore remapJar --no-daemon --stacktrace
           test -f .lockstep/TotemCore/build/libs/totem-core-0.1.2.jar
-          ./gradlew -p .lockstep/TotemDiscordBridge remapJar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemDiscordBridge jar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemAutomata \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             remapJar --no-daemon --stacktrace

@@ -195,6 +195,29 @@ public class DeadRecallSpaceUnitSavedData extends SavedData {
         return true;
     }
 
+    /**
+     * Completes a death-backpack recovery without requiring the recovering
+     * player to be the node owner. A node that was already disabled or removed
+     * by an administrator is an idempotent recovery success.
+     */
+    public boolean recoverDeathUnit(UUID unitId, long gameTime) {
+        Optional<SpaceUnitRecord> unit = get(unitId);
+        if (unit.isEmpty()) {
+            return true;
+        }
+        if (unit.get().type() != SpaceUnitType.DEATH) {
+            return false;
+        }
+        if (unit.get().status() != SpaceUnitStatus.ACTIVE) {
+            return true;
+        }
+
+        SpaceUnitRecord disabled = unit.get().withStatus(SpaceUnitStatus.DISABLED, gameTime);
+        this.unitsById.put(disabled.id(), disabled);
+        setDirty();
+        return true;
+    }
+
     public boolean disableLodestone(ResourceKey<Level> dimension, BlockPos pos, long gameTime) {
         GlobalPos globalPos = GlobalPos.of(dimension, pos.immutable());
         boolean changed = this.lodestoneUnitsByPosition.remove(globalPos) != null;

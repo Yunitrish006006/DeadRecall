@@ -216,6 +216,33 @@ public final class SpaceUnitHandler {
         return units(level.getServer()).disableDeathUnit(player.getUUID(), unitId, level.getGameTime());
     }
 
+    /**
+     * Reverts a death-node creation that failed before its backpack transaction
+     * committed. Unlike ordinary recovery, this must also remove the discovery
+     * reference created with the node so a failed capture leaves no visible
+     * tombstone in the owner's map.
+     */
+    public static boolean rollbackDeathNode(ServerPlayer player, ServerLevel level, UUID unitId) {
+        if (player == null || level == null || unitId == null) {
+            return false;
+        }
+        boolean disabled = disableDeathNode(player, level, unitId);
+        discovery(level.getServer()).removeDiscovered(player.getUUID(), unitId);
+        return disabled;
+    }
+
+    /**
+     * Finalizes a backpack-bound death node. Unlike the owner-only disable
+     * action, recovery may be performed by any player and succeeds when an
+     * administrator has already removed the record.
+     */
+    public static boolean recoverDeathNode(ServerPlayer player, UUID unitId) {
+        if (player == null || unitId == null) {
+            return false;
+        }
+        return units(player.level().getServer()).recoverDeathUnit(unitId, player.level().getGameTime());
+    }
+
     public static void sendSpaceUnitMap(ServerPlayer player) {
         Optional<InteractionHand> hand = findBoundCompassHand(player);
         if (hand.isEmpty()) {
