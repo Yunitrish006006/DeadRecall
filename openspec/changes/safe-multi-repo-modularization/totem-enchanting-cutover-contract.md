@@ -57,4 +57,11 @@ The module's GameTest suite ran three required tests: the Fabric baseline plus
 weighted normal/enchant-book power and the 64-power cap. All passed. With only
 TotemCore `0.1.2`, TotemEnchanting `0.1.0` and Fabric API installed, a Java 25
 Dedicated Server on port `25570` loaded both initializers, reached `Done` and
-saved every dimension. Exact bundle validation remains the release gate.
+saved every dimension.
+
+Exact bundle validation passed in GitHub Actions run
+[`30215251844`](https://github.com/Yunitrish006006/DeadRecall/actions/runs/30215251844):
+the pinned sources rebuilt, module GameTests and artifact-resource checks
+passed, the seven-JAR Java 25 dedicated server verified one enchanting Mixin
+owner and initializer, and both `25571` legacy-world probes completed. The
+module is now in its two-release observation window.
