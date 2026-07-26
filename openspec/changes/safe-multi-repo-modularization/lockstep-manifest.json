@@ -13,7 +13,7 @@
   "modules": [
     {
       "id": "totem-core",
-      "version": "0.1.3",
+      "version": "0.1.2",
       "repository": "TotemCore local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemCore.git",
       "sourceCommit": "1d055144f9f2b9dcd79d8bb44479ce76e3c242bc",
@@ -45,7 +45,7 @@
     },
     {
       "id": "totem-alchemy",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "repository": "TotemAlchemy local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAlchemy.git",
       "sourceCommit": "390c4a77a233cfc56a9bbadaf0432e9fe16f981e",
