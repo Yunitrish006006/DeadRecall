@@ -40,8 +40,8 @@
       "version": "0.1.1",
       "repository": "TotemNexus local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemNexus.git",
-      "sourceCommit": "6a11ece1588897ca5122130a7c0caf65912f9718",
-      "sha512": "382d1f3523bc72769db0bcfc80a17655d2bcac091537457c0e167aa7f97f94df02726f23a7e02154109ad82075cd60f5ea5937283eb193fd71abbbc0967f1ff9"
+      "sourceCommit": "3e3a24a5803e13c4e020443ff1f8838c03a46723",
+      "sha512": "27ab02f5920ee62b34fadce897039e17b21459751ebaf86027a03da7732463905e34b973fdbc0990d73e0eb1410c6da7f4cc9351526cc1487138aca6e03f5c53"
     }
   ],
   "rollback": {

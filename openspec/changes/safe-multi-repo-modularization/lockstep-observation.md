@@ -286,8 +286,8 @@ together.
 ## Nexus 0.1.1 atomic cutover validation
 
 `TotemNexus 0.1.1` is now pinned to source commit
-`6a11ece1588897ca5122130a7c0caf65912f9718` and SHA-512
-`382d1f3523bc72769db0bcfc80a17655d2bcac091537457c0e167aa7f97f94df02726f23a7e02154109ad82075cd60f5ea5937283eb193fd71abbbc0967f1ff9`.
+`3e3a24a5803e13c4e020443ff1f8838c03a46723` and SHA-512
+`27ab02f5920ee62b34fadce897039e17b21459751ebaf86027a03da7732463905e34b973fdbc0990d73e0eb1410c6da7f4cc9351526cc1487138aca6e03f5c53`.
 The manifest retains Nexus `0.1.0` and its SHA-512 as the rollback pin.
 DeadRecall selects this external authority only at `>=0.1.1`; it gates the
 root server bootstrap, payload type/receiver registration, client networking,
@@ -332,3 +332,15 @@ compatibility projects have no `remapJar` task and write their production JARs
 directly to `build/libs`. The root-JAR surface check excludes only entries in
 `delegated-compatibility-surface.txt`; the exact multi-JAR bundle continues to
 require those entries and rejects duplicate resource owners.
+
+The first remote exact-graph build exposed a reproducibility defect rather
+than a code/content discrepancy: every Nexus class and resource matched the
+local artifact, while Loom emitted `Fabric-Loom-Client-Only-Entries` in a
+host-dependent order. Nexus commit
+`a9d663ffe603293662e57bb897f2558e54f4f821` sorts that manifest value and all
+archive entries with fixed timestamps. Two forced Java 25 builds produced the
+same normalized artifact; its successor `3e3a24a5803e13c4e020443ff1f8838c03a46723`
+also makes a live player target's exact safe position the first landing choice,
+using the existing deviation search only when that position is unsafe. CI can
+therefore use the pinned checksum as an immutable lockstep guard while the
+root GameTest has a deterministic latest-target assertion.

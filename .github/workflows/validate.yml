@@ -107,7 +107,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemNexus
-          ref: 6a11ece1588897ca5122130a7c0caf65912f9718
+          ref: 3e3a24a5803e13c4e020443ff1f8838c03a46723
           path: .lockstep/TotemNexus
           persist-credentials: false
 

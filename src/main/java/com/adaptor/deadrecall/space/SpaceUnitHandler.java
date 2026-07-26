@@ -1607,6 +1607,16 @@ public final class SpaceUnitHandler {
             ServerPlayer player,
             RandomSource random) {
         BlockPos anchor = landingAnchor(target);
+        if (target.type() == SpaceUnitType.PLAYER) {
+            Optional<BlockPos> exactPlayerLanding = findSafeLandingInColumn(level, anchor);
+            if (exactPlayerLanding.isPresent()) {
+                return Optional.of(new LandingPlan(
+                        exactPlayerLanding.get(),
+                        randomizedYaw(player, quote, random)
+                ));
+            }
+        }
+
         int radius = clamp(quote.maxHorizontalDeviation(), 0, 96);
         if (radius > 0) {
             for (int attempt = 0; attempt < RANDOM_LANDING_ATTEMPTS; attempt++) {
