@@ -52,6 +52,14 @@
       "sha512": "129e1da238384511b3586a0ea8fd44fe33d51876eda0dc494fb9284e3d258b9b02f1b6df4a611365c0f25bd193580e11e4849d3ed86c32805c5857e6281cb5ea"
     },
     {
+      "id": "totem-enchanting",
+      "version": "0.1.0",
+      "repository": "TotemEnchanting local staging",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemEnchanting.git",
+      "sourceCommit": "1fcf1483b06040cde80293acde63c2b8ffbde780",
+      "sha512": "ce8fb9b77d22ed0d439e70cd9783693f87b33c6c19a2b9cdd9df841d090a459a8866a61fbaebcf9ed0850e4564a353eaa8c8d39a241611e5e3fd7a93be35cb40"
+    },
+    {
       "id": "totem-nexus",
       "version": "0.1.1",
       "repository": "TotemNexus local staging",

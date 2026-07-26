@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.adaptor.deadrecall.mixin",
+  "plugin": "com.adaptor.deadrecall.mixin.DeadRecallEnchantingMixinPlugin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "EnchantmentHelperMixin",
+    "EnchantmentMenuMixin",
+    "EnchantingTableBlockMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

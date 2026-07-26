@@ -61,7 +61,7 @@ public final class EnchantingPowerHelper {
      */
     private static int getBookLevel(ItemStack stack) {
         var enchantments = stack.getOrDefault(
-                DataComponents.ENCHANTMENTS,
+                DataComponents.STORED_ENCHANTMENTS,
                 net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY
         );
 

@@ -4,9 +4,6 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AbstractFurnaceBlockEntityAccessor",
-    "EnchantmentHelperMixin",
-    "EnchantmentMenuMixin",
-    "EnchantingTableBlockMixin",
     "HopperBlockEntityMixin",
     "ConcretePowderItemEntityMixin",
     "RecipeManagerMixin",

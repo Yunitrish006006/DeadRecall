@@ -84,8 +84,8 @@
     {
       "id": "enchanting",
       "repository": "TotemEnchanting",
-      "status": "approved-boundary-repository-pending-inventory",
-      "plannedAreas": [
+      "status": "cutover-staged-pending-assembled-bundle-validation",
+      "currentAreas": [
         "EnchantingPowerHelper",
         "EnchantingTableBlockMixin, EnchantmentHelperMixin and EnchantmentMenuMixin",
         "enchanting rules, data resources and tests"
