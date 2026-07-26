@@ -44,7 +44,7 @@ Every module build and Dedicated Server gate uses Java 25. The exact-version
 bundle starts an isolated server on port `25570`; any legacy-world seed run
 uses `25571`. These are harness isolation ports, not gameplay protocol values.
 
-## Required evidence before completion
+## Evidence required before the observation window
 
 1. TotemAlchemy clean build, resource-artifact check and standalone Dedicated
    Server startup with Core and Fabric API only.
@@ -65,6 +65,9 @@ advancements and the three cauldron recipes, reached `Done` and saved every
 dimension. The module-owned `deadrecall:alchemy_root` parent makes the
 preserved Alchemy advancement IDs valid when DeadRecall is absent.
 
-The root lockstep workflow rebuilds this exact source, runs its GameTests,
-checks its resource surface and starts the assembled bundle. The resulting
-exact-version bundle run is required before closing the observation window.
+GitHub Actions Validate run `30196301553` rebuilt the exact source, ran its
+GameTests, checked its resource surface and successfully started the six-JAR
+assembled bundle. Its Copper and Nexus migration probes also completed their
+two-server restart checks with TotemAlchemy present in the same exact bundle.
+The two-release observation window remains open; only independent release
+publication stays blocked on that window.
