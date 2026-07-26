@@ -80,3 +80,9 @@
 - [ ] 7.5 Enable independent versions and Modrinth publishing for stable repositories.
   - [ ] 7.5.1 Complete the Automata and Nexus cutover gates and two-release observation windows before declaring either repository stable.
   - [ ] 7.5.2 Configure independent release/version metadata and Modrinth publication only for modules with completed observation windows.
+- [x] 7.6 Approve the three remaining bounded-context repositories without moving their implementation into Core.
+  - [x] 7.6.1 Assign Alchemy Cauldron gameplay and its resources to `TotemAlchemy`.
+  - [x] 7.6.2 Assign enchanting-power behavior and its Mixins to `TotemEnchanting`.
+  - [x] 7.6.3 Assign general recipe/concrete-powder and other vanilla tweaks to `TotemVanillaTweaks`, while retaining portable-container ownership in `TotemRemnant`.
+  - [x] 7.6.4 Create and publish the initial `TotemAlchemy`, `TotemEnchanting` and `TotemVanillaTweaks` repository scaffolds.
+- [ ] 7.7 Inventory, extract, dual-validate and cut over each approved remaining gameplay repository independently.

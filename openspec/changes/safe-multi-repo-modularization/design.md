@@ -7,7 +7,10 @@ TotemCore
 ├── TotemDiscordBridge
 ├── TotemRemnant
 ├── TotemAutomata
-└── TotemNexus
+├── TotemNexus
+├── TotemAlchemy
+├── TotemEnchanting
+└── TotemVanillaTweaks
 
 DeadRecall compatibility bundle
 ├── pins one tested version of every required module
@@ -87,9 +90,33 @@ Copper Golem implementation, payloads, client screens, Mixin and restart probes 
 
 Nexus moves last among current gameplay modules because it owns the largest connected group of SavedData, Payload, client UI, teleport sessions and Mixin accessors. All existing SavedData keys and `deadrecall:*` identifiers remain readable.
 
+### TotemAlchemy
+
+Alchemy owns the Alchemy Cauldron, its block entity, cauldron interactions and
+recipes, associated items, payloads, Mixins and data resources. Its extraction
+must preserve the existing `deadrecall:*` IDs and recipes while it is consumed
+through the compatibility bundle.
+
+### TotemEnchanting
+
+Enchanting owns the enchanting-power rules and the Enchanting Table, helper and
+menu Mixins that implement them. It must be extracted as one server/client
+behavioral unit rather than leaving individual Enchanting Mixins in DeadRecall.
+
+### TotemVanillaTweaks
+
+VanillaTweaks owns general recipe overrides, concrete-powder behavior and other
+small vanilla gameplay changes that do not belong to an existing feature
+repository. Portable-container policy is explicitly excluded: it remains owned
+by TotemRemnant, so the new module cannot duplicate its registrations or data.
+
 ## 5. Unassigned gameplay
 
-Alchemy, enchanting changes, recipe overrides, concrete-powder behavior, portable-container policy and other legacy gameplay remain in DeadRecall until each has an approved bounded-context repository. They must not be placed in TotemCore merely to empty DeadRecall.
+The Alchemy, Enchanting and VanillaTweaks bounded contexts are now approved.
+Their implementations remain in DeadRecall only until their individual
+inventory, extraction, dual-validation and cutover tasks are complete. Future
+gameplay without an approved bounded context remains in DeadRecall; it must not
+be placed in TotemCore merely to empty the compatibility repository.
 
 ## 6. Build and release contract
 

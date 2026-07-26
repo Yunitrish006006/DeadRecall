@@ -69,6 +69,39 @@
         "Space Unit, teleport and distributed-spawn mixins",
         "Nexus SavedData and restart tests"
       ]
+    },
+    {
+      "id": "alchemy",
+      "repository": "TotemAlchemy",
+      "status": "approved-boundary-repository-pending-inventory",
+      "plannedAreas": [
+        "src/main/java/com/adaptor/deadrecall/alchemy/**",
+        "AlchemyCauldronBlock and AlchemyCauldronBlockEntity",
+        "cauldron recipes, interactions, items, payloads, Mixins and data resources"
+      ]
+    },
+    {
+      "id": "enchanting",
+      "repository": "TotemEnchanting",
+      "status": "approved-boundary-repository-pending-inventory",
+      "plannedAreas": [
+        "EnchantingPowerHelper",
+        "EnchantingTableBlockMixin, EnchantmentHelperMixin and EnchantmentMenuMixin",
+        "enchanting rules, data resources and tests"
+      ]
+    },
+    {
+      "id": "vanilla-tweaks",
+      "repository": "TotemVanillaTweaks",
+      "status": "approved-boundary-repository-pending-inventory",
+      "plannedAreas": [
+        "general recipe overrides and RecipeManagerMixin",
+        "ConcretePowderItemHardening and ConcretePowderItemEntityMixin",
+        "other vanilla gameplay tweaks without an existing feature owner"
+      ],
+      "mustNotOwn": [
+        "portable-container policy, which remains owned by TotemRemnant"
+      ]
     }
   ],
   "sharedSeamsRequiringRefactor": [
@@ -84,14 +117,9 @@
   ],
   "unassignedGameplay": {
     "temporaryRepository": "DeadRecall",
-    "policy": "Remain in DeadRecall until a bounded-context repository is approved; never move gameplay into TotemCore merely to empty the compatibility repository.",
+    "policy": "Future gameplay remains in DeadRecall until a bounded-context repository is approved; never move gameplay into TotemCore merely to empty the compatibility repository.",
     "knownAreas": [
-      "alchemy and cauldron gameplay",
-      "enchanting changes",
-      "recipe overrides",
-      "concrete-powder item behavior",
-      "portable-container restrictions",
-      "other vanilla gameplay tweaks"
+      "future gameplay without an approved bounded context"
     ]
   },
   "dependencyRules": [
