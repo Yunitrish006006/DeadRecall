@@ -350,3 +350,9 @@ Automata. `31b257707da0a04d8fd1efa006ca1b1ca8e8bcc7` applies the same
 canonical archive procedure. Two Java 25 forced builds produced Automata
 SHA-512 `56d38fb0a6266a43a5302f5c98f7cc9faaa4e72d5ec5369eaa5a9995daca2d4b8c39590eca223bcf2b9af3ad39ad694c913022f96c72a554f5a8a3a4f416cc2f`,
 which is now the immutable lockstep pin.
+
+Exact-bundle resource ownership also removes the seven root
+`assets/deadrecall/lang/discord_zh_tw/{adventure,end,events,husbandry,nether,story,system}.json`
+files. They are owned by TotemDiscordBridge in the assembled graph; retaining
+root copies would create duplicate `deadrecall` resource paths, regardless of
+whether their historical translation content differs.
