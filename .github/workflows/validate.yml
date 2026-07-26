@@ -87,6 +87,14 @@ jobs:
           path: .lockstep/TotemCore
           persist-credentials: false
 
+      - name: Checkout pinned TotemRemnant source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemRemnant
+          ref: 04000c420097da465db8cb706087f6756830aeb0
+          path: .lockstep/TotemRemnant
+          persist-credentials: false
+
       - name: Checkout pinned TotemDiscordBridge source
         uses: actions/checkout@v4
         with:
@@ -141,9 +149,13 @@ jobs:
           ./gradlew -p .lockstep/TotemNexus \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             jar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemRemnant \
+            -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
+            jar --no-daemon --stacktrace
           test -f .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
           test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
           test -f .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+          test -f .lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar
 
       - name: Verify module-owned resources survive artifact packaging
         shell: bash
@@ -157,6 +169,9 @@ jobs:
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemNexus \
             --jar .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
+          bash .github/scripts/check-module-artifact-resources.sh \
+            --source-root .lockstep/TotemRemnant \
+            --jar .lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar
 
       - name: Download Fabric Dedicated Server launcher
         shell: bash
@@ -182,10 +197,12 @@ jobs:
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --source totem-core=.lockstep/TotemCore \
+            --source totem-remnant=.lockstep/TotemRemnant \
             --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -229,10 +246,12 @@ jobs:
             --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
             --completion-marker "${migration_marker}/migrate.ok" \
             --source totem-core=.lockstep/TotemCore \
+            --source totem-remnant=.lockstep/TotemRemnant \
             --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -250,10 +269,12 @@ jobs:
             --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
             --completion-marker "${migration_marker}/verify.ok" \
             --source totem-core=.lockstep/TotemCore \
+            --source totem-remnant=.lockstep/TotemRemnant \
             --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -298,10 +319,12 @@ jobs:
             --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
             --completion-marker "${marker_root}/migrate.ok" \
             --source totem-core=.lockstep/TotemCore \
+            --source totem-remnant=.lockstep/TotemRemnant \
             --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -318,10 +341,12 @@ jobs:
             --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
             --completion-marker "${marker_root}/verify.ok" \
             --source totem-core=.lockstep/TotemCore \
+            --source totem-remnant=.lockstep/TotemRemnant \
             --source totem-discord-bridge=.lockstep/TotemDiscordBridge \
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
+            --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.0.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -343,6 +368,7 @@ jobs:
             ${{ runner.temp }}/legacy-automata-*/**
             ${{ runner.temp }}/legacy-nexus-*/**
             .lockstep/TotemCore/build/libs/*.jar
+            .lockstep/TotemRemnant/build/libs/*.jar
             .lockstep/TotemDiscordBridge/build/libs/*.jar
             .lockstep/TotemAutomata/build/libs/*.jar
             .lockstep/TotemNexus/build/libs/*.jar

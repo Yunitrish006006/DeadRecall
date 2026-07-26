@@ -178,7 +178,10 @@ for id in "${!expected_commits[@]}"; do
     [[ -n "${supplied_sources[${id}]+x}" ]] || { printf 'Missing source repository for %s.\n' "${id}" >&2; exit 1; }
     [[ -n "${supplied_artifacts[${id}]+x}" ]] || { printf 'Missing artifact for %s.\n' "${id}" >&2; exit 1; }
     source_root="${supplied_sources[${id}]}"
-    [[ -d "${source_root}/.git" ]] || { printf 'Source is not a Git checkout: %s\n' "${source_root}" >&2; exit 1; }
+    git -C "${source_root}" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+        printf 'Source is not a Git checkout: %s\n' "${source_root}" >&2
+        exit 1
+    }
     actual_commit="$(git -C "${source_root}" rev-parse HEAD)"
     [[ "${actual_commit}" == "${expected_commits[${id}]}" ]] || {
         printf 'Source commit mismatch for %s: expected %s, found %s.\n' \
@@ -307,6 +310,7 @@ done
 
 for initializer in \
     'TotemCore API 1.0 initialized without gameplay registration' \
+    'TotemRemnant initialized without Nexus dependency' \
     'TotemDiscordBridge initialized' \
     'TotemAutomata 0.1.1 cutover authority activated without Cognition dependency' \
     'TotemNexus 0.1.1 cutover authority activated'; do

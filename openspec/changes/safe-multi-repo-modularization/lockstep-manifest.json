@@ -20,6 +20,14 @@
       "sha512": "1af05f3aa190b935739ad05f54d77d57da4607fdd76863afdf06f049ae296e79bf74a79889368f6f8e6b95c57ae0b0ec6c4fe48346662cadf326983442a3707f"
     },
     {
+      "id": "totem-remnant",
+      "version": "0.1.0",
+      "repository": "TotemRemnant local staging",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemRemnant.git",
+      "sourceCommit": "04000c420097da465db8cb706087f6756830aeb0",
+      "sha512": "286bc791e194867206e069f46f440b8fa997ea372a6911b9c63777adf23dbb3e4c41a29221fa1460d18cc9d99a01ad7b0a20549a00d6a1296243193adf82ca6d"
+    },
+    {
       "id": "totem-discord-bridge",
       "version": "0.1.1",
       "repository": "GitHub Packages",
