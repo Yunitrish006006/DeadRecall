@@ -5,7 +5,7 @@
 `TotemAlchemy 0.1.2` is built from
 `fff959536487bd5de4ed6e12c7e6ea2a52b65653` and is pinned in the exact
 compatibility graph with SHA-512
-`f579a530318aaa2db9c856047ece959a066b49d51e4a79d63083a7acf45604b6d0acd20afa9a75868fa3f48dc2ca299f6551fbec346048b97f62ae1e11b56f5a`.
+`129e1da238384511b3586a0ea8fd44fe33d51876eda0dc494fb9284e3d258b9b02f1b6df4a611365c0f25bd193580e11e4849d3ed86c32805c5857e6281cb5ea`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
 
 The module preserves the established `deadrecall:*` block, block-entity,
