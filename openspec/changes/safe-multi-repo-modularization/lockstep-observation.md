@@ -73,10 +73,17 @@ and 1,699 advancements, and saved all three dimensions. The runtime reported
 one TotemCore and one TotemRemnant initializer, with no duplicate registry or
 Mixin registration failure.
 
-This completes the reversible development cutover. The next compatibility
-bundle release must replace the local SNAPSHOT with a published immutable
-Remnant artifact and retain this legacy fallback through the two-release
-lockstep observation window before independent versioning is enabled.
+This completes the reversible development cutover. The first immutable
+Remnant artifact is now `0.1.1`, built from source commit
+`f0c30797b122b3bd2a95d28829ac76a581a584c7` with SHA-512
+`cf7da0fb6af305e576279cf3b2a13af80e029d6814a263e8884dc10e7bdf5b8193b4f7682b8edd771f6a495b0c059c9f9a1f5a90fa65176c004fccba8bbef4a5`.
+Loom writes its development JAR to `build/devlibs` through `jar`; its
+production `build/libs/totem-remnant-0.1.1.jar` is emitted by `remapJar` and
+then normalized with fixed archive metadata. Two forced Java 25 production
+builds produced the same SHA-512. The compatibility workflow therefore invokes
+`remapJar` for Remnant, pins that source and artifact, and retains the guarded
+legacy fallback for the two-release observation window before independent
+versioning is enabled.
 
 ## Automata qualification before cutover
 
@@ -325,11 +332,11 @@ tag resources under `src/gametest/resources`. They let the legacy root
 authority tests run without the external Nexus JAR, but are excluded from the
 production DeadRecall JAR and the normal exact compatibility bundle, so the
 production resource-ownership check continues to see exactly one Nexus owner.
-The assembled-bundle CI builds Core with `remapJar`, because its plain `jar`
-task only produces a development artifact in `build/devlibs`. Discord Bridge,
-Automata and Nexus deliberately retain `jar`: their split-source-set
-compatibility projects have no `remapJar` task and write their production JARs
-directly to `build/libs`. The root-JAR surface check excludes only entries in
+The assembled-bundle CI builds Core and Remnant with `remapJar`, because each
+plain `jar` task only produces a development artifact in `build/devlibs`.
+Discord Bridge, Automata and Nexus deliberately retain `jar`: their
+split-source-set compatibility projects have no `remapJar` task and write
+their production JARs directly to `build/libs`. The root-JAR surface check excludes only entries in
 `delegated-compatibility-surface.txt`; the exact multi-JAR bundle continues to
 require those entries and rejects duplicate resource owners.
 

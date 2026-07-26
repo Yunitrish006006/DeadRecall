@@ -21,11 +21,11 @@
     },
     {
       "id": "totem-remnant",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "repository": "TotemRemnant local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemRemnant.git",
-      "sourceCommit": "04000c420097da465db8cb706087f6756830aeb0",
-      "sha512": "286bc791e194867206e069f46f440b8fa997ea372a6911b9c63777adf23dbb3e4c41a29221fa1460d18cc9d99a01ad7b0a20549a00d6a1296243193adf82ca6d"
+      "sourceCommit": "f0c30797b122b3bd2a95d28829ac76a581a584c7",
+      "sha512": "cf7da0fb6af305e576279cf3b2a13af80e029d6814a263e8884dc10e7bdf5b8193b4f7682b8edd771f6a495b0c059c9f9a1f5a90fa65176c004fccba8bbef4a5"
     },
     {
       "id": "totem-discord-bridge",
