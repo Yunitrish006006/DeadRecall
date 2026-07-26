@@ -45,11 +45,11 @@
     },
     {
       "id": "totem-alchemy",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "repository": "TotemAlchemy local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAlchemy.git",
-      "sourceCommit": "91352727256ca5ea300bc36c9629aa61b5369600",
-      "sha512": "aa421bbbef2b3f6c93906f7163dedf3d99c9739a63471fcd124d89ffb8bd728e8985f76718997017fb9c51c59bd90214c1f971f400dddc11f75fb228a0652bd9"
+      "sourceCommit": "c01504a0b8a512c43f211c7a8b9882f7b13fe976",
+      "sha512": "68d380b37f6d0a80cfbe55005c9a43dd3d948dbebd7a1b6030dd71fac1646475123a5e4eafc2676ed62330e84f3b080d393c82e996f5b22324005c27285f289e"
     },
     {
       "id": "totem-nexus",

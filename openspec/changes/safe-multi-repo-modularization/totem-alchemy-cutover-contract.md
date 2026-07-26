@@ -2,15 +2,15 @@
 
 ## Current state
 
-`TotemAlchemy 0.1.0` is built from
-`91352727256ca5ea300bc36c9629aa61b5369600` and is pinned in the exact
+`TotemAlchemy 0.1.1` is built from
+`c01504a0b8a512c43f211c7a8b9882f7b13fe976` and is pinned in the exact
 compatibility graph with SHA-512
-`aa421bbbef2b3f6c93906f7163dedf3d99c9739a63471fcd124d89ffb8bd728e8985f76718997017fb9c51c59bd90214c1f971f400dddc11f75fb228a0652bd9`.
+`68d380b37f6d0a80cfbe55005c9a43dd3d948dbebd7a1b6030dd71fac1646475123a5e4eafc2676ed62330e84f3b080d393c82e996f5b22324005c27285f289e`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
 
 The module preserves the established `deadrecall:*` block, block-entity,
 item, effect, criterion and recipe identifiers. It owns the Alchemy Cauldron,
-Pig Manure, Cherry Brew, their two Mixins, cauldron persistence and all 49
+Pig Manure, Cherry Brew, their two Mixins, cauldron persistence and all 50
 verified compatibility data/asset paths. The shared locale files remain in
 DeadRecall until a later extraction can avoid duplicate paths.
 
@@ -34,7 +34,7 @@ Alchemy item owner.
 
 ## Resource and runtime contract
 
-The 49 owner paths are registered in
+The 49 preserved legacy owner paths are registered in
 `delegated-compatibility-surface.txt`, removed from the root JAR, verified
 byte-for-byte in TotemAlchemy's production JAR and checked for duplicate paths
 in the assembled bundle. This preserves the committed compatibility baseline
@@ -52,3 +52,13 @@ uses `25571`. These are harness isolation ports, not gameplay protocol values.
    preserved Alchemy ownership, including no duplicate resource path or Mixin.
 3. Alchemy Cauldron legacy-state/reload/restart coverage and one compatibility
    bundle restart observation before independent releases are enabled.
+
+## Recorded standalone evidence
+
+`0.1.1` was clean-built and its production JAR retained all 50 owned resources.
+With only TotemCore `0.1.2`, TotemAlchemy `0.1.1` and Fabric API installed, a
+Java 25 Dedicated Server on port `25570` loaded both initializers, all 1,693
+advancements and the three cauldron recipes, reached `Done`, saved every
+dimension and restarted the same world without an advancement-load error. The
+module-owned `deadrecall:alchemy_root` parent makes the preserved Alchemy
+advancement IDs valid when DeadRecall is absent.

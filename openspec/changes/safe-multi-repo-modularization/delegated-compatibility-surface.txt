@@ -19,7 +19,7 @@ resource data/deadrecall/tags/block/space_unit_amethyst_catalysts.json
 resource data/deadrecall/tags/block/space_unit_structure_blocks.json
 resource data/deadrecall/tags/block/space_unit_structure_degradable_blocks.json
 resource data/deadrecall/tags/block/space_unit_structure_worn_blocks.json
-# TotemAlchemy 0.1.0 owns this complete legacy Alchemy Cauldron surface.
+# TotemAlchemy 0.1.1 owns this complete legacy Alchemy Cauldron surface.
 identifier deadrecall:block/pig_manure_coarse_dirt
 identifier deadrecall:block/pig_manure_dirt
 identifier deadrecall:block/pig_manure_grass_block
