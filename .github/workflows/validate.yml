@@ -163,7 +163,7 @@ jobs:
         run: |
           curl -fL --retry 3 \
             --output "${RUNNER_TEMP}/fabric-server-launch.jar" \
-            https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.1.0/fabric-installer-1.1.0.jar
+            https://meta.fabricmc.net/v2/versions/loader/26.2/0.19.3/1.1.0/server/jar
 
       - name: Verify exact-version assembled compatibility bundle
         shell: bash

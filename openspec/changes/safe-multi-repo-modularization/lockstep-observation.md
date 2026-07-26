@@ -359,3 +359,9 @@ whether their historical translation content differs. The root-only legacy
 Discord fallback and GameTests retain their historical snapshot under the
 distinct `legacy_discord_zh_tw/` path, so it cannot collide with the Bridge's
 owner paths in the assembled production graph.
+
+The assembled-bundle CI downloads Fabric's loader-specific Dedicated Server
+launcher from the official `.../server/jar` endpoint. It must not run the bare
+Fabric Installer artifact with `nogui`: that artifact has no server launch
+handler. The verification script continues to use Java 25 and its isolated
+port `25570` once the correct launcher is supplied.
