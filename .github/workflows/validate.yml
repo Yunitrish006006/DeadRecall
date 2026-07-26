@@ -131,7 +131,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemVanillaTweaks
-          ref: f18ce5d193bc51fa45c072b30fabbd8072cb978d
+          ref: 1cd901ba6bfef49ad6fd2786e9c6c986bbe4d38e
           path: .lockstep/TotemVanillaTweaks
           persist-credentials: false
 

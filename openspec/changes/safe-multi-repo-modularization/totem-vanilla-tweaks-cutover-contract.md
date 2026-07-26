@@ -3,7 +3,7 @@
 ## Current state
 
 `TotemVanillaTweaks 0.1.0` is built from
-`f18ce5d193bc51fa45c072b30fabbd8072cb978d` and is pinned in the exact
+`1cd901ba6bfef49ad6fd2786e9c6c986bbe4d38e` and is pinned in the exact
 compatibility graph with SHA-512
 `f06ab91e4a42bc5fa494424089879dfdd63d9d2aa887d9244c254534e45889a9eef7a3fd7d7175e6fbf8c37602e0a3582e742903ad6c832e67fbafe731f6a251`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
@@ -45,4 +45,6 @@ concrete-powder cases, three lectern cases, and a direct original
 furnace experience. All passed. With only TotemCore `0.1.2`,
 TotemVanillaTweaks `0.1.0` and Fabric API installed, a Java 25 Dedicated
 Server on port `25570` loaded both initializers, reached `Done` and saved every
-dimension. Exact bundle validation remains the release gate.
+dimension. The external module additionally owns four JVM assertions for the
+vanilla-ID `lectern.json` resource. Exact bundle validation remains the
+release gate.
