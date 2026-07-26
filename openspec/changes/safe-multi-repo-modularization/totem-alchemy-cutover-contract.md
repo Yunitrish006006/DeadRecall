@@ -2,10 +2,10 @@
 
 ## Current state
 
-`TotemAlchemy 0.1.2` is built from
-`2a3bd6f46e9e0cb24c392294b1e235437d671816` and is pinned in the exact
+`TotemAlchemy 0.1.3` is built from
+`390c4a77a233cfc56a9bbadaf0432e9fe16f981e` and is pinned in the exact
 compatibility graph with SHA-512
-`129e1da238384511b3586a0ea8fd44fe33d51876eda0dc494fb9284e3d258b9b02f1b6df4a611365c0f25bd193580e11e4849d3ed86c32805c5857e6281cb5ea`.
+`3b99c8c15024bf3cc5072fd2287182ede9a628e2d7035ed24d3e4e4c89e5bf7b04e2626a54a725169d41577b28982df0d4bb475352b998e6501e7888f51af6d5`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
 
 Its source pin includes the Fabric API class-tweaker normalization prerequisite
@@ -14,9 +14,10 @@ of any pre-normalized local Gradle cache and does not alter the production JAR.
 
 The module preserves the established `deadrecall:*` block, block-entity,
 item, effect, criterion and recipe identifiers. It owns the Alchemy Cauldron,
-Pig Manure, Cherry Brew, their two Mixins, cauldron persistence and all 50
-verified compatibility data/asset paths. The shared locale files remain in
-DeadRecall until a later extraction can avoid duplicate paths.
+Pig Manure, Cherry Brew, the Stone-Bowl Flint recipe, their two Mixins,
+cauldron persistence and all 51 verified compatibility data/asset paths. The
+shared locale files remain in DeadRecall until a later extraction can avoid
+duplicate paths.
 
 ## Atomic registration decision
 
@@ -30,15 +31,16 @@ DeadRecall until a later extraction can avoid duplicate paths.
 - the legacy `PigMixin` and `SnowballMixin` through
   `deadrecall.alchemy.mixins.json`.
 
-The old source remains compiled as the observation-window rollback path, but
-may not register when the module is installed. The general Flint-from-Bowl
-serializer remains in DeadRecall pending TotemVanillaTweaks; it resolves the
-preserved `deadrecall:stone_bowl` registry ID and does not load the legacy
-Alchemy item owner.
+The old Alchemy implementation remains the observation-window rollback path,
+but may not register when the module is installed. Version `0.1.3` moves the
+preserved `deadrecall:flint_from_bowl` serializer and recipe data beside the
+Stone Bowl owner. DeadRecall no longer registers a duplicate serializer or
+resource; rollback to the prior immutable Alchemy pin restores the former
+compatibility state.
 
 ## Resource and runtime contract
 
-The 49 preserved legacy owner paths are registered in
+The 51 preserved legacy owner paths are registered in
 `delegated-compatibility-surface.txt`, removed from the root JAR, verified
 byte-for-byte in TotemAlchemy's production JAR and checked for duplicate paths
 in the assembled bundle. This preserves the committed compatibility baseline
@@ -75,3 +77,11 @@ assembled bundle. Its Copper and Nexus migration probes also completed their
 two-server restart checks with TotemAlchemy present in the same exact bundle.
 The two-release observation window remains open; only independent release
 publication stays blocked on that window.
+
+`0.1.3` was clean-built with Java 25; its production JAR retained all 51 owned
+resources, including `data/deadrecall/recipe/flint_from_bowl.json`. Its
+Dedicated Server GameTest suite ran four required tests: the framework
+baseline, both cauldron migration tests and a Flint-from-Bowl test that loads
+the external datapack recipe, validates its serializer, produces one flint and
+returns the Stone Bowl. Exact lockstep-bundle validation is the remaining gate
+for this follow-on ownership transfer.

@@ -91,3 +91,4 @@
   - [x] 7.7.3 Record TotemAlchemy standalone Dedicated Server, cauldron restart and assembled-bundle cutover evidence; retain its two-release observation window.
   - [x] 7.7.4 Inventory and stage TotemEnchanting 0.1.0 with its atomic Mixin cutover; record exact-bundle evidence and retain its two-release observation window.
   - [x] 7.7.5 Inventory and stage TotemVanillaTweaks 0.1.0 with its atomic Mixin cutover; record exact-bundle evidence and retain its two-release observation window.
+  - [ ] 7.7.6 Move the preserved Stone-Bowl Flint recipe into TotemAlchemy 0.1.3; record Java 25 module and exact-bundle evidence before closing its observation window.

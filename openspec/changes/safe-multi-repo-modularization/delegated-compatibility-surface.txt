@@ -19,7 +19,7 @@ resource data/deadrecall/tags/block/space_unit_amethyst_catalysts.json
 resource data/deadrecall/tags/block/space_unit_structure_blocks.json
 resource data/deadrecall/tags/block/space_unit_structure_degradable_blocks.json
 resource data/deadrecall/tags/block/space_unit_structure_worn_blocks.json
-# TotemAlchemy 0.1.2 owns this complete legacy Alchemy Cauldron surface.
+# TotemAlchemy 0.1.3 owns this complete legacy Alchemy Cauldron surface.
 identifier deadrecall:block/pig_manure_coarse_dirt
 identifier deadrecall:block/pig_manure_dirt
 identifier deadrecall:block/pig_manure_grass_block
@@ -29,6 +29,7 @@ identifier deadrecall:block/pig_manure_podzol
 identifier deadrecall:block/pig_manure_rooted_dirt
 identifier deadrecall:cherry_brew
 identifier deadrecall:cocoa_powder
+identifier deadrecall:flint_from_bowl
 identifier deadrecall:item/cherry_brew
 identifier deadrecall:item/cocoa_powder
 identifier deadrecall:item/hot_cocoa
@@ -88,6 +89,7 @@ resource data/deadrecall/deadrecall/cauldron_recipes/cherry_brew.json
 resource data/deadrecall/deadrecall/cauldron_recipes/hot_cocoa.json
 resource data/deadrecall/deadrecall/cauldron_recipes/saltpeter.json
 resource data/deadrecall/recipe/cocoa_powder.json
+resource data/deadrecall/recipe/flint_from_bowl.json
 resource data/deadrecall/recipe/gunpowder_from_alchemy.json
 resource data/deadrecall/recipe/stone_bowl.json
 resource data/deadrecall/recipe/wood_ash_from_hay_block_smelting.json

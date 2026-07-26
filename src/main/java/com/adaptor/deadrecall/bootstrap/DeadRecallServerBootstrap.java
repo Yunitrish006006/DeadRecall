@@ -22,7 +22,6 @@ public final class DeadRecallServerBootstrap {
         if (!NexusCutover.usesExternalAuthority()) {
             TotemNexusBootstrap.register();
         }
-        LegacyGameplayBootstrap.registerRecipes();
         if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
             TotemDiscordBridgeBootstrap.register(configDir);
             TotemDiscordBridgeBootstrap.registerRuntime();

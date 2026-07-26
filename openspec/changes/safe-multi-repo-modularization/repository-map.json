@@ -78,7 +78,7 @@
         "src/main/java/com/adaptor/deadrecall/alchemy/**",
         "AlchemyCauldronBlock and AlchemyCauldronBlockEntity",
         "Pig Manure and Cherry Brew items, effects, criteria and Mixins",
-        "cauldron recipes, interactions and 49 owned data/resource paths"
+        "cauldron recipes, interactions, Stone-Bowl Flint recipe and 51 owned data/resource paths"
       ]
     },
     {
