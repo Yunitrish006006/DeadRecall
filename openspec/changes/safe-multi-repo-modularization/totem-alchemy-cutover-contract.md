@@ -2,10 +2,10 @@
 
 ## Current state
 
-`TotemAlchemy 0.1.1` is built from
-`c01504a0b8a512c43f211c7a8b9882f7b13fe976` and is pinned in the exact
+`TotemAlchemy 0.1.2` is built from
+`fff959536487bd5de4ed6e12c7e6ea2a52b65653` and is pinned in the exact
 compatibility graph with SHA-512
-`68d380b37f6d0a80cfbe55005c9a43dd3d948dbebd7a1b6030dd71fac1646475123a5e4eafc2676ed62330e84f3b080d393c82e996f5b22324005c27285f289e`.
+`f579a530318aaa2db9c856047ece959a066b49d51e4a79d63083a7acf45604b6d0acd20afa9a75868fa3f48dc2ca299f6551fbec346048b97f62ae1e11b56f5a`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
 
 The module preserves the established `deadrecall:*` block, block-entity,
@@ -55,10 +55,16 @@ uses `25571`. These are harness isolation ports, not gameplay protocol values.
 
 ## Recorded standalone evidence
 
-`0.1.1` was clean-built and its production JAR retained all 50 owned resources.
-With only TotemCore `0.1.2`, TotemAlchemy `0.1.1` and Fabric API installed, a
-Java 25 Dedicated Server on port `25570` loaded both initializers, all 1,693
-advancements and the three cauldron recipes, reached `Done`, saved every
-dimension and restarted the same world without an advancement-load error. The
-module-owned `deadrecall:alchemy_root` parent makes the preserved Alchemy
-advancement IDs valid when DeadRecall is absent.
+`0.1.2` was clean-built; its production JAR retained all 50 owned resources.
+Its Java 25 Dedicated Server GameTest suite ran three required tests: the
+framework baseline plus cauldron NBT round-trip and legacy `HOT_COCOA` state
+migration. All passed and the test world saved every dimension. With only
+TotemCore `0.1.2`, TotemAlchemy `0.1.2` and Fabric API installed, a Java 25
+Dedicated Server on port `25570` loaded both initializers, all 1,693
+advancements and the three cauldron recipes, reached `Done` and saved every
+dimension. The module-owned `deadrecall:alchemy_root` parent makes the
+preserved Alchemy advancement IDs valid when DeadRecall is absent.
+
+The root lockstep workflow rebuilds this exact source, runs its GameTests,
+checks its resource surface and starts the assembled bundle. The resulting
+exact-version bundle run is required before closing the observation window.

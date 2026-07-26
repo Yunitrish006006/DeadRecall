@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemAlchemy
-          ref: c01504a0b8a512c43f211c7a8b9882f7b13fe976
+          ref: fff959536487bd5de4ed6e12c7e6ea2a52b65653
           path: .lockstep/TotemAlchemy
           persist-credentials: false
 
@@ -156,7 +156,7 @@ jobs:
             jar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemAlchemy \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
-            remapJar --no-daemon --stacktrace
+            test runGameTest remapJar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemNexus \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             jar --no-daemon --stacktrace
@@ -165,7 +165,7 @@ jobs:
             remapJar --no-daemon --stacktrace
           test -f .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
           test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
-          test -f .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar
+          test -f .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar
           test -f .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
           test -f .lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar
 
@@ -180,7 +180,7 @@ jobs:
             --jar .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemAlchemy \
-            --jar .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar
+            --jar .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemNexus \
             --jar .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -221,7 +221,7 @@ jobs:
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
-            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar \
+            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
       - name: Verify legacy Copper Golem world through Automata cutover
@@ -272,7 +272,7 @@ jobs:
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
-            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar \
+            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
           bash .github/scripts/verify-lockstep-bundle.sh \
@@ -297,7 +297,7 @@ jobs:
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
-            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar \
+            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
           test -f "${migration_marker}/migrate.ok"
           test -f "${migration_marker}/verify.ok"
@@ -349,7 +349,7 @@ jobs:
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
-            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar \
+            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
           bash .github/scripts/verify-lockstep-bundle.sh \
@@ -373,7 +373,7 @@ jobs:
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
-            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.1.jar \
+            --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
           test -f "${marker_root}/migrate.ok"
           test -f "${marker_root}/verify.ok"

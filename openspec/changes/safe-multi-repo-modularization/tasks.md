@@ -87,7 +87,7 @@
   - [x] 7.6.4 Create and publish the initial `TotemAlchemy`, `TotemEnchanting` and `TotemVanillaTweaks` repository scaffolds.
 - [ ] 7.7 Inventory, extract, dual-validate and cut over each approved remaining gameplay repository independently.
   - [x] 7.7.1 Inventory the Alchemy Cauldron surface and record its ownership, preserved IDs, resource transfer and rollback seams in [`totem-alchemy-cutover-contract.md`](totem-alchemy-cutover-contract.md).
-  - [x] 7.7.2 Extract TotemAlchemy 0.1.1 as a Java 25, Core-only module and pin its immutable source commit and SHA-512 artifact.
+  - [x] 7.7.2 Extract TotemAlchemy 0.1.2 as a Java 25, Core-only module and pin its immutable source commit and SHA-512 artifact.
   - [ ] 7.7.3 Complete TotemAlchemy standalone Dedicated Server, cauldron restart and assembled-bundle cutover evidence before closing its observation window.
   - [ ] 7.7.4 Independently inventory and extract TotemEnchanting after the Alchemy cutover gate is green.
   - [ ] 7.7.5 Independently inventory and extract TotemVanillaTweaks after the Alchemy cutover gate is green.

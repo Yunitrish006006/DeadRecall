@@ -73,7 +73,7 @@
     {
       "id": "alchemy",
       "repository": "TotemAlchemy",
-      "status": "cutover-staged-pending-assembled-bundle-validation",
+      "status": "cutover-qualified-pending-exact-0.1.2-bundle-validation",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/alchemy/**",
         "AlchemyCauldronBlock and AlchemyCauldronBlockEntity",
