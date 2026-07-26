@@ -13,9 +13,11 @@ public final class LegacyGameplayBootstrap {
     }
 
     public static void registerInteractions() {
-        AlchemyHandler.register();
-        CherryBrewInteractions.register();
-        PigManureInteractions.register();
+        if (!AlchemyCutover.usesExternalAuthority()) {
+            AlchemyHandler.register();
+            CherryBrewInteractions.register();
+            PigManureInteractions.register();
+        }
     }
 
     public static void registerRecipes() {

@@ -9,11 +9,9 @@
     "EnchantingTableBlockMixin",
     "HopperBlockEntityMixin",
     "ConcretePowderItemEntityMixin",
-    "PigMixin",
     "RecipeManagerMixin",
     "ShulkerBoxBlockEntityMixin",
     "ShulkerBoxSlotMixin",
-    "SnowballMixin",
     "StructureTemplateMixin"
   ],
   "client": [],

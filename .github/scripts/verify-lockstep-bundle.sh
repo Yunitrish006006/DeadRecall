@@ -313,6 +313,7 @@ for initializer in \
     'TotemRemnant initialized without Nexus dependency' \
     'TotemDiscordBridge initialized' \
     'TotemAutomata 0.1.1 cutover authority activated without Cognition dependency' \
+    'TotemAlchemy initialized without DeadRecall implementation dependency' \
     'TotemNexus 0.1.1 cutover authority activated'; do
     match_count="$(grep -F -c -- "${initializer}" "${server_log}" || true)"
     [[ "${match_count}" == 1 ]] || {

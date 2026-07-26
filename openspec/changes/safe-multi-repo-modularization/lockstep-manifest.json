@@ -44,6 +44,14 @@
       "sha512": "56d38fb0a6266a43a5302f5c98f7cc9faaa4e72d5ec5369eaa5a9995daca2d4b8c39590eca223bcf2b9af3ad39ad694c913022f96c72a554f5a8a3a4f416cc2f"
     },
     {
+      "id": "totem-alchemy",
+      "version": "0.1.0",
+      "repository": "TotemAlchemy local staging",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemAlchemy.git",
+      "sourceCommit": "91352727256ca5ea300bc36c9629aa61b5369600",
+      "sha512": "aa421bbbef2b3f6c93906f7163dedf3d99c9739a63471fcd124d89ffb8bd728e8985f76718997017fb9c51c59bd90214c1f971f400dddc11f75fb228a0652bd9"
+    },
+    {
       "id": "totem-nexus",
       "version": "0.1.1",
       "repository": "TotemNexus local staging",

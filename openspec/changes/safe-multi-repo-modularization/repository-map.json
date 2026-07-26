@@ -73,11 +73,12 @@
     {
       "id": "alchemy",
       "repository": "TotemAlchemy",
-      "status": "approved-boundary-repository-pending-inventory",
-      "plannedAreas": [
+      "status": "cutover-staged-pending-assembled-bundle-validation",
+      "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/alchemy/**",
         "AlchemyCauldronBlock and AlchemyCauldronBlockEntity",
-        "cauldron recipes, interactions, items, payloads, Mixins and data resources"
+        "Pig Manure and Cherry Brew items, effects, criteria and Mixins",
+        "cauldron recipes, interactions and 49 owned data/resource paths"
       ]
     },
     {

@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.item;
 
 import com.adaptor.deadrecall.Deadrecall;
+import com.adaptor.deadrecall.bootstrap.AlchemyCutover;
 import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.registry.LegacyGameplayItemGroupRegistration;
 import com.adaptor.deadrecall.registry.TotemAutomataItemGroupRegistration;
@@ -48,7 +49,9 @@ public final class ModItemGroups {
         if (!FabricLoader.getInstance().isModLoaded("totem-remnant")) {
             TotemRemnantItemGroupRegistration.addItems(output);
         }
-        LegacyGameplayItemGroupRegistration.addItems(output);
+        if (!AlchemyCutover.usesExternalAuthority()) {
+            LegacyGameplayItemGroupRegistration.addItems(output);
+        }
     }
 
     private static ItemStack copperWrenchIcon() {

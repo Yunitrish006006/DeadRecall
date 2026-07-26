@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.adaptor.deadrecall.mixin",
+  "plugin": "com.adaptor.deadrecall.mixin.DeadRecallAlchemyMixinPlugin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "PigMixin",
+    "SnowballMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

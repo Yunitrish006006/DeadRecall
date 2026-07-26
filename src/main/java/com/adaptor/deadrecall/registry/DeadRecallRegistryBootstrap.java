@@ -1,6 +1,7 @@
 package com.adaptor.deadrecall.registry;
 
 import com.adaptor.deadrecall.advancement.ModCriteriaTriggers;
+import com.adaptor.deadrecall.bootstrap.AlchemyCutover;
 import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.block.ModBlocks;
 import com.adaptor.deadrecall.block.entity.ModBlockEntities;
@@ -17,16 +18,21 @@ public final class DeadRecallRegistryBootstrap {
     }
 
     public static void registerContent() {
-        ModBlocks.registerModBlocks();
-        ModBlockEntities.registerModBlockEntities();
-        ModMobEffects.registerModEffects();
+        boolean externalAlchemy = AlchemyCutover.usesExternalAuthority();
+        if (!externalAlchemy) {
+            ModBlocks.registerModBlocks();
+            ModBlockEntities.registerModBlockEntities();
+            ModMobEffects.registerModEffects();
+        }
 
         boolean externalAutomata = AutomataCutover.usesExternalAuthority();
-        LegacyGameplayCriteriaRegistration.register();
+        if (!externalAlchemy) {
+            LegacyGameplayCriteriaRegistration.register();
+            ModCriteriaTriggers.registerModCriteriaTriggers();
+        }
         if (!externalAutomata) {
             TotemAutomataCriteriaRegistration.register();
         }
-        ModCriteriaTriggers.registerModCriteriaTriggers();
 
         if (!externalAutomata) {
             TotemAutomataMenuRegistration.register();
@@ -36,7 +42,9 @@ public final class DeadRecallRegistryBootstrap {
         if (!FabricLoader.getInstance().isModLoaded("totem-remnant")) {
             TotemRemnantItemRegistration.register();
         }
-        LegacyGameplayItemRegistration.register();
+        if (!externalAlchemy) {
+            LegacyGameplayItemRegistration.register();
+        }
         if (!externalAutomata) {
             TotemAutomataItemRegistration.register();
         }
