@@ -1,6 +1,6 @@
 # Proposal: Admin Death Node Manager
 
-Status: proposed
+Status: in progress
 Target Version: 2.4.1
 
 ## 問題

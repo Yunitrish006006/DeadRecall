@@ -7,46 +7,50 @@ import com.adaptor.deadrecall.space.DeathNodeAdminService;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public final class DeathNodeAdminScreen extends Screen {
     public static DeathNodeAdminScreen CURRENT;
 
     private static final int PANEL_WIDTH = 620;
-    private static final int PANEL_HEIGHT = 360;
+    private static final int PANEL_HEIGHT = 380;
     private static final int PANEL_PADDING = 12;
     private static final int HEADER_HEIGHT = 34;
-    private static final int CONTROL_HEIGHT = 28;
+    private static final int CONTROL_HEIGHT = 52;
+    private static final int DETAIL_HEIGHT = 72;
     private static final int FOOTER_HEIGHT = 36;
     private static final int ROW_HEIGHT = 34;
 
     private DeathNodeAdminPayload payload;
-    private UUID ownerFilter;
     private UUID selectedNodeId;
-    private UUID pendingPurgeId;
+    private String ownerQuery = "";
+    private String dimensionId = "";
     private StatusFilter statusFilter = StatusFilter.ALL;
+    private TimeFilter timeFilter = TimeFilter.ALL;
     private int scrollIndex;
 
-    private Button previousOwnerButton;
-    private Button ownerFilterButton;
-    private Button nextOwnerButton;
+    private EditBox ownerQueryField;
+    private EditBox dimensionField;
     private Button statusFilterButton;
+    private Button timeFilterButton;
     private Button refreshButton;
+    private Button batchDisableButton;
+    private Button batchPurgeButton;
+    private Button previousPageButton;
+    private Button nextPageButton;
+    private Button teleportButton;
     private Button disableButton;
     private Button purgeButton;
     private Button doneButton;
 
     public DeathNodeAdminScreen(DeathNodeAdminPayload payload) {
-        super(Component.literal("死亡節點管理"));
+        super(Component.translatable("container.deadrecall.death_node_admin"));
         this.payload = payload;
         this.selectedNodeId = payload.entries().stream().findFirst().map(DeathNodeAdminPayload.Entry::id).orElse(null);
         CURRENT = this;
@@ -56,32 +60,75 @@ public final class DeathNodeAdminScreen extends Screen {
     protected void init() {
         CURRENT = this;
 
-        this.previousOwnerButton = Button.builder(Component.literal("<"), button -> cycleOwner(-1))
-                .bounds(ownerPreviousX(), controlsY(), 20, 18)
-                .build();
-        this.addRenderableWidget(this.previousOwnerButton);
+        this.ownerQueryField = new EditBox(
+                this.font,
+                ownerQueryX(),
+                controlsY(),
+                ownerQueryWidth(),
+                18,
+                Component.translatable("message.deadrecall.death_node_admin.owner_query")
+        );
+        this.ownerQueryField.setMaxLength(64);
+        this.ownerQueryField.setValue(this.ownerQuery);
+        this.ownerQueryField.setHint(Component.translatable("message.deadrecall.death_node_admin.owner_query"));
+        this.ownerQueryField.setResponder(value -> this.ownerQuery = value == null ? "" : value);
+        this.addRenderableWidget(this.ownerQueryField);
 
-        this.ownerFilterButton = Button.builder(ownerFilterText(), button -> cycleOwner(1))
-                .bounds(ownerFilterX(), controlsY(), ownerFilterWidth(), 18)
-                .build();
-        this.addRenderableWidget(this.ownerFilterButton);
-
-        this.nextOwnerButton = Button.builder(Component.literal(">"), button -> cycleOwner(1))
-                .bounds(ownerNextX(), controlsY(), 20, 18)
-                .build();
-        this.addRenderableWidget(this.nextOwnerButton);
+        this.dimensionField = new EditBox(
+                this.font,
+                dimensionX(),
+                controlsY(),
+                dimensionWidth(),
+                18,
+                Component.translatable("message.deadrecall.death_node_admin.dimension_query")
+        );
+        this.dimensionField.setMaxLength(128);
+        this.dimensionField.setValue(this.dimensionId);
+        this.dimensionField.setHint(Component.translatable("message.deadrecall.death_node_admin.dimension_query"));
+        this.dimensionField.setResponder(value -> this.dimensionId = value == null ? "" : value);
+        this.addRenderableWidget(this.dimensionField);
 
         this.statusFilterButton = Button.builder(statusFilterText(), button -> cycleStatus())
-                .bounds(statusFilterX(), controlsY(), 96, 18)
-                .build();
+                .bounds(statusFilterX(), controlsY(), statusFilterWidth(), 18)
+        .build();
         this.addRenderableWidget(this.statusFilterButton);
 
-        this.refreshButton = Button.builder(Component.literal("重新整理"), button -> requestRefresh())
-                .bounds(refreshX(), footerY(), 72, 18)
+        this.timeFilterButton = Button.builder(timeFilterText(), button -> cycleTimeFilter())
+                .bounds(timeFilterX(), controlsY(), timeFilterWidth(), 18)
                 .build();
+        this.addRenderableWidget(this.timeFilterButton);
+
+        this.refreshButton = Button.builder(Component.translatable("message.deadrecall.death_node_admin.apply_filters"), button -> requestRefresh())
+                .bounds(refreshX(), controlsY(), refreshWidth(), 18)
+        .build();
         this.addRenderableWidget(this.refreshButton);
 
-        this.disableButton = Button.builder(Component.literal("停用節點"), button -> disableSelected())
+        this.batchDisableButton = Button.builder(batchDisableButtonText(), button -> batchDisable())
+                .bounds(batchDisableX(), batchControlsY(), 164, 18)
+                .build();
+        this.addRenderableWidget(this.batchDisableButton);
+
+        this.batchPurgeButton = Button.builder(batchPurgeButtonText(), button -> batchPurge())
+                .bounds(batchPurgeX(), batchControlsY(), 164, 18)
+                .build();
+        this.addRenderableWidget(this.batchPurgeButton);
+
+        this.previousPageButton = Button.builder(Component.literal("<"), button -> requestPage(this.payload.page() - 1))
+                .bounds(previousPageX(), footerY(), 40, 18)
+                .build();
+        this.addRenderableWidget(this.previousPageButton);
+
+        this.nextPageButton = Button.builder(Component.literal(">"), button -> requestPage(this.payload.page() + 1))
+                .bounds(nextPageX(), footerY(), 40, 18)
+                .build();
+        this.addRenderableWidget(this.nextPageButton);
+
+        this.teleportButton = Button.builder(Component.translatable("message.deadrecall.death_node_admin.teleport"), button -> teleportToSelected())
+                .bounds(teleportX(), footerY(), 60, 18)
+                .build();
+        this.addRenderableWidget(this.teleportButton);
+
+        this.disableButton = Button.builder(Component.translatable("message.deadrecall.death_node_admin.disable"), button -> disableSelected())
                 .bounds(disableX(), footerY(), 72, 18)
                 .build();
         this.addRenderableWidget(this.disableButton);
@@ -109,14 +156,10 @@ public final class DeathNodeAdminScreen extends Screen {
 
     public void applyPayload(DeathNodeAdminPayload payload) {
         this.payload = payload;
-        if (this.ownerFilter != null && ownerOptions().stream().noneMatch(owner -> owner.id().equals(this.ownerFilter))) {
-            this.ownerFilter = null;
-        }
         if (selectedEntry() == null) {
-            this.selectedNodeId = filteredEntries().stream().findFirst().map(DeathNodeAdminPayload.Entry::id).orElse(null);
+            this.selectedNodeId = this.payload.entries().stream().findFirst().map(DeathNodeAdminPayload.Entry::id).orElse(null);
         }
         this.scrollIndex = Math.min(this.scrollIndex, maxScrollIndex());
-        this.pendingPurgeId = null;
         updateButtons();
     }
 
@@ -139,9 +182,10 @@ public final class DeathNodeAdminScreen extends Screen {
         extractor.text(this.font, countSummary(), x + width - PANEL_PADDING - 180, y + 10, 0xFFB8C0C8);
 
         drawEntries(extractor, mouseX, mouseY);
+        drawSelectedDetails(extractor);
         if (this.payload.truncated()) {
-            extractor.text(this.font, "節點數量超過傳輸上限，只顯示前 " + DeathNodeAdminPayload.MAX_ENTRIES + " 筆。",
-                    x + PANEL_PADDING, y + height - 34, 0xFFFFC857);
+            extractor.text(this.font, Component.translatable("message.deadrecall.death_node_admin.more_results").getString(),
+                    x + 106, y + height - 20, 0xFFFFC857);
         }
         super.extractRenderState(extractor, mouseX, mouseY, partialTick);
     }
@@ -151,7 +195,6 @@ public final class DeathNodeAdminScreen extends Screen {
         UUID hit = entryAt(event.x(), event.y());
         if (hit != null) {
             this.selectedNodeId = hit;
-            this.pendingPurgeId = null;
             updateButtons();
             return true;
         }
@@ -181,7 +224,7 @@ public final class DeathNodeAdminScreen extends Screen {
 
         List<DeathNodeAdminPayload.Entry> entries = filteredEntries();
         if (entries.isEmpty()) {
-            extractor.text(this.font, "目前篩選條件下沒有死亡節點。", x + 8, y + 10, 0xFFFFC857);
+            extractor.text(this.font, Component.translatable("message.deadrecall.death_node_admin.no_results").getString(), x + 8, y + 10, 0xFFFFC857);
             return;
         }
 
@@ -219,44 +262,71 @@ public final class DeathNodeAdminScreen extends Screen {
         extractor.fill(x, thumbY, x + 3, thumbY + thumbHeight, 0xFF9A9A9A);
     }
 
-    private void cycleOwner(int direction) {
-        List<OwnerOption> owners = ownerOptions();
-        int optionCount = owners.size() + 1;
-        if (optionCount <= 1) {
-            this.ownerFilter = null;
-            updateButtons();
+    private void drawSelectedDetails(GuiGraphicsExtractor extractor) {
+        int x = listX();
+        int y = detailsY();
+        int width = listWidth();
+        extractor.fill(x, y, x + width, y + DETAIL_HEIGHT - 6, 0x8020252B);
+        extractor.outline(x, y, width, DETAIL_HEIGHT - 6, 0xFF3F4A56);
+        DeathNodeAdminPayload.Entry selected = selectedEntry();
+        if (selected == null) {
+            extractor.text(this.font,
+                    Component.translatable("message.deadrecall.death_node_admin.details.none_selected").getString(),
+                    x + 8, y + 8, 0xFFB8C0C8);
             return;
         }
 
-        int current = 0;
-        if (this.ownerFilter != null) {
-            for (int index = 0; index < owners.size(); index++) {
-                if (owners.get(index).id().equals(this.ownerFilter)) {
-                    current = index + 1;
-                    break;
-                }
-            }
-        }
-        int next = Math.floorMod(current + direction, optionCount);
-        this.ownerFilter = next == 0 ? null : owners.get(next - 1).id();
-        resetFilterSelection();
+        extractor.text(this.font,
+                Component.translatable("message.deadrecall.death_node_admin.details.title").getString(),
+                x + 8, y + 6, 0xFFFFFFFF);
+        extractor.text(this.font,
+                Component.translatable(
+                        "message.deadrecall.death_node_admin.details.owner",
+                        selected.ownerName(),
+                        selected.ownerId()).getString(),
+                x + 8, y + 20, 0xFFD2D8E0);
+        extractor.text(this.font,
+                Component.translatable(
+                        "message.deadrecall.death_node_admin.details.node",
+                        selected.id()).getString(),
+                x + 8, y + 32, 0xFFD2D8E0);
+        extractor.text(this.font,
+                Component.translatable(
+                        "message.deadrecall.death_node_admin.details.times",
+                        selected.createdGameTime(),
+                        selected.updatedGameTime()).getString(),
+                x + 8, y + 44, 0xFFB8C0C8);
+        extractor.text(this.font,
+                Component.translatable(
+                        "message.deadrecall.death_node_admin.details.diagnostics",
+                        diagnosticsText(selected)).getString(),
+                x + width / 2, y + 44, 0xFFFFC857);
     }
 
     private void cycleStatus() {
         this.statusFilter = this.statusFilter.next();
-        resetFilterSelection();
+        requestRefresh();
     }
 
-    private void resetFilterSelection() {
-        this.scrollIndex = 0;
-        this.pendingPurgeId = null;
-        this.selectedNodeId = filteredEntries().stream().findFirst().map(DeathNodeAdminPayload.Entry::id).orElse(null);
-        updateButtons();
+    private void cycleTimeFilter() {
+        this.timeFilter = this.timeFilter.next();
+        requestRefresh();
     }
 
     private void requestRefresh() {
+        requestPage(0);
+    }
+
+    private void requestPage(int page) {
         if (ClientPlayNetworking.canSend(RequestDeathNodeAdminPayload.TYPE)) {
-            ClientPlayNetworking.send(new RequestDeathNodeAdminPayload());
+            ClientPlayNetworking.send(new RequestDeathNodeAdminPayload(
+                    this.ownerQuery,
+                    this.dimensionId,
+                    this.statusFilter.id,
+                    this.timeFilter.createdAfterGameTime(this.payload.serverGameTime()),
+                    0L,
+                    Math.max(0, page)
+            ));
         }
     }
 
@@ -268,54 +338,121 @@ public final class DeathNodeAdminScreen extends Screen {
         sendAction(selected.id(), DeathNodeAdminService.ACTION_DISABLE);
     }
 
+    private void teleportToSelected() {
+        DeathNodeAdminPayload.Entry selected = selectedEntry();
+        if (selected != null) {
+            sendAction(selected.id(), DeathNodeAdminService.ACTION_TELEPORT);
+        }
+    }
+
     private void purgeSelected() {
         DeathNodeAdminPayload.Entry selected = selectedEntry();
         if (selected == null || "active".equals(selected.status())) {
             return;
         }
-        if (!selected.id().equals(this.pendingPurgeId)) {
-            this.pendingPurgeId = selected.id();
-            updateButtons();
+        if (!this.payload.hasActivePurgeConfirmationFor(selected.id(), System.currentTimeMillis())) {
+            sendAction(selected.id(), DeathNodeAdminService.ACTION_REQUEST_PURGE);
             return;
         }
-        this.pendingPurgeId = null;
-        sendAction(selected.id(), DeathNodeAdminService.ACTION_PURGE);
+        sendAction(selected.id(), DeathNodeAdminService.ACTION_PURGE, this.payload.confirmationToken());
+    }
+
+    private void batchDisable() {
+        if (!this.payload.hasActiveConfirmationFor(
+                DeathNodeAdminService.BATCH_NODE_ID,
+                DeathNodeAdminService.ACTION_BATCH_DISABLE,
+                System.currentTimeMillis())) {
+            sendAction(DeathNodeAdminService.BATCH_NODE_ID, DeathNodeAdminService.ACTION_REQUEST_BATCH_DISABLE);
+            return;
+        }
+        sendAction(
+                DeathNodeAdminService.BATCH_NODE_ID,
+                DeathNodeAdminService.ACTION_BATCH_DISABLE,
+                this.payload.confirmationToken()
+        );
+    }
+
+    private void batchPurge() {
+        if (!this.payload.hasActiveConfirmationFor(
+                DeathNodeAdminService.BATCH_NODE_ID,
+                DeathNodeAdminService.ACTION_BATCH_PURGE,
+                System.currentTimeMillis())) {
+            sendAction(DeathNodeAdminService.BATCH_NODE_ID, DeathNodeAdminService.ACTION_REQUEST_BATCH_PURGE);
+            return;
+        }
+        sendAction(
+                DeathNodeAdminService.BATCH_NODE_ID,
+                DeathNodeAdminService.ACTION_BATCH_PURGE,
+                this.payload.confirmationToken()
+        );
     }
 
     private void sendAction(UUID nodeId, String action) {
+        sendAction(nodeId, action, null);
+    }
+
+    private void sendAction(UUID nodeId, String action, UUID confirmationToken) {
         if (ClientPlayNetworking.canSend(ManageDeathNodeAdminPayload.TYPE)) {
-            ClientPlayNetworking.send(new ManageDeathNodeAdminPayload(nodeId, action));
+            ClientPlayNetworking.send(new ManageDeathNodeAdminPayload(nodeId, action, confirmationToken));
         }
     }
 
     private void updateButtons() {
-        if (this.previousOwnerButton != null) {
-            this.previousOwnerButton.setX(ownerPreviousX());
-            this.previousOwnerButton.setY(controlsY());
-            this.previousOwnerButton.active = !ownerOptions().isEmpty();
+        if (this.ownerQueryField != null) {
+            this.ownerQueryField.setX(ownerQueryX());
+            this.ownerQueryField.setY(controlsY());
+            this.ownerQueryField.setWidth(ownerQueryWidth());
         }
-        if (this.ownerFilterButton != null) {
-            this.ownerFilterButton.setX(ownerFilterX());
-            this.ownerFilterButton.setY(controlsY());
-            this.ownerFilterButton.setWidth(ownerFilterWidth());
-            this.ownerFilterButton.setMessage(ownerFilterText());
-            this.ownerFilterButton.active = !ownerOptions().isEmpty();
-        }
-        if (this.nextOwnerButton != null) {
-            this.nextOwnerButton.setX(ownerNextX());
-            this.nextOwnerButton.setY(controlsY());
-            this.nextOwnerButton.active = !ownerOptions().isEmpty();
+        if (this.dimensionField != null) {
+            this.dimensionField.setX(dimensionX());
+            this.dimensionField.setY(controlsY());
+            this.dimensionField.setWidth(dimensionWidth());
         }
         if (this.statusFilterButton != null) {
             this.statusFilterButton.setX(statusFilterX());
             this.statusFilterButton.setY(controlsY());
+            this.statusFilterButton.setWidth(statusFilterWidth());
             this.statusFilterButton.setMessage(statusFilterText());
+        }
+        if (this.timeFilterButton != null) {
+            this.timeFilterButton.setX(timeFilterX());
+            this.timeFilterButton.setY(controlsY());
+            this.timeFilterButton.setWidth(timeFilterWidth());
+            this.timeFilterButton.setMessage(timeFilterText());
         }
         if (this.refreshButton != null) {
             this.refreshButton.setX(refreshX());
-            this.refreshButton.setY(footerY());
+            this.refreshButton.setY(controlsY());
+            this.refreshButton.setWidth(refreshWidth());
+        }
+        if (this.batchDisableButton != null) {
+            this.batchDisableButton.setX(batchDisableX());
+            this.batchDisableButton.setY(batchControlsY());
+            this.batchDisableButton.setMessage(batchDisableButtonText());
+            this.batchDisableButton.active = this.payload.totalEntries() > 0;
+        }
+        if (this.batchPurgeButton != null) {
+            this.batchPurgeButton.setX(batchPurgeX());
+            this.batchPurgeButton.setY(batchControlsY());
+            this.batchPurgeButton.setMessage(batchPurgeButtonText());
+            this.batchPurgeButton.active = this.payload.totalEntries() > 0;
+        }
+        if (this.previousPageButton != null) {
+            this.previousPageButton.setX(previousPageX());
+            this.previousPageButton.setY(footerY());
+            this.previousPageButton.active = this.payload.page() > 0;
+        }
+        if (this.nextPageButton != null) {
+            this.nextPageButton.setX(nextPageX());
+            this.nextPageButton.setY(footerY());
+            this.nextPageButton.active = this.payload.truncated();
         }
         DeathNodeAdminPayload.Entry selected = selectedEntry();
+        if (this.teleportButton != null) {
+            this.teleportButton.setX(teleportX());
+            this.teleportButton.setY(footerY());
+            this.teleportButton.active = selected != null;
+        }
         if (this.disableButton != null) {
             this.disableButton.setX(disableX());
             this.disableButton.setY(footerY());
@@ -334,31 +471,7 @@ public final class DeathNodeAdminScreen extends Screen {
     }
 
     private List<DeathNodeAdminPayload.Entry> filteredEntries() {
-        List<DeathNodeAdminPayload.Entry> entries = new ArrayList<>();
-        for (DeathNodeAdminPayload.Entry entry : this.payload.entries()) {
-            if (this.ownerFilter != null && !this.ownerFilter.equals(entry.ownerId())) {
-                continue;
-            }
-            if (!this.statusFilter.matches(entry.status())) {
-                continue;
-            }
-            entries.add(entry);
-        }
-        entries.sort(Comparator
-                .comparing(DeathNodeAdminPayload.Entry::ownerName, String.CASE_INSENSITIVE_ORDER)
-                .thenComparing(Comparator.comparingLong(DeathNodeAdminPayload.Entry::createdGameTime).reversed())
-                .thenComparing(DeathNodeAdminPayload.Entry::id));
-        return entries;
-    }
-
-    private List<OwnerOption> ownerOptions() {
-        Map<UUID, String> owners = new LinkedHashMap<>();
-        this.payload.entries().stream()
-                .sorted(Comparator.comparing(DeathNodeAdminPayload.Entry::ownerName, String.CASE_INSENSITIVE_ORDER))
-                .forEach(entry -> owners.putIfAbsent(entry.ownerId(), entry.ownerName()));
-        List<OwnerOption> options = new ArrayList<>(owners.size());
-        owners.forEach((id, name) -> options.add(new OwnerOption(id, name)));
-        return options;
+        return this.payload.entries();
     }
 
     private DeathNodeAdminPayload.Entry selectedEntry() {
@@ -386,31 +499,46 @@ public final class DeathNodeAdminScreen extends Screen {
         return index >= 0 && index < entries.size() ? entries.get(index).id() : null;
     }
 
-    private Component ownerFilterText() {
-        if (this.ownerFilter == null) {
-            return Component.literal("玩家：全部");
-        }
-        for (OwnerOption owner : ownerOptions()) {
-            if (owner.id().equals(this.ownerFilter)) {
-                return Component.literal("玩家：" + owner.name());
-            }
-        }
-        return Component.literal("玩家：全部");
+    private Component statusFilterText() {
+        return Component.translatable("message.deadrecall.death_node_admin.status_filter", this.statusFilter.label());
     }
 
-    private Component statusFilterText() {
-        return Component.literal("狀態：" + this.statusFilter.label);
+    private Component timeFilterText() {
+        return Component.translatable("message.deadrecall.death_node_admin.time_filter", this.timeFilter.label());
     }
 
     private Component purgeButtonText() {
         DeathNodeAdminPayload.Entry selected = selectedEntry();
-        return Component.literal(selected != null && selected.id().equals(this.pendingPurgeId)
-                ? "再次確認"
-                : "永久刪除");
+        return selected != null && this.payload.hasActivePurgeConfirmationFor(selected.id(), System.currentTimeMillis())
+                ? Component.translatable("message.deadrecall.death_node_admin.confirm_purge")
+                : Component.translatable("message.deadrecall.death_node_admin.purge");
+    }
+
+    private Component batchDisableButtonText() {
+        return this.payload.hasActiveConfirmationFor(
+                DeathNodeAdminService.BATCH_NODE_ID,
+                DeathNodeAdminService.ACTION_BATCH_DISABLE,
+                System.currentTimeMillis())
+                ? Component.translatable("message.deadrecall.death_node_admin.confirm_batch_disable")
+                : Component.translatable("message.deadrecall.death_node_admin.batch_disable");
+    }
+
+    private Component batchPurgeButtonText() {
+        return this.payload.hasActiveConfirmationFor(
+                DeathNodeAdminService.BATCH_NODE_ID,
+                DeathNodeAdminService.ACTION_BATCH_PURGE,
+                System.currentTimeMillis())
+                ? Component.translatable("message.deadrecall.death_node_admin.confirm_batch_purge")
+                : Component.translatable("message.deadrecall.death_node_admin.batch_purge");
     }
 
     private String countSummary() {
-        return "顯示 " + filteredEntries().size() + " / 共 " + this.payload.entries().size() + " 個節點";
+        return Component.translatable(
+                "message.deadrecall.death_node_admin.page_summary",
+                this.payload.page() + 1,
+                this.payload.entries().size(),
+                this.payload.totalEntries()
+        ).getString();
     }
 
     private String locationLine(DeathNodeAdminPayload.Entry entry) {
@@ -420,10 +548,24 @@ public final class DeathNodeAdminScreen extends Screen {
 
     private String statusText(String status) {
         return switch (status) {
-            case "active" -> "ACTIVE";
-            case "disabled" -> "DISABLED";
+            case "active" -> Component.translatable("message.deadrecall.death_node_admin.status.active").getString();
+            case "disabled" -> Component.translatable("message.deadrecall.death_node_admin.status.disabled").getString();
             default -> status.toUpperCase(java.util.Locale.ROOT);
         };
+    }
+
+    private String diagnosticsText(DeathNodeAdminPayload.Entry entry) {
+        if (entry.diagnosticFlags().isEmpty()) {
+            return Component.translatable("message.deadrecall.death_node_admin.diagnostics.none").getString();
+        }
+        return entry.diagnosticFlags().stream()
+                .map(this::diagnosticText)
+                .reduce((first, second) -> first + ", " + second)
+                .orElse("");
+    }
+
+    private String diagnosticText(String diagnosticId) {
+        return Component.translatable("message.deadrecall.death_node_admin.diagnostic." + diagnosticId).getString();
     }
 
     private int maxScrollIndex() {
@@ -435,11 +577,11 @@ public final class DeathNodeAdminScreen extends Screen {
     }
 
     private int panelWidth() {
-        return Math.min(PANEL_WIDTH, Math.max(330, this.width - 12));
+        return Math.min(PANEL_WIDTH, Math.max(560, this.width - 12));
     }
 
     private int panelHeight() {
-        return Math.min(PANEL_HEIGHT, Math.max(250, this.height - 12));
+        return Math.min(PANEL_HEIGHT, Math.max(320, this.height - 12));
     }
 
     private int panelX() {
@@ -467,35 +609,75 @@ public final class DeathNodeAdminScreen extends Screen {
     }
 
     private int listHeight() {
-        return panelHeight() - HEADER_HEIGHT - CONTROL_HEIGHT - FOOTER_HEIGHT;
+        return panelHeight() - HEADER_HEIGHT - CONTROL_HEIGHT - DETAIL_HEIGHT - FOOTER_HEIGHT;
     }
 
-    private int ownerPreviousX() {
+    private int detailsY() {
+        return listY() + listHeight() + 4;
+    }
+
+    private int ownerQueryX() {
         return panelX() + PANEL_PADDING;
     }
 
-    private int ownerFilterX() {
-        return ownerPreviousX() + 24;
+    private int ownerQueryWidth() {
+        return 120;
     }
 
-    private int ownerFilterWidth() {
-        return Math.max(120, Math.min(230, panelWidth() - 260));
+    private int dimensionX() {
+        return ownerQueryX() + ownerQueryWidth() + 4;
     }
 
-    private int ownerNextX() {
-        return ownerFilterX() + ownerFilterWidth() + 4;
+    private int dimensionWidth() {
+        return 130;
     }
 
     private int statusFilterX() {
-        return ownerNextX() + 28;
+        return dimensionX() + dimensionWidth() + 4;
+    }
+
+    private int statusFilterWidth() {
+        return 96;
+    }
+
+    private int timeFilterX() {
+        return statusFilterX() + statusFilterWidth() + 4;
+    }
+
+    private int timeFilterWidth() {
+        return 86;
     }
 
     private int footerY() {
         return panelY() + panelHeight() - 25;
     }
 
+    private int batchControlsY() {
+        return controlsY() + 24;
+    }
+
+    private int batchDisableX() {
+        return ownerQueryX();
+    }
+
+    private int batchPurgeX() {
+        return batchDisableX() + 170;
+    }
+
     private int refreshX() {
+        return timeFilterX() + timeFilterWidth() + 4;
+    }
+
+    private int refreshWidth() {
+        return 60;
+    }
+
+    private int previousPageX() {
         return panelX() + PANEL_PADDING;
+    }
+
+    private int nextPageX() {
+        return previousPageX() + 46;
     }
 
     private int doneX() {
@@ -508,6 +690,10 @@ public final class DeathNodeAdminScreen extends Screen {
 
     private int disableX() {
         return purgeX() - 6 - 72;
+    }
+
+    private int teleportX() {
+        return disableX() - 6 - 60;
     }
 
     private static boolean isInside(double mouseX, double mouseY, int x, int y, int width, int height) {
@@ -537,18 +723,21 @@ public final class DeathNodeAdminScreen extends Screen {
         return trimmed + ellipsis;
     }
 
-    private record OwnerOption(UUID id, String name) {
-    }
-
     private enum StatusFilter {
-        ALL("全部"),
-        ACTIVE("ACTIVE"),
-        DISABLED("DISABLED");
+        ALL("message.deadrecall.death_node_admin.status.all", ""),
+        ACTIVE("message.deadrecall.death_node_admin.status.active", "active"),
+        DISABLED("message.deadrecall.death_node_admin.status.disabled", "disabled");
 
-        private final String label;
+        private final String labelKey;
+        private final String id;
 
-        StatusFilter(String label) {
-            this.label = label;
+        StatusFilter(String labelKey, String id) {
+            this.labelKey = labelKey;
+            this.id = id;
+        }
+
+        private Component label() {
+            return Component.translatable(this.labelKey);
         }
 
         private StatusFilter next() {
@@ -559,8 +748,37 @@ public final class DeathNodeAdminScreen extends Screen {
             };
         }
 
-        private boolean matches(String status) {
-            return this == ALL || this.name().equalsIgnoreCase(status);
+    }
+
+    private enum TimeFilter {
+        ALL("message.deadrecall.death_node_admin.time.all", 0L),
+        DAY("message.deadrecall.death_node_admin.time.day", 24_000L),
+        WEEK("message.deadrecall.death_node_admin.time.week", 168_000L),
+        MONTH("message.deadrecall.death_node_admin.time.month", 720_000L);
+
+        private final String labelKey;
+        private final long windowTicks;
+
+        TimeFilter(String labelKey, long windowTicks) {
+            this.labelKey = labelKey;
+            this.windowTicks = windowTicks;
+        }
+
+        private Component label() {
+            return Component.translatable(this.labelKey);
+        }
+
+        private TimeFilter next() {
+            return switch (this) {
+                case ALL -> DAY;
+                case DAY -> WEEK;
+                case WEEK -> MONTH;
+                case MONTH -> ALL;
+            };
+        }
+
+        private long createdAfterGameTime(long serverGameTime) {
+            return this.windowTicks == 0L ? 0L : Math.max(0L, serverGameTime - this.windowTicks);
         }
     }
 }

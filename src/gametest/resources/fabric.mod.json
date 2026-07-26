@@ -41,6 +41,7 @@
       "com.adaptor.deadrecall.item.copper.CopperGolemTransportGameTest",
       "com.adaptor.deadrecall.recipe.LecternGameplayGameTest",
       "com.adaptor.deadrecall.space.AmethystCatalystTeleportGameTest",
+      "com.adaptor.deadrecall.space.DeathNodeAdminAuthorizationGameTest",
       "com.adaptor.deadrecall.space.DirectFriendPlayerTeleportGameTest",
       "com.adaptor.deadrecall.space.TeleportInterfacePhaseAGameTest",
       "com.adaptor.deadrecall.space.TeleportInterfacePhaseBGameTest",

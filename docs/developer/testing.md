@@ -47,6 +47,20 @@ Loom 設定使用 `fabricApi.configureTests` 建立獨立 `gametest` source set�
 
 目前 Client GameTests 保持停用；需要畫面、滑鼠或 Client-only 渲染驗證時，應另行建立 Client GameTest 或人工測試矩陣。
 
+## 可視化測試截圖證據
+
+需要驗證 Client GUI、渲染、滑鼠／鍵盤互動或人工視覺驗收的測試，必須把截圖寫入**目前 repository 工作目錄**下的：
+
+```text
+test-artifacts/screenshots/<change-id>/<test-id>-<stage>.png
+```
+
+`<stage>` 至少包含 `before` 與 `after`；驗收錯誤訊息、確認對話框或其他關鍵狀態時，另存對應的階段截圖。檔名必須穩定，讓同一案例重跑時只覆寫自己的證據。測試報告須列出執行命令、測試 ID 與相對截圖路徑。
+
+以 Xvfb 執行的 Client 測試可擷取該虛擬 display；真人驗收則只擷取遊戲視窗。截圖不得包含 token、私密聊天或無關的桌面內容。`test-artifacts/screenshots/` 不納入 Git，但 GitHub Actions 會在成功、失敗或逾時後上傳它。
+
+純 JVM 與 headless Fabric Server GameTest 沒有有意義的 Client framebuffer，維持輸出 JUnit／GameTest 報告即可，不能以空白畫面代替驗收證據。凡是有可視化需求的功能，必須另有 Client GameTest 或明確記錄的人工驗收案例。
+
 ## Discord 本地化回歸
 
 Discord 的四組 Dedicated Server GameTests 已明確註冊於測試模組的 `fabric-gametest` entrypoint：

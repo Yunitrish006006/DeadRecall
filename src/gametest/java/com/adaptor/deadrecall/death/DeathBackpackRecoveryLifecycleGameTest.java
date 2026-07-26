@@ -153,6 +153,42 @@ public final class DeathBackpackRecoveryLifecycleGameTest {
 
     @SuppressWarnings("removal")
     @GameTest(maxTicks = 80)
+    public void recoverySucceedsWhenAnAdministratorAlreadyDeletedTheBoundNode(GameTestHelper helper) {
+        prepareGround(helper, FIRST_DEATH_POS, RECOVERY_POS);
+        BlockPos absoluteDeathPos = helper.absolutePos(FIRST_DEATH_POS);
+        ServerPlayer owner = createPlayerAt(helper, absoluteDeathPos);
+        owner.getInventory().setItem(0, new ItemStack(Items.REDSTONE, 7));
+        owner.die(helper.getLevel().damageSources().generic());
+
+        helper.runAtTickTime(5, () -> {
+            ServerPlayer recoveringPlayer = createPlayerAt(helper, helper.absolutePos(RECOVERY_POS));
+            try {
+                ItemEntity backpackEntity = findBackpackContaining(
+                        helper,
+                        deathBackpacksAround(helper, absoluteDeathPos, 5.0),
+                        Items.REDSTONE,
+                        7
+                );
+                UUID nodeId = activeDeathNodeId(helper, owner.getUUID());
+                unitRecords(helper).remove(nodeId);
+                units(helper).setDirty();
+
+                recoverBackpack(recoveringPlayer, backpackEntity);
+
+                require(helper, unitRecords(helper).get(nodeId) == null,
+                        "Recovery recreated an administrator-deleted death node");
+                require(helper, recoveringPlayer.getMainHandItem().isEmpty(),
+                        "Missing death node prevented empty-backpack removal");
+                helper.succeed();
+            } finally {
+                owner.discard();
+                recoveringPlayer.discard();
+            }
+        });
+    }
+
+    @SuppressWarnings("removal")
+    @GameTest(maxTicks = 80)
     public void recoveredNodeAndDiscoverySurviveSavedDataCodecRoundTrip(GameTestHelper helper) {
         prepareGround(helper, FIRST_DEATH_POS);
         BlockPos absoluteDeathPos = helper.absolutePos(FIRST_DEATH_POS);

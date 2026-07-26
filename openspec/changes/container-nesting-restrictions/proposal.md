@@ -1,6 +1,6 @@
 # Proposal: Container Nesting Restrictions
 
-Status: proposed
+Status: complete.
 Target Version: 2.4.1
 
 ## 問題

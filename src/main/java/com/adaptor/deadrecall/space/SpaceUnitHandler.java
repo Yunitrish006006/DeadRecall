@@ -884,9 +884,15 @@ public final class SpaceUnitHandler {
         };
     }
 
-    private static String playerDisplayName(MinecraftServer server, UUID playerId) {
+    public static String playerDisplayName(MinecraftServer server, UUID playerId) {
         ServerPlayer player = server.getPlayerList().getPlayer(playerId);
-        return player == null ? shortPlayerId(playerId) : player.getName().getString();
+        if (player != null) {
+            return player.getName().getString();
+        }
+        return server.services().nameToIdCache().get(playerId)
+                .map(net.minecraft.server.players.NameAndId::name)
+                .filter(name -> !name.isBlank())
+                .orElseGet(() -> shortPlayerId(playerId));
     }
 
     private static String shortPlayerId(UUID playerId) {
@@ -1634,7 +1640,18 @@ public final class SpaceUnitHandler {
     }
 
     private static Optional<BlockPos> findNearestSafeLanding(ServerLevel level, TeleportTarget target, int maxHorizontalDeviation) {
-        BlockPos anchor = landingAnchor(target);
+        return findSafeLandingNear(level, landingAnchor(target), maxHorizontalDeviation);
+    }
+
+    /**
+     * Finds the nearest safe feet position around an explicit server-owned
+     * anchor. Administrative tools use this rather than teleporting directly
+     * into an unvalidated death-node block position.
+     */
+    public static Optional<BlockPos> findSafeLandingNear(ServerLevel level, BlockPos anchor, int maxHorizontalDeviation) {
+        if (level == null || anchor == null) {
+            return Optional.empty();
+        }
         int radius = clamp(maxHorizontalDeviation, 0, 96);
         for (int horizontal = 0; horizontal <= radius; horizontal++) {
             for (int dx = -horizontal; dx <= horizontal; dx++) {

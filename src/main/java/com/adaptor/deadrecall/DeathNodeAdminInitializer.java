@@ -8,6 +8,7 @@ import com.adaptor.deadrecall.space.DeathNodeAdminService;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.permissions.Permissions;
@@ -24,10 +25,17 @@ public final class DeathNodeAdminInitializer implements ModInitializer {
 
         ServerPlayNetworking.registerGlobalReceiver(RequestDeathNodeAdminPayload.TYPE,
                 (payload, context) -> context.server().execute(() ->
-                        DeathNodeAdminService.sendSnapshot(context.player())));
+                        DeathNodeAdminService.sendSnapshot(context.player(), payload)));
         ServerPlayNetworking.registerGlobalReceiver(ManageDeathNodeAdminPayload.TYPE,
                 (payload, context) -> context.server().execute(() ->
-                        DeathNodeAdminService.handleAction(context.player(), payload.nodeId(), payload.action())));
+                        DeathNodeAdminService.handleAction(
+                                context.player(),
+                                payload.nodeId(),
+                                payload.action(),
+                                payload.confirmationToken()
+                        )));
+        ServerPlayConnectionEvents.DISCONNECT.register((listener, server) ->
+                DeathNodeAdminService.clearSession(listener.getPlayer().getUUID()));
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(Commands.literal("deadrecall")
