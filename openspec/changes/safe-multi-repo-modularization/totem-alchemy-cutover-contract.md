@@ -83,5 +83,10 @@ resources, including `data/deadrecall/recipe/flint_from_bowl.json`. Its
 Dedicated Server GameTest suite ran four required tests: the framework
 baseline, both cauldron migration tests and a Flint-from-Bowl test that loads
 the external datapack recipe, validates its serializer, produces one flint and
-returns the Stone Bowl. Exact lockstep-bundle validation is the remaining gate
-for this follow-on ownership transfer.
+returns the Stone Bowl. GitHub Actions [Validate run 30221855600](https://github.com/Yunitrish006006/DeadRecall/actions/runs/30221855600)
+then rebuilt the exact Java 25 graph, checked the assembled ownership surface,
+and started the complete bundle on isolated port `25570`. It completed the
+Automata and Nexus legacy-world probes as part of the same bundle. The Flint
+transfer is therefore cutover-qualified; the existing Alchemy two-release
+observation window remains open and now includes `0.1.3`, so independent
+publication remains blocked.

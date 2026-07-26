@@ -381,3 +381,15 @@ launcher from the official `.../server/jar` endpoint. It must not run the bare
 Fabric Installer artifact with `nogui`: that artifact has no server launch
 handler. The verification script continues to use Java 25 and its isolated
 port `25570` once the correct launcher is supplied.
+
+## Alchemy 0.1.3 Flint ownership follow-on
+
+GitHub Actions [Validate run 30221855600](https://github.com/Yunitrish006006/DeadRecall/actions/runs/30221855600)
+passed for compatibility-bundle commit `474cd00ec40949fc8bc70c71ecb995441e08d5c6`.
+Its Java 25 assembled-bundle job rebuilt the exact immutable graph, including
+`TotemAlchemy 0.1.3` from `390c4a77a233cfc56a9bbadaf0432e9fe16f981e`, checked
+all module-owned resources, and started the complete server on port `25570`.
+The same run completed the legacy Copper Golem and Nexus old-world probes;
+their root-only seed uses `25571` and each exact bundle uses `25570`. This
+qualifies the preserved `deadrecall:flint_from_bowl` serializer and recipe
+transfer, but does not close Alchemy's existing two-release observation window.
