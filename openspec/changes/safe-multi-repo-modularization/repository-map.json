@@ -50,7 +50,8 @@
     {
       "id": "automata",
       "repository": "TotemAutomata",
-      "status": "test-qualified-pending-bundle-cutover",
+      "status": "cutover-qualified-observation-in-progress",
+      "remainingGate": "Verify full client visual/layout parity for the external Copper Golem screen, then complete the two-release observation window.",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/item/copper/**",
         "Copper Golem payloads and receivers",
@@ -61,7 +62,8 @@
     {
       "id": "nexus",
       "repository": "TotemNexus",
-      "status": "repository-initialized-additive-extraction-in-progress",
+      "status": "cutover-qualified-observation-in-progress",
+      "remainingGate": "Complete documented in-game client visual-parity inspection and the two-release observation window.",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/space/**",
         "Space Unit, friend, teleport and death-node payloads",
