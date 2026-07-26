@@ -46,5 +46,17 @@ furnace experience. All passed. With only TotemCore `0.1.2`,
 TotemVanillaTweaks `0.1.0` and Fabric API installed, a Java 25 Dedicated
 Server on port `25570` loaded both initializers, reached `Done` and saved every
 dimension. The external module additionally owns four JVM assertions for the
-vanilla-ID `lectern.json` resource. Exact bundle validation remains the
-release gate.
+vanilla-ID `lectern.json` resource.
+
+## Recorded exact-bundle evidence
+
+GitHub Actions [Validate run 30218984899](https://github.com/Yunitrish006006/DeadRecall/actions/runs/30218984899)
+passed for root commit `7447d82829c82b46760b7a4241d1770b42512ea0`.
+With Java 25 it rebuilt the exact immutable graph, including
+TotemVanillaTweaks source `1cd901ba6bfef49ad6fd2786e9c6c986bbe4d38e`,
+verified every module-owned artifact resource (including the vanilla-namespace
+lectern recipe), and started the exact multi-JAR Dedicated Server on port
+`25570`. It also completed the Automata and Nexus legacy-world probes on port
+`25571`. The atomic external Mixin authority is therefore qualified and now
+enters its two-release observation window; the compiled root copies remain the
+rollback path for that window.

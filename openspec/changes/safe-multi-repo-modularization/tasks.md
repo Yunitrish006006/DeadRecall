@@ -90,4 +90,4 @@
   - [x] 7.7.2 Extract TotemAlchemy 0.1.2 as a Java 25, Core-only module and pin its immutable source commit and SHA-512 artifact.
   - [x] 7.7.3 Record TotemAlchemy standalone Dedicated Server, cauldron restart and assembled-bundle cutover evidence; retain its two-release observation window.
   - [x] 7.7.4 Inventory and stage TotemEnchanting 0.1.0 with its atomic Mixin cutover; record exact-bundle evidence and retain its two-release observation window.
-  - [ ] 7.7.5 Inventory and stage TotemVanillaTweaks 0.1.0 with its atomic Mixin cutover; complete exact-bundle evidence before closing its observation window.
+  - [x] 7.7.5 Inventory and stage TotemVanillaTweaks 0.1.0 with its atomic Mixin cutover; record exact-bundle evidence and retain its two-release observation window.

@@ -94,7 +94,7 @@
     {
       "id": "vanilla-tweaks",
       "repository": "TotemVanillaTweaks",
-      "status": "cutover-staged-pending-assembled-bundle-validation",
+      "status": "cutover-qualified-observation-in-progress",
       "currentAreas": [
         "lectern recipe override and RecipeManagerMixin",
         "ConcretePowderItemHardening and ConcretePowderItemEntityMixin",
