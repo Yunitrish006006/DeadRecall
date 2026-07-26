@@ -32,13 +32,13 @@ import java.util.regex.Pattern;
 
 public final class DiscordLocalizationService {
     private static final List<String> BUNDLED_TABLES = List.of(
-            "/assets/deadrecall/lang/discord_zh_tw/adventure.json",
-            "/assets/deadrecall/lang/discord_zh_tw/end.json",
-            "/assets/deadrecall/lang/discord_zh_tw/events.json",
-            "/assets/deadrecall/lang/discord_zh_tw/husbandry.json",
-            "/assets/deadrecall/lang/discord_zh_tw/nether.json",
-            "/assets/deadrecall/lang/discord_zh_tw/story.json",
-            "/assets/deadrecall/lang/discord_zh_tw/system.json"
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/adventure.json",
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/end.json",
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/events.json",
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/husbandry.json",
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/nether.json",
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/story.json",
+            "/assets/deadrecall/lang/legacy_discord_zh_tw/system.json"
     );
     private static final String SERVER_DATA_DIRECTORY = "deadrecall/discord_zh_tw";
     private static final Identifier RELOAD_LISTENER_ID =

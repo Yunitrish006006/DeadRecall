@@ -355,4 +355,7 @@ Exact-bundle resource ownership also removes the seven root
 `assets/deadrecall/lang/discord_zh_tw/{adventure,end,events,husbandry,nether,story,system}.json`
 files. They are owned by TotemDiscordBridge in the assembled graph; retaining
 root copies would create duplicate `deadrecall` resource paths, regardless of
-whether their historical translation content differs.
+whether their historical translation content differs. The root-only legacy
+Discord fallback and GameTests retain their historical snapshot under the
+distinct `legacy_discord_zh_tw/` path, so it cannot collide with the Bridge's
+owner paths in the assembled production graph.

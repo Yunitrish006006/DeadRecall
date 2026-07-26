@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MinecraftZhTwLanguageClasspathProbeTest {
-    private static final String SYSTEM_TABLE = "/assets/deadrecall/lang/discord_zh_tw/system.json";
+    private static final String SYSTEM_TABLE = "/assets/deadrecall/lang/legacy_discord_zh_tw/system.json";
 
     @Test
     void deadRecallProvidesDedicatedServerTranslationSnapshot() throws Exception {
