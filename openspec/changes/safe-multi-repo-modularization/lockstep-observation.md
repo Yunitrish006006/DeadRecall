@@ -344,3 +344,9 @@ also makes a live player target's exact safe position the first landing choice,
 using the existing deviation search only when that position is unsafe. CI can
 therefore use the pinned checksum as an immutable lockstep guard while the
 root GameTest has a deterministic latest-target assertion.
+
+The next exact remote build found the same manifest-only nondeterminism in
+Automata. `31b257707da0a04d8fd1efa006ca1b1ca8e8bcc7` applies the same
+canonical archive procedure. Two Java 25 forced builds produced Automata
+SHA-512 `56d38fb0a6266a43a5302f5c98f7cc9faaa4e72d5ec5369eaa5a9995daca2d4b8c39590eca223bcf2b9af3ad39ad694c913022f96c72a554f5a8a3a4f416cc2f`,
+which is now the immutable lockstep pin.

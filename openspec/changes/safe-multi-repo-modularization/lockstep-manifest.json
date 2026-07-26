@@ -32,8 +32,8 @@
       "version": "0.1.1",
       "repository": "TotemAutomata local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAutomata.git",
-      "sourceCommit": "f96094193a347795a6c14320e8c8112497db18ed",
-      "sha512": "dcf6114d667aeb91b2aa328897335f85f94e6ee771080506eebb7026d6ea5cb983188439d088af7ac8af5bd58d0337183911b59e0a6fffb50c3d00a49cfdcd11"
+      "sourceCommit": "31b257707da0a04d8fd1efa006ca1b1ca8e8bcc7",
+      "sha512": "56d38fb0a6266a43a5302f5c98f7cc9faaa4e72d5ec5369eaa5a9995daca2d4b8c39590eca223bcf2b9af3ad39ad694c913022f96c72a554f5a8a3a4f416cc2f"
     },
     {
       "id": "totem-nexus",

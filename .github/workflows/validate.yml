@@ -99,7 +99,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemAutomata
-          ref: f96094193a347795a6c14320e8c8112497db18ed
+          ref: 31b257707da0a04d8fd1efa006ca1b1ca8e8bcc7
           path: .lockstep/TotemAutomata
           persist-credentials: false
 
