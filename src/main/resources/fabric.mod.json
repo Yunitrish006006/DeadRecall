@@ -31,6 +31,7 @@
     "deadrecall.automata.mixins.json",
     "deadrecall.alchemy.mixins.json",
     "deadrecall.enchanting.mixins.json",
+    "deadrecall.vanilla-tweaks.mixins.json",
     "deadrecall.nexus.mixins.json",
     "deadrecall.legacy.mixins.json",
     {

@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.adaptor.deadrecall.mixin",
+  "plugin": "com.adaptor.deadrecall.mixin.DeadRecallVanillaTweaksMixinPlugin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "AbstractFurnaceBlockEntityAccessor",
+    "ConcretePowderItemEntityMixin",
+    "HopperBlockEntityMixin",
+    "RecipeManagerMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

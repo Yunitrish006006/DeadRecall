@@ -60,6 +60,14 @@
       "sha512": "ce8fb9b77d22ed0d439e70cd9783693f87b33c6c19a2b9cdd9df841d090a459a8866a61fbaebcf9ed0850e4564a353eaa8c8d39a241611e5e3fd7a93be35cb40"
     },
     {
+      "id": "totem-vanilla-tweaks",
+      "version": "0.1.0",
+      "repository": "TotemVanillaTweaks local staging",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemVanillaTweaks.git",
+      "sourceCommit": "f18ce5d193bc51fa45c072b30fabbd8072cb978d",
+      "sha512": "f06ab91e4a42bc5fa494424089879dfdd63d9d2aa887d9244c254534e45889a9eef7a3fd7d7175e6fbf8c37602e0a3582e742903ad6c832e67fbafe731f6a251"
+    },
+    {
       "id": "totem-nexus",
       "version": "0.1.1",
       "repository": "TotemNexus local staging",

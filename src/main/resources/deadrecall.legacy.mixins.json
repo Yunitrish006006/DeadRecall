@@ -3,10 +3,6 @@
   "package": "com.adaptor.deadrecall.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "AbstractFurnaceBlockEntityAccessor",
-    "HopperBlockEntityMixin",
-    "ConcretePowderItemEntityMixin",
-    "RecipeManagerMixin",
     "ShulkerBoxBlockEntityMixin",
     "ShulkerBoxSlotMixin",
     "StructureTemplateMixin"

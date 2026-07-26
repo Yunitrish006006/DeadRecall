@@ -127,6 +127,14 @@ jobs:
           path: .lockstep/TotemEnchanting
           persist-credentials: false
 
+      - name: Checkout pinned TotemVanillaTweaks source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemVanillaTweaks
+          ref: f18ce5d193bc51fa45c072b30fabbd8072cb978d
+          path: .lockstep/TotemVanillaTweaks
+          persist-credentials: false
+
       - name: Checkout pinned TotemNexus source
         uses: actions/checkout@v4
         with:
@@ -168,6 +176,9 @@ jobs:
           ./gradlew -p .lockstep/TotemEnchanting \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             test runGameTest remapJar --no-daemon --stacktrace
+          ./gradlew -p .lockstep/TotemVanillaTweaks \
+            -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
+            test runGameTest remapJar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemNexus \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             jar --no-daemon --stacktrace
@@ -178,6 +189,7 @@ jobs:
           test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
           test -f .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar
           test -f .lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar
+          test -f .lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar
           test -f .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
           test -f .lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar
 
@@ -196,6 +208,9 @@ jobs:
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemEnchanting \
             --jar .lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar
+          bash .github/scripts/check-module-artifact-resources.sh \
+            --source-root .lockstep/TotemVanillaTweaks \
+            --jar .lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemNexus \
             --jar .lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
@@ -232,6 +247,7 @@ jobs:
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-alchemy=.lockstep/TotemAlchemy \
             --source totem-enchanting=.lockstep/TotemEnchanting \
+            --source totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
@@ -239,6 +255,7 @@ jobs:
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
+            --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
       - name: Verify legacy Copper Golem world through Automata cutover
@@ -285,6 +302,7 @@ jobs:
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-alchemy=.lockstep/TotemAlchemy \
             --source totem-enchanting=.lockstep/TotemEnchanting \
+            --source totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
@@ -292,6 +310,7 @@ jobs:
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
+            --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
           bash .github/scripts/verify-lockstep-bundle.sh \
@@ -312,6 +331,7 @@ jobs:
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-alchemy=.lockstep/TotemAlchemy \
             --source totem-enchanting=.lockstep/TotemEnchanting \
+            --source totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
@@ -319,6 +339,7 @@ jobs:
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
+            --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
           test -f "${migration_marker}/migrate.ok"
           test -f "${migration_marker}/verify.ok"
@@ -366,6 +387,7 @@ jobs:
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-alchemy=.lockstep/TotemAlchemy \
             --source totem-enchanting=.lockstep/TotemEnchanting \
+            --source totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
@@ -373,6 +395,7 @@ jobs:
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
+            --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
 
           bash .github/scripts/verify-lockstep-bundle.sh \
@@ -392,6 +415,7 @@ jobs:
             --source totem-automata=.lockstep/TotemAutomata \
             --source totem-alchemy=.lockstep/TotemAlchemy \
             --source totem-enchanting=.lockstep/TotemEnchanting \
+            --source totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks \
             --source totem-nexus=.lockstep/TotemNexus \
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
@@ -399,6 +423,7 @@ jobs:
             --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.2.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
+            --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.1.1.jar
           test -f "${marker_root}/migrate.ok"
           test -f "${marker_root}/verify.ok"
@@ -422,4 +447,6 @@ jobs:
             .lockstep/TotemDiscordBridge/build/libs/*.jar
             .lockstep/TotemAutomata/build/libs/*.jar
             .lockstep/TotemAlchemy/build/libs/*.jar
+            .lockstep/TotemEnchanting/build/libs/*.jar
+            .lockstep/TotemVanillaTweaks/build/libs/*.jar
             .lockstep/TotemNexus/build/libs/*.jar

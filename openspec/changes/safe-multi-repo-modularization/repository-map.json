@@ -94,11 +94,11 @@
     {
       "id": "vanilla-tweaks",
       "repository": "TotemVanillaTweaks",
-      "status": "approved-boundary-repository-pending-inventory",
-      "plannedAreas": [
-        "general recipe overrides and RecipeManagerMixin",
+      "status": "cutover-staged-pending-assembled-bundle-validation",
+      "currentAreas": [
+        "lectern recipe override and RecipeManagerMixin",
         "ConcretePowderItemHardening and ConcretePowderItemEntityMixin",
-        "other vanilla gameplay tweaks without an existing feature owner"
+        "HopperBlockEntityMixin and AbstractFurnaceBlockEntityAccessor"
       ],
       "mustNotOwn": [
         "portable-container policy, which remains owned by TotemRemnant"

@@ -6,10 +6,10 @@ usage() {
     cat <<'USAGE'
 Usage: check-module-artifact-resources.sh --source-root <repository-root> --jar <module-jar>
 
-Ensures every DeadRecall compatibility asset or data resource owned by a
-module source tree is present byte-for-byte in its publishable JAR. This
-catches Loom remap configurations that leave resources in the development JAR
-but remove them from the artifact used by the compatibility bundle.
+Ensures every compatibility asset or data resource owned by a module source
+tree is present byte-for-byte in its publishable JAR. This catches Loom remap
+configurations that leave resources in the development JAR but remove them
+from the artifact used by the compatibility bundle.
 USAGE
 }
 
@@ -45,11 +45,11 @@ for resource_root in "${source_root}/src/main/resources" "${source_root}/src/cli
     [[ -d "${resource_root}" ]] || continue
     while IFS= read -r -d '' source_file; do
         source_files+=("${source_file}")
-    done < <(find "${resource_root}" -type f \( -path '*/assets/deadrecall/*' -o -path '*/data/deadrecall/*' \) -print0)
+    done < <(find "${resource_root}" -type f \( -path '*/assets/deadrecall/*' -o -path '*/data/deadrecall/*' -o -path '*/data/minecraft/*' \) -print0)
 done
 
 if [[ ${#source_files[@]} -eq 0 ]]; then
-    printf 'No owned DeadRecall compatibility resources to verify in %s.\n' "${source_root}"
+    printf 'No owned compatibility resources to verify in %s.\n' "${source_root}"
     exit 0
 fi
 
