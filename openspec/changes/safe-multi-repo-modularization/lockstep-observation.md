@@ -85,6 +85,15 @@ builds produced the same SHA-512. The compatibility workflow therefore invokes
 legacy fallback for the two-release observation window before independent
 versioning is enabled.
 
+On 2026-07-26, compatibility-bundle commit
+`58fa3efc5ec6c89d4f429e085dc9c497a8eb2f55` passed GitHub Actions
+[`Validate` run 30190452817](https://github.com/Yunitrish006006/DeadRecall/actions/runs/30190452817).
+Its Java 25 assembled-bundle job rebuilt the exact five-module graph, verified
+the pinned Remnant production JAR and its owned resources, then passed the
+Dedicated Server and Automata/Nexus legacy-world migration gates. The exact
+bundle used the isolated server port `25570`; the legacy seed continued to use
+`25571`, as specified in the modularization design.
+
 ## Automata qualification before cutover
 
 TotemAutomata remains additive, so DeadRecall is still the live Wrench/menu
