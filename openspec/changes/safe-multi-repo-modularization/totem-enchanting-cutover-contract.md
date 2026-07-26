@@ -3,10 +3,14 @@
 ## Current state
 
 `TotemEnchanting 0.1.0` is built from
-`1fcf1483b06040cde80293acde63c2b8ffbde780` and is pinned in the exact
+`9c782640095a6c156af4ca5ab1e6fa481dcbdd72` and is pinned in the exact
 compatibility graph with SHA-512
 `ce8fb9b77d22ed0d439e70cd9783693f87b33c6c19a2b9cdd9df841d090a459a8866a61fbaebcf9ed0850e4564a353eaa8c8d39a241611e5e3fd7a93be35cb40`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
+
+Its source pin includes the Fabric API class-tweaker normalization prerequisite
+for named Java 25 GameTest runtimes. This makes the GameTest launch independent
+of any pre-normalized local Gradle cache and does not alter the production JAR.
 
 The module owns the weighted Chiseled Bookshelf power rule and all three
 enchanting behavior Mixins: `EnchantmentHelperMixin`,

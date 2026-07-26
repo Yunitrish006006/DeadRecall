@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemAlchemy
-          ref: fff959536487bd5de4ed6e12c7e6ea2a52b65653
+          ref: 2a3bd6f46e9e0cb24c392294b1e235437d671816
           path: .lockstep/TotemAlchemy
           persist-credentials: false
 
@@ -123,7 +123,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemEnchanting
-          ref: 1fcf1483b06040cde80293acde63c2b8ffbde780
+          ref: 9c782640095a6c156af4ca5ab1e6fa481dcbdd72
           path: .lockstep/TotemEnchanting
           persist-credentials: false
 

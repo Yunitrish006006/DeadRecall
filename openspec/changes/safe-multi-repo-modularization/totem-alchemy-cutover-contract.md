@@ -3,10 +3,14 @@
 ## Current state
 
 `TotemAlchemy 0.1.2` is built from
-`fff959536487bd5de4ed6e12c7e6ea2a52b65653` and is pinned in the exact
+`2a3bd6f46e9e0cb24c392294b1e235437d671816` and is pinned in the exact
 compatibility graph with SHA-512
 `129e1da238384511b3586a0ea8fd44fe33d51876eda0dc494fb9284e3d258b9b02f1b6df4a611365c0f25bd193580e11e4849d3ed86c32805c5857e6281cb5ea`.
 It is a Java 25 module that depends only on TotemCore and Fabric API.
+
+Its source pin includes the Fabric API class-tweaker normalization prerequisite
+for named Java 25 GameTest runtimes. This makes the GameTest launch independent
+of any pre-normalized local Gradle cache and does not alter the production JAR.
 
 The module preserves the established `deadrecall:*` block, block-entity,
 item, effect, criterion and recipe identifiers. It owns the Alchemy Cauldron,
