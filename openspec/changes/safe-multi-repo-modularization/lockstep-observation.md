@@ -393,3 +393,19 @@ The same run completed the legacy Copper Golem and Nexus old-world probes;
 their root-only seed uses `25571` and each exact bundle uses `25570`. This
 qualifies the preserved `deadrecall:flint_from_bowl` serializer and recipe
 transfer, but does not close Alchemy's existing two-release observation window.
+
+## Automata 0.1.2 client visual evidence
+
+`TotemAutomata 0.1.2` is pinned to
+`bc5f7a8642c64a38128c5822a395868cc0e342ba` with Java 25 SHA-512
+`b3016bfb7b315cebef73106fcb26a7a81168addb946536452c967ca11685896a1d5317b356f788441260be877df7b6df51d72a9c048afddbd4dddaba6492d623`.
+Its Fabric client GameTest runs inside a local singleplayer world under a
+virtual display and captures `safe-multi-repo-modularization-automata-menu-before`
+before a state snapshot and `safe-multi-repo-modularization-automata-menu-after`
+after an authoritative, deterministic, non-secret Copper Golem snapshot. The
+captured screen verifies the safe loading state and the populated
+source/destination/LLM state. The exact-bundle CI runs this gate and uploads
+the resulting screenshots and client log alongside the normal Java 25,
+port-`25570` Dedicated Server evidence. The prior Automata `0.1.1` pin remains
+in the rollback graph; task 5.4 itself remains open only for its two-release
+observation window.

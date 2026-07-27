@@ -107,7 +107,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemAutomata
-          ref: 31b257707da0a04d8fd1efa006ca1b1ca8e8bcc7
+          ref: bc5f7a8642c64a38128c5822a395868cc0e342ba
           path: .lockstep/TotemAutomata
           persist-credentials: false
 
@@ -170,6 +170,12 @@ jobs:
           ./gradlew -p .lockstep/TotemAutomata \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             jar --no-daemon --stacktrace
+          # Capture the safe pre-snapshot and authoritative post-snapshot
+          # Copper Golem screens on a virtual display.
+          timeout --signal=TERM --kill-after=30s 8m \
+            xvfb-run -a ./gradlew -p .lockstep/TotemAutomata \
+              -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
+              runClientGameTest --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemAlchemy \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             test runGameTest remapJar --no-daemon --stacktrace
@@ -186,7 +192,7 @@ jobs:
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar" \
             remapJar --no-daemon --stacktrace
           test -f .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
-          test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
+          test -f .lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar
           test -f .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar
           test -f .lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar
           test -f .lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar
@@ -201,7 +207,7 @@ jobs:
             --jar .lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemAutomata \
-            --jar .lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar
+            --jar .lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar
           bash .github/scripts/check-module-artifact-resources.sh \
             --source-root .lockstep/TotemAlchemy \
             --jar .lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar
@@ -252,7 +258,7 @@ jobs:
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
-            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
             --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
@@ -307,7 +313,7 @@ jobs:
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
-            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
             --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
@@ -336,7 +342,7 @@ jobs:
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
-            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
             --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
@@ -392,7 +398,7 @@ jobs:
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
-            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
             --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
@@ -420,7 +426,7 @@ jobs:
             --artifact totem-core=.lockstep/TotemCore/build/libs/totem-core-0.1.2.jar \
             --artifact totem-remnant=.lockstep/TotemRemnant/build/libs/totem-remnant-0.1.1.jar \
             --artifact totem-discord-bridge=.lockstep/TotemDiscordBridge/build/libs/totem-discord-bridge-0.1.1.jar \
-            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.1.jar \
+            --artifact totem-automata=.lockstep/TotemAutomata/build/libs/totem-automata-0.1.2.jar \
             --artifact totem-alchemy=.lockstep/TotemAlchemy/build/libs/totem-alchemy-0.1.3.jar \
             --artifact totem-enchanting=.lockstep/TotemEnchanting/build/libs/totem-enchanting-0.1.0.jar \
             --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.0.jar \
@@ -446,6 +452,8 @@ jobs:
             .lockstep/TotemRemnant/build/libs/*.jar
             .lockstep/TotemDiscordBridge/build/libs/*.jar
             .lockstep/TotemAutomata/build/libs/*.jar
+            .lockstep/TotemAutomata/build/run/clientGameTest/screenshots/**
+            .lockstep/TotemAutomata/build/run/clientGameTest/logs/**
             .lockstep/TotemAlchemy/build/libs/*.jar
             .lockstep/TotemEnchanting/build/libs/*.jar
             .lockstep/TotemVanillaTweaks/build/libs/*.jar

@@ -86,9 +86,13 @@ now consumes the authoritative snapshot for operation/mode state, a
 source/destination/LLM summary, API configuration and gathering-LLM prompt
 edits. It now also owns the sorting binding selection, per-binding LLM prompt
 and cache-decision editor, responsive slot placement through its cutover-only
-accessor, and gathering target browsing/right-click removal. It still needs
-full legacy visual/layout parity and client-side in-game inspection before the
-cutover can be declared complete.
+accessor, and gathering target browsing/right-click removal. Automata `0.1.2`
+adds a Java 25 Fabric client GameTest which creates a singleplayer world,
+opens the external screen before and after an authoritative non-secret
+snapshot, and captures both stages for CI inspection. The external JAR now
+contains the tab/action translations used by this screen, so it does not rely
+on root UI language resources. The cutover still needs its two-release
+observation window before it can be declared complete.
 
 ## Matching DeadRecall gates
 
@@ -119,6 +123,8 @@ selected.
 - legacy-world load plus the Copper Golem restart probe using the external
   authority;
 - Dedicated Server start and normal shutdown; and
+- a Java 25 client GameTest on a virtual display that captures the external
+  screen before and after its authoritative snapshot; and
 - an immutable Automata JAR pin with its previous pin retained as rollback.
 
 Passing the existing additive qualification alone does not satisfy this

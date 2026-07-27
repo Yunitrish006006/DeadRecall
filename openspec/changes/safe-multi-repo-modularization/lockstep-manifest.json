@@ -37,11 +37,11 @@
     },
     {
       "id": "totem-automata",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "repository": "TotemAutomata local staging",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAutomata.git",
-      "sourceCommit": "31b257707da0a04d8fd1efa006ca1b1ca8e8bcc7",
-      "sha512": "56d38fb0a6266a43a5302f5c98f7cc9faaa4e72d5ec5369eaa5a9995daca2d4b8c39590eca223bcf2b9af3ad39ad694c913022f96c72a554f5a8a3a4f416cc2f"
+      "sourceCommit": "bc5f7a8642c64a38128c5822a395868cc0e342ba",
+      "sha512": "b3016bfb7b315cebef73106fcb26a7a81168addb946536452c967ca11685896a1d5317b356f788441260be877df7b6df51d72a9c048afddbd4dddaba6492d623"
     },
     {
       "id": "totem-alchemy",
@@ -91,8 +91,8 @@
       },
       {
         "id": "totem-automata",
-        "version": "0.1.0",
-        "sha512": "35f4d983049fdb6c8cf7d554bd0cebea569558fb6ac8cc088a6fde5fbd0453cc1e969fb695509d1dfd581d20e1ae2c0ba00f03d7c6265991cf2a9ad05d06b2ca"
+        "version": "0.1.1",
+        "sha512": "56d38fb0a6266a43a5302f5c98f7cc9faaa4e72d5ec5369eaa5a9995daca2d4b8c39590eca223bcf2b9af3ad39ad694c913022f96c72a554f5a8a3a4f416cc2f"
       },
       {
         "id": "totem-nexus",

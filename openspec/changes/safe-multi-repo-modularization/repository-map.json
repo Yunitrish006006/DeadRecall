@@ -51,7 +51,7 @@
       "id": "automata",
       "repository": "TotemAutomata",
       "status": "cutover-qualified-observation-in-progress",
-      "remainingGate": "Verify full client visual/layout parity for the external Copper Golem screen, then complete the two-release observation window.",
+      "remainingGate": "Complete the two-release observation window; pinned CI now captures the external Copper Golem screen before and after its authoritative snapshot.",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/item/copper/**",
         "Copper Golem payloads and receivers",
