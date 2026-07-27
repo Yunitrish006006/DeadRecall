@@ -428,3 +428,27 @@ as Automata. Exact-bundle CI runs and uploads this evidence alongside the
 existing Java 25 server validation on port `25570` and the root-only
 legacy-world seed on port `25571`. Nexus `0.1.1` remains its rollback pin;
 task 6.4 remains open only for the two-release observation window.
+
+## Shared locale merge guard
+
+The exact-bundle gate found that the standalone Nexus client visual fixture
+ships the `deadrecall` English, Simplified Chinese and Traditional Chinese
+Space Unit friends translations, while DeadRecall retains its complete locale
+files for legacy fallback. These files share resource paths in the assembled
+graph. Nexus `0.1.4` therefore synchronizes the four differing Chinese keys
+to the established DeadRecall values. The assembled-surface guard now permits
+only those three locale paths to be shared and parses each JSON object: every
+overlapping translation key must have exactly the same value. All other
+duplicate compatibility paths, malformed locale files and any future
+translation conflict remain hard failures. This keeps standalone Nexus
+localization and the root rollback path without letting resource ordering
+change visible text.
+
+`TotemNexus 0.1.4` is pinned to source commit
+`1a4724cad9cfea473c6677c6d868986ea2329b1b` with Java 25 SHA-512
+`c2ea781f402c9a2d54dd24c6a6c891c499e3d2b87e111dd1c270d05758a33d66bba5ea7d97f18708a8d655aafde2d2b81e6eecd87a156f831dfd35dfd7ef8468`.
+Two forced Java 25 JAR builds produced this identical digest. The current
+exact-version workflow now checks out this source revision, runs the retained
+Nexus client visual gate, and verifies the complete assembled server and
+legacy-world paths with the `0.1.4` artifact. Nexus `0.1.1` remains the
+rollback pin throughout the observation window.

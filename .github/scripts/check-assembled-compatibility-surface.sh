@@ -59,7 +59,7 @@ if [[ "${allow_delegated_surface}" == true ]]; then
     }
 fi
 
-for required_command in awk comm find jar mktemp sort uniq xargs; do
+for required_command in awk comm find jar jq mktemp sort uniq unzip xargs; do
     require_command "${required_command}"
 done
 
@@ -75,9 +75,67 @@ for module_jar in "${jars[@]}"; do
     ' >> "${bundle_resources_all}"
 done
 
-if sort "${bundle_resources_all}" | uniq -d | grep -q .; then
+duplicate_resources="${temporary_directory}/duplicate-resources"
+LC_ALL=C sort "${bundle_resources_all}" | uniq -d > "${duplicate_resources}"
+
+# Locale resources need to stay packaged with the standalone Nexus visual
+# GameTest while the compatibility bundle still owns the complete legacy
+# locale files for fallback.  The three shared files are safe only when every
+# overlapping translation key has exactly the same JSON value.  This permits
+# no resource-owner exception: malformed JSON or a conflicting translation
+# remains a hard bundle failure.
+is_shared_locale_resource() {
+    case "$1" in
+        assets/deadrecall/lang/en_us.json|assets/deadrecall/lang/zh_cn.json|assets/deadrecall/lang/zh_tw.json) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+invalid_duplicates="${temporary_directory}/invalid-duplicates"
+shared_locale_duplicates="${temporary_directory}/shared-locale-duplicates"
+while IFS= read -r duplicate_resource; do
+    [[ -n "${duplicate_resource}" ]] || continue
+    resource_path="${duplicate_resource#resource }"
+    if is_shared_locale_resource "${resource_path}"; then
+        printf '%s\n' "${resource_path}" >> "${shared_locale_duplicates}"
+    else
+        printf '%s\n' "${duplicate_resource}" >> "${invalid_duplicates}"
+    fi
+done < "${duplicate_resources}"
+
+if [[ -s "${invalid_duplicates}" ]]; then
     printf 'The assembled bundle has duplicate compatibility resources:\n' >&2
-    sort "${bundle_resources_all}" | uniq -d >&2
+    cat "${invalid_duplicates}" >&2
+    exit 1
+fi
+
+shared_locale_conflicts="${temporary_directory}/shared-locale-conflicts"
+while IFS= read -r locale_path; do
+    [[ -n "${locale_path}" ]] || continue
+    locale_entries="${temporary_directory}/$(basename "${locale_path}").entries"
+    : > "${locale_entries}"
+
+    for module_jar in "${jars[@]}"; do
+        jar tf "${module_jar}" | grep -Fqx "${locale_path}" || continue
+        locale_json="${temporary_directory}/$(basename "${module_jar}").$(basename "${locale_path}").json"
+        unzip -p "${module_jar}" "${locale_path}" > "${locale_json}"
+        jq -e -c -S 'if type == "object" then to_entries[] else error("locale must be a JSON object") end' \
+            "${locale_json}" >> "${locale_entries}"
+    done
+
+    jq -r -s '
+        sort_by(.key)
+        | group_by(.key)[]
+        | select(length > 1 and ([.[].value] | unique | length > 1))
+        | .[0].key
+    ' "${locale_entries}" | while IFS= read -r key; do
+        printf '%s: %s\n' "${locale_path}" "${key}" >> "${shared_locale_conflicts}"
+    done
+done < "${shared_locale_duplicates}"
+
+if [[ -s "${shared_locale_conflicts}" ]]; then
+    printf 'The assembled bundle has conflicting shared locale translations:\n' >&2
+    cat "${shared_locale_conflicts}" >&2
     exit 1
 fi
 
