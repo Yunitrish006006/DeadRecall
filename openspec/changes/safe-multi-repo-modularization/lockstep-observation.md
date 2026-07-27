@@ -394,18 +394,37 @@ their root-only seed uses `25571` and each exact bundle uses `25570`. This
 qualifies the preserved `deadrecall:flint_from_bowl` serializer and recipe
 transfer, but does not close Alchemy's existing two-release observation window.
 
-## Automata 0.1.2 client visual evidence
+## Automata 0.1.3 client visual evidence
 
-`TotemAutomata 0.1.2` is pinned to
-`bc5f7a8642c64a38128c5822a395868cc0e342ba` with Java 25 SHA-512
-`b3016bfb7b315cebef73106fcb26a7a81168addb946536452c967ca11685896a1d5317b356f788441260be877df7b6df51d72a9c048afddbd4dddaba6492d623`.
+`TotemAutomata 0.1.3` is pinned to
+`afd7f790a7274334f9528c394e44b051840c85e8` with Java 25 SHA-512
+`c0d58ed485a7dcf1762aed59d7c2631d1bfbc57b70220438c11a2bccea79076b3c6eb9f124d74ef97b720df6b4bce50d8b40cbb67a1e1b72267e4895506d96f8`.
 Its Fabric client GameTest runs inside a local singleplayer world under a
 virtual display and captures `safe-multi-repo-modularization-automata-menu-before`
 before a state snapshot and `safe-multi-repo-modularization-automata-menu-after`
 after an authoritative, deterministic, non-secret Copper Golem snapshot. The
 captured screen verifies the safe loading state and the populated
-source/destination/LLM state. The exact-bundle CI runs this gate and uploads
-the resulting screenshots and client log alongside the normal Java 25,
-port-`25570` Dedicated Server evidence. The prior Automata `0.1.1` pin remains
+source/destination/LLM state. A clean Gradle cache initially exposed Fabric
+API class-tweakers using the official namespace; the module now normalizes
+them before named client launch, and the same Java 25 test passed in that
+clean-cache simulation. The exact-bundle CI runs this gate and uploads the
+resulting screenshots and client log alongside the normal Java 25,
+port-`25570` Dedicated Server evidence. The prior Automata `0.1.2` pin remains
 in the rollback graph; task 5.4 itself remains open only for its two-release
 observation window.
+
+## Nexus 0.1.3 client visual evidence
+
+`TotemNexus 0.1.3` is pinned to
+`083c98c8b8eb2bd30080c4ad60aa8c0894e21725` with Java 25 SHA-512
+`ef8f69efa4df86e1d9d7d05168e379778a47d79a48ea861fb684b67e2d0524a102c726dbb2cd519311cf0ecbf93d6f2a46dc1dbd43ae792c75056e3a84400770`.
+Its Fabric client GameTest starts an isolated singleplayer world under a
+virtual display, captures an empty external Space Unit Friends screen, then
+captures deterministic populated friend, incoming-invite and outgoing-invite
+entries. The test ships its displayed English, Traditional Chinese and
+Simplified Chinese strings with Nexus, does not use credentials or remote
+services, and applies the same named-runtime Fabric API tweaker normalization
+as Automata. Exact-bundle CI runs and uploads this evidence alongside the
+existing Java 25 server validation on port `25570` and the root-only
+legacy-world seed on port `25571`. Nexus `0.1.1` remains its rollback pin;
+task 6.4 remains open only for the two-release observation window.

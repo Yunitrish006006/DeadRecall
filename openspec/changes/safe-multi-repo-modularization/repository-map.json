@@ -63,7 +63,7 @@
       "id": "nexus",
       "repository": "TotemNexus",
       "status": "cutover-qualified-observation-in-progress",
-      "remainingGate": "Complete documented in-game client visual-parity inspection and the two-release observation window.",
+      "remainingGate": "Complete the two-release observation window; pinned CI now captures the external Space Unit friends screen with empty and populated authoritative state.",
       "currentAreas": [
         "src/main/java/com/adaptor/deadrecall/space/**",
         "Space Unit, friend, teleport and death-node payloads",

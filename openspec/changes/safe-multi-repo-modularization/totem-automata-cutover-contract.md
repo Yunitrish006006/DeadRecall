@@ -86,13 +86,16 @@ now consumes the authoritative snapshot for operation/mode state, a
 source/destination/LLM summary, API configuration and gathering-LLM prompt
 edits. It now also owns the sorting binding selection, per-binding LLM prompt
 and cache-decision editor, responsive slot placement through its cutover-only
-accessor, and gathering target browsing/right-click removal. Automata `0.1.2`
+accessor, and gathering target browsing/right-click removal. Automata `0.1.3`
 adds a Java 25 Fabric client GameTest which creates a singleplayer world,
 opens the external screen before and after an authoritative non-secret
 snapshot, and captures both stages for CI inspection. The external JAR now
 contains the tab/action translations used by this screen, so it does not rely
-on root UI language resources. The cutover still needs its two-release
-observation window before it can be declared complete.
+on root UI language resources. Its GameTest normalizes Fabric API's official
+class-tweaker headers to the named development namespace before client launch,
+which makes the same Java 25 test valid on a clean headless CI runner. The
+cutover still needs its two-release observation window before it can be
+declared complete.
 
 ## Matching DeadRecall gates
 
