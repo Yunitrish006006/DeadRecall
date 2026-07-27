@@ -93,6 +93,7 @@ is_shared_locale_resource() {
 
 invalid_duplicates="${temporary_directory}/invalid-duplicates"
 shared_locale_duplicates="${temporary_directory}/shared-locale-duplicates"
+: > "${shared_locale_duplicates}"
 while IFS= read -r duplicate_resource; do
     [[ -n "${duplicate_resource}" ]] || continue
     resource_path="${duplicate_resource#resource }"
