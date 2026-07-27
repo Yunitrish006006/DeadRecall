@@ -198,7 +198,7 @@ public final class LegacyNexusMigrationProbe implements ModInitializer {
         String version = FabricLoader.getInstance().getModContainer("totem-nexus")
                 .orElseThrow(() -> new IllegalStateException("Legacy Nexus migration probe requires TotemNexus"))
                 .getMetadata().getVersion().getFriendlyString();
-        require("0.1.1".equals(version), "Legacy Nexus migration probe requires pinned Nexus 0.1.1, found " + version);
+        require("0.1.4".equals(version), "Legacy Nexus migration probe requires pinned Nexus 0.1.4, found " + version);
         require(NexusCutover.usesExternalAuthority(), "DeadRecall retained its legacy Nexus authority");
     }
 

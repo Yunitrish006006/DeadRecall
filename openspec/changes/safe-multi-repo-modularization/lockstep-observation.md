@@ -458,3 +458,8 @@ assertion: it still required the historical `0.1.1` artifact even though the
 immutable current graph has pinned the visual-gate `0.1.3` release. The probe
 now requires `0.1.3`; the `0.1.1` cutover threshold and the manifest's
 separate `0.1.2` rollback pin remain unchanged.
+
+The corresponding Nexus legacy-world probe also retained its historical
+`0.1.1` current-artifact assertion after the manifest advanced to Nexus
+`0.1.4`. It now requires the current `0.1.4` artifact while retaining the
+separate `0.1.1` rollback pin and the existing cutover threshold.
