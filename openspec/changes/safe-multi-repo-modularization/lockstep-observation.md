@@ -452,3 +452,9 @@ exact-version workflow now checks out this source revision, runs the retained
 Nexus client visual gate, and verifies the complete assembled server and
 legacy-world paths with the `0.1.4` artifact. Nexus `0.1.1` remains the
 rollback pin throughout the observation window.
+
+The next exact-bundle run exposed an outdated Automata legacy-world probe
+assertion: it still required the historical `0.1.1` artifact even though the
+immutable current graph has pinned the visual-gate `0.1.3` release. The probe
+now requires `0.1.3`; the `0.1.1` cutover threshold and the manifest's
+separate `0.1.2` rollback pin remain unchanged.

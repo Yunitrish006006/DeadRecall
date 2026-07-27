@@ -175,7 +175,7 @@ public final class LegacyAutomataMigrationProbe implements ModInitializer {
         String version = FabricLoader.getInstance().getModContainer("totem-automata")
                 .orElseThrow(() -> new IllegalStateException("Legacy migration probe requires TotemAutomata"))
                 .getMetadata().getVersion().getFriendlyString();
-        require("0.1.1".equals(version), "Legacy migration probe requires pinned Automata 0.1.1, found " + version);
+        require("0.1.3".equals(version), "Legacy migration probe requires pinned Automata 0.1.3, found " + version);
         require(AutomataCutover.usesExternalAuthority(), "DeadRecall retained its legacy Automata authority");
     }
 
