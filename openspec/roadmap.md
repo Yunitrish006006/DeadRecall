@@ -147,7 +147,8 @@
 - Core、Nexus、Discord Bridge、Enchanting 與 Vanilla Tweaks 沒有自訂
   Item registry，因此沒有需要遷移的物品 ID。
 - DeadRecall `2.4.5` 已固定三個變更模組的 source commit 與 artifact
-  SHA-512；remote CI 與 release observation 於推送後追蹤。
+  SHA-512，遠端 Build／Validate 與 GitHub Releases 已完成；多版本 release
+  observation 繼續追蹤。Modrinth project ID `AM1TmETA` 目前回傳 404。
 
 ### 圖靈騰樞紐（Totem Nexus）
 

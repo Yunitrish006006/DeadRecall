@@ -1,6 +1,6 @@
 # Proposal: Remnant Item ID Migration
 
-Status: implementation.
+Status: released in DeadRecall 2.4.5 / TotemRemnant 0.1.5.
 Target Version: DeadRecall 2.4.5 / TotemRemnant 0.1.5
 
 ## 問題

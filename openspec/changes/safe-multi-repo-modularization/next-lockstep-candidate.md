@@ -1,9 +1,9 @@
 # Next lockstep candidate
 
-Status: content-addressed local exact graph; remote reachability, CI and formal
-release promotion are still pending.
+Status: GitHub release promoted. The content-addressed graph is remotely
+reachable and the exact-source Build and Validate workflows passed.
 
-| Repository | Candidate version | Previous immutable version | Reason |
+| Repository | Released version | Previous immutable version | Reason |
 | --- | --- | --- | --- |
 | DeadRecall | `2.4.5` | `2.4.4` | Backpack dyeing and reversible custom-item ID migration |
 | TotemCore | `0.2.0` | `0.1.2` | Backwards-compatible public lifecycle API addition |
@@ -30,10 +30,10 @@ Promotion status:
 4. [x] Update the CI checkout pins and module artifact paths.
 5. [x] Locally verify current and rollback assembly, the compatibility surface,
    Dedicated Server startup, and the Automata and Nexus legacy-world migrations.
-6. [ ] Push every source commit so the graph is remote-reachable and pass the
+6. [x] Push every source commit so the graph is remote-reachable and pass the
    exact-source GitHub Actions workflow.
-7. [ ] Promote or copy final release artifacts only after the remote workflow
-   and release observation gates pass.
+7. [x] Promote or copy final release artifacts only after the remote workflow
+   and release-promotion gates pass.
 
 ## Local candidate evidence
 
@@ -79,6 +79,10 @@ authority, then verified the saved result in a third JVM. Each exact bundle
 reported one live initializer per Totem module and no duplicate compatibility
 resources.
 
-This is strong local qualification, but it is not remote release evidence.
-The commits remain ahead of their upstream branches, so the OpenSpec parent
-tasks that require a release observation window stay open.
+GitHub Build and Validate passed for DeadRecall commit
+`4fdd98fdfb19153131c2f833e576ecfa2c513151`, including exact-source assembly,
+the complete compatibility surface and both legacy-world migration gates.
+DeadRecall `v2.4.5`, Remnant `v0.1.5`, Automata `v0.1.7` and Alchemy `v0.1.5`
+were promoted as non-draft GitHub Releases with their production JAR assets.
+The longer multi-release observation window remains open. Modrinth promotion
+is separately blocked because configured project ID `AM1TmETA` returns 404.
