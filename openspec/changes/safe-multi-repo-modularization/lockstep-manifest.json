@@ -48,8 +48,8 @@
       "version": "0.1.5",
       "repository": "TotemAlchemy exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAlchemy.git",
-      "sourceCommit": "65b5432829241a28d9d2acbb9d856134426c6ae6",
-      "sha512": "51349808f3f4a74e6a37efc041ca652d527cd914aa5f842547441315fd974b1d02d962bce846da965b571430d02e3b37259f41d211f4f0103dffc5f36229a6b8"
+      "sourceCommit": "f95f9553e034a0fee9a0361cbafda70b8ba8bad5",
+      "sha512": "9421d97219bac15e741cd5dd0c63815f0d3ff46c9f5eda600ce15aa9f5cafc00d80de76b91ca1a7028414d3ea50fef91dd19ca4272c37ef509ccfb35d0fd19e9"
     },
     {
       "id": "totem-enchanting",
