@@ -36,6 +36,14 @@
 
 `SORTING`／`GATHERING`、容器型管理 GUI、來源與目的地、採集工作區、工具／倉庫／燃料、Home、LLM、Client 視覺化、權威 payload、chunk persistence、跨 JVM probe 與壓力測試均已完成。Client text-input change 修正 Prompt／API 欄位聚焦時 Inventory key 與整理快捷鍵搶占輸入的問題；實際鍵盤驗收狀態以該 change 的 `tasks.md` 為準。
 
+## Automata and Alchemy / Item IDs
+
+- [`openspec/changes/automata-alchemy-item-id-migration/`](openspec/changes/automata-alchemy-item-id-migration/)
+
+銅扳手使用 `totem:automata/copper_wrench` canonical ID，八個煉金物品使用
+`totem:alchemy/*`。對應 `deadrecall:*` ID 保持可讀，互動、合成與煉藥鍋
+轉換路徑接受兩個世代並只產生 canonical 自訂物品。
+
 ## DeadRecall / Discord Bridge
 
 - [`openspec/specs/discord-bridge/spec.md`](openspec/specs/discord-bridge/spec.md)
@@ -66,6 +74,15 @@
 - 舊附近 ItemEntity 掃描、UUID 差集、雙重排程與第二條死亡背包 fallback 已完整移除；交易失敗只回到原版死亡掉落。
 
 開發者 API 文件：[`docs/developer/death-backpack-addon-inventory-api.md`](docs/developer/death-backpack-addon-inventory-api.md)。
+
+## 圖靈騰殘響（Totem Remnant）/ Backpacks and Item IDs
+
+- [`openspec/changes/backpack-dyeing/`](openspec/changes/backpack-dyeing/)
+- [`openspec/changes/remnant-item-id-migration/`](openspec/changes/remnant-item-id-migration/)
+
+四級一般背包採用原版染料混色與裝水煉藥鍋洗色。新取得路徑使用
+`totem:remnant/*` canonical item ID；五個 `deadrecall:*` legacy ID 保持可讀，
+並在使用或染色時保留完整 ItemStack Components 進行 lazy migration。
 
 ## DeadRecall / Container Safety
 
@@ -107,4 +124,4 @@
 | 圖靈騰掘進 | `Totem Excavation` | 區域採掘與工程工具 |
 | 圖靈騰智識 | `Totem Cognition` | 可選 Agent Framework |
 
-完整進度請統一參閱 [`openspec/README.md`](openspec/README.md) 的「模組總覽與進度」。在正式拆分前，repository、mod ID 與既有世界資料 identifier 暫時維持 DeadRecall。
+完整進度請統一參閱 [`openspec/README.md`](openspec/README.md) 的「模組總覽與進度」。識別碼遷移必須保留舊資料入口，並以各功能 OpenSpec 的 mapping 與驗證為準。

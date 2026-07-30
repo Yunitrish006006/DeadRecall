@@ -5,12 +5,12 @@ release promotion are still pending.
 
 | Repository | Candidate version | Previous immutable version | Reason |
 | --- | --- | --- | --- |
-| DeadRecall | `2.4.4` | `2.4.1` | Single-file Fabric nested-JAR distribution of the verified module graph |
+| DeadRecall | `2.4.5` | `2.4.4` | Backpack dyeing and reversible custom-item ID migration |
 | TotemCore | `0.2.0` | `0.1.2` | Backwards-compatible public lifecycle API addition |
-| TotemRemnant | `0.1.4` | `0.1.1` | Death-backpack beam, Trinkets adapter and shared creative-tab ownership |
+| TotemRemnant | `0.1.5` | `0.1.4` | Dyeable backpacks and canonical Remnant item IDs |
 | TotemNexus | `0.2.0` | `0.1.4` | Persisted reverse binding, diagnostics and authority coverage |
-| TotemAutomata | `0.1.6` | `0.1.3` | Candidate UI/resource fixes and Remnant container-policy integration |
-| TotemAlchemy | `0.1.4` | `0.1.3` | Candidate ownership/resource fixes |
+| TotemAutomata | `0.1.7` | `0.1.6` | Canonical copper-wrench ID with legacy migration |
+| TotemAlchemy | `0.1.5` | `0.1.4` | Canonical Alchemy item IDs with legacy recipe and cauldron bridges |
 | TotemEnchanting | `0.1.1` | `0.1.0` | Candidate ownership/resource fixes |
 | TotemVanillaTweaks | `0.1.3` | `0.1.0` | Survival and generated-structure bookshelf rules |
 | TotemDiscordBridge | `0.1.2` | `0.1.1` | Candidate compatibility/resource fixes |
@@ -51,10 +51,10 @@ cross-feature dependency boundary checks also passed. An isolated Dedicated
 Server loaded all nine current versions together, reached `Done`, retained the
 migrated Death Node reverse backpack binding and wrote `verify.ok`.
 
-The 2026-07-30 portable-container revalidation additionally reported all 23
-TotemRemnant required GameTests passing and all 13 TotemVanillaTweaks required
-GameTests passing. The complete candidate bundle loaded Remnant `0.1.4`,
-VanillaTweaks `0.1.3` and Automata `0.1.6`, reached `Done`, handled
+The 2026-07-31 item-migration revalidation reported all 33 TotemRemnant,
+20 TotemAutomata and 11 TotemAlchemy required GameTests passing. The complete
+candidate bundle loaded Remnant `0.1.5`, VanillaTweaks `0.1.3` and Automata
+`0.1.7`, reached `Done`, handled
 `/deadrecall containers scan` through the single Remnant authority, and stopped
 with every dimension saved. The assembled compatibility-surface and both
 module-resource checks passed without duplicate resources or locale conflicts.
@@ -62,14 +62,14 @@ The same graph also reached `Done` with the production Trinkets Updated and
 Yumi Core artifacts installed; the death-backpack inventory provider was
 registered once by TotemRemnant.
 
-DeadRecall `2.4.4` additionally packages the same eight verified module bytes
+DeadRecall `2.4.5` additionally packages the same eight verified module bytes
 under `META-INF/jars` and declares them through Fabric's nested-JAR metadata.
 With only that single DeadRecall artifact and Fabric API installed, Fabric
 loaded the complete graph, the server reached `Done`, the Remnant container
 scan executed, and all dimensions saved during clean shutdown.
 
 The cutover migration gates used three independent Java 25 Dedicated Server
-JVMs per feature. Automata `0.1.6` loaded a root-authority Copper Golem world,
+JVMs per feature. Automata `0.1.7` loaded a root-authority Copper Golem world,
 migrated its persisted sorting, gathering, inventory and target state, and
 reloaded the changed world; `seed.ok`, `migrate.ok` and `verify.ok` were all
 produced. Nexus `0.2.0` likewise loaded the four root-owned legacy SavedData

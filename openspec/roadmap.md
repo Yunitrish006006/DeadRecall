@@ -96,8 +96,8 @@
 - OpenSpec 統一與平台架構整理。
 - DeadRecall 向圖靈騰模組化架構過渡。
 - 安全多 repository 拆分：Core、Discord、Remnant、Automata、Nexus、Alchemy、Enchanting 與 VanillaTweaks 均已有獨立 repository／artifact，完整 authority 已完成可逆 bundle cutover，DeadRecall exact-version assembled E2E、legacy-world migration、restart、Dedicated Server、resource ownership 與 rollback pin 驗證均已建立。Discord 已完成兩個 lockstep release；其餘 feature repositories 處於 cutover-qualified observation window，尚不得宣告獨立版本或發布。
-- 下一組本機候選版本已分配：DeadRecall `2.4.4`、Core `0.2.0`、Remnant
-  `0.1.4`、Nexus `0.2.0`、Automata `0.1.6`、Alchemy `0.1.4`、Enchanting
+- 下一組 release 版本已分配：DeadRecall `2.4.5`、Core `0.2.0`、Remnant
+  `0.1.5`、Nexus `0.2.0`、Automata `0.1.7`、Alchemy `0.1.5`、Enchanting
   `0.1.1`、VanillaTweaks `0.1.3`、Discord Bridge `0.1.2`。在各 repository commit、
   最終 SHA-512 與 assembled E2E 完成前，不得改寫現行 immutable manifest；
   詳見 `safe-multi-repo-modularization/next-lockstep-candidate.md`。
@@ -127,12 +127,27 @@
 
 ### 圖靈騰殘響（Totem Remnant）
 
+- 背包物品第一階段 ID migration 已完成：新取得路徑使用
+  `totem:remnant/*`，`deadrecall:*` legacy ID 雙註冊並支援保留 Components
+  的使用／染色 lazy migration；`0.1.5` source commit、JAR SHA-512 與
+  DeadRecall `2.4.5` lockstep pin 已建立。
 - 離線玩家身體 Entity、SavedData、playerdata body lock 與 data migration。
 - 登出建立身體、重連接回身體、身體死亡及一次性死亡流程。
 - 與死亡背包、死亡紀錄、Nexus 死亡節點及 Discord Bridge 死亡事件整合。
 - Server restart、server shutdown、crash recovery 與管理員修復指令。
 - 多玩家、PVP、區塊卸載、fake player、Creative／Spectator 與 Dedicated Server 測試。
 - 尚無 Minecraft 26.2 直接版本的特定 Accessories adapter；其他 addon 已可使用公開死亡 inventory SPI。
+
+### 跨模組物品 ID 遷移
+
+- Remnant 五個背包、Automata 銅扳手與 Alchemy 八個物品已建立
+  `totem:<module>/<path>` canonical mapping。
+- 所有對應 `deadrecall:*` Item 保持雙註冊；新取得路徑使用 canonical，
+  轉換型互動／recipe／cauldron 接受 legacy 並保留 Components。
+- Core、Nexus、Discord Bridge、Enchanting 與 Vanilla Tweaks 沒有自訂
+  Item registry，因此沒有需要遷移的物品 ID。
+- DeadRecall `2.4.5` 已固定三個變更模組的 source commit 與 artifact
+  SHA-512；remote CI 與 release observation 於推送後追蹤。
 
 ### 圖靈騰樞紐（Totem Nexus）
 
@@ -169,14 +184,13 @@
 
 ## 重新命名策略
 
-在模組真正拆分前：
+重新命名採逐批 migration：
 
-- repository、mod ID 與 package 可暫時維持 DeadRecall。
-- UI 與文件使用圖靈騰中文顯示品牌；`Totem` 保留作為技術名稱。
-- 不直接更改現有 component、SavedData、item 或 block identifier。
-
-正式拆分時：
-
-- 為每個模組建立獨立 mod ID。
-- 提供舊 DeadRecall identifier 到新模組 identifier 的 migration。
-- 提供整合版或相容層，讓舊世界能安全升級。
+- repository、mod ID、package、component、SavedData、item 與 block identifier
+  不做無 migration 的一次性全域替換。
+- 每批變更先定義 legacy → canonical mapping，保留 legacy 讀取入口，再將
+  新取得路徑切到 canonical。
+- 背包物品已是第一批：`deadrecall:*` 與 `totem:remnant/*` 雙註冊，採
+  lazy migration，不掃描離線玩家或未載入區塊。
+- 後續批次仍須提供 compatibility bundle、舊世界、restart 與 rollback
+  驗證，才能進入 release graph。
