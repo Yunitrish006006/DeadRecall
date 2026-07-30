@@ -77,6 +77,32 @@ The system SHALL NOT automatically delete a death backpack entity when its death
 - THEN recovery completes successfully
 - AND the missing node deactivation step is treated as an idempotent success
 
+### Requirement: Persisted reverse backpack binding
+
+The system SHALL persist the spawned death-backpack ItemEntity UUID on its
+death-node record without searching loaded or unloaded chunks. The field SHALL
+remain optional so records written before reverse binding was introduced stay
+readable.
+
+#### Scenario: Duplicate active binding
+
+- **GIVEN** two active death nodes persist the same backpack ItemEntity UUID
+- **WHEN** an authorized administrator requests diagnostics
+- **THEN** both nodes SHALL report a duplicate backpack-binding conflict
+- **AND** diagnostics SHALL not load chunks or mutate SavedData
+
+#### Scenario: Restart persistence
+
+- **GIVEN** a death node has a persisted reverse backpack binding
+- **WHEN** the world is migrated to the external Nexus authority and restarted
+- **THEN** the authority SHALL retain the same backpack ItemEntity UUID
+
+#### Scenario: Legacy record without reverse binding
+
+- **GIVEN** a death-node record was written without a `backpack_id` field
+- **WHEN** the current authority loads the record
+- **THEN** the record SHALL load with an empty reverse binding
+
 ### Requirement: Audit trail
 
 The system SHALL record the operator, operation, affected count, filter summary, timestamp and result of every administrative mutation.

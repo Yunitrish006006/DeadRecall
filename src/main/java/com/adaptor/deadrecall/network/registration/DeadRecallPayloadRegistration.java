@@ -2,6 +2,7 @@ package com.adaptor.deadrecall.network.registration;
 
 import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.bootstrap.NexusCutover;
+import com.adaptor.deadrecall.bootstrap.VanillaTweaksCutover;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class DeadRecallPayloadRegistration {
@@ -18,7 +19,9 @@ public final class DeadRecallPayloadRegistration {
         if (!usesExternalDiscordBridge()) {
             TotemDiscordBridgePayloadRegistration.registerServerboundTypes();
         }
-        LegacyContainerPayloadRegistration.registerServerboundTypes();
+        if (!VanillaTweaksCutover.usesExternalContainerSortAuthority()) {
+            LegacyContainerPayloadRegistration.registerServerboundTypes();
+        }
         if (!AutomataCutover.usesExternalAuthority()) {
             TotemAutomataPayloadRegistration.registerServerboundTypes();
         }
@@ -42,7 +45,9 @@ public final class DeadRecallPayloadRegistration {
         if (!usesExternalDiscordBridge()) {
             TotemDiscordBridgePayloadRegistration.registerReceivers();
         }
-        LegacyContainerPayloadRegistration.registerReceivers();
+        if (!VanillaTweaksCutover.usesExternalContainerSortAuthority()) {
+            LegacyContainerPayloadRegistration.registerReceivers();
+        }
         if (!AutomataCutover.usesExternalAuthority()) {
             TotemAutomataPayloadRegistration.registerReceivers();
         }

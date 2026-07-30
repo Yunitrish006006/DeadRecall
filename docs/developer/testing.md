@@ -45,6 +45,13 @@ Loom 設定使用 `fabricApi.configureTests` 建立獨立 `gametest` source set�
 ./gradlew runGameTest --no-daemon --stacktrace
 ```
 
+診斷單一案例時，提供 `-PgameTestFilter=<test-id>`。這個可選 property 只會轉交給 Loom 的 `gameTest` 遊戲 JVM；未提供時仍執行完整套件。例如：
+
+```bash
+./gradlew -PgameTestFilter=deadrecall-gametest:copper_golem_gathering_lifecycle_game_test_home_removal_during_return_preserves_storage_and_blocks \
+  runGameTest --no-daemon --stacktrace
+```
+
 目前 Client GameTests 保持停用；需要畫面、滑鼠或 Client-only 渲染驗證時，應另行建立 Client GameTest 或人工測試矩陣。
 
 ## 可視化測試截圖證據

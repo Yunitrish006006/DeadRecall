@@ -125,12 +125,33 @@ No nearby-`ItemEntity` collector, completion marker, radius scan, UUID-differenc
 
 Discord, player-notification and logging failures SHALL NOT roll back a completed death-backpack transaction.
 
+#### Scenario: Notification fails after commit
+
+- **GIVEN** the death backpack entity, source mutations and death node have committed successfully
+- **WHEN** Discord, player notification or logging throws an exception
+- **THEN** the completed death-backpack transaction SHALL remain committed
+- **AND** the failure SHALL be isolated from item and node state
+
 ### Requirement: Server authority
 
 All source selection, mutation, rollback, death-node creation and `ItemEntity` creation SHALL execute on the logical Server thread. The Client SHALL NOT provide captured contents or determine eligible slots.
+
+#### Scenario: Client cannot select captured contents
+
+- **GIVEN** a Client sends arbitrary inventory or eligibility data
+- **WHEN** a player death is processed
+- **THEN** the Server SHALL derive every source and eligible stack from authoritative Server state
+- **AND** all transaction mutations SHALL execute on the logical Server thread
 
 ## MODIFIED Requirements
 
 ### Requirement: Death backpack source data
 
 The sole runtime sources for death-backpack contents SHALL be authoritative player-owned vanilla slots, explicitly supported transient inputs and registered addon-provider slots. Nearby `ItemEntity` scanning SHALL NOT participate in normal capture or failure fallback.
+
+#### Scenario: Nearby world drops are not capture sources
+
+- **GIVEN** loose `ItemEntity` instances exist near a dying player
+- **WHEN** the direct death-backpack transaction collects its source snapshots
+- **THEN** those world entities SHALL NOT be included
+- **AND** success or rollback SHALL NOT scan, mutate or discard them

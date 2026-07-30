@@ -26,6 +26,30 @@ rollback path but cannot apply beside the external group.
 the legacy root GameTests for this recipe and concrete powder were transferred
 so root-only validation does not implicitly duplicate this module's authority.
 
+## 0.1.2 container-sort extension
+
+The `0.1.2` candidate additionally owns the preserved
+`deadrecall:sort_backpack` serverbound payload, open-menu sorting service,
+middle-click key binding and `AbstractContainerScreen`/`Options` client Mixins.
+`VanillaTweaksCutover` selects that authority separately at
+`totem-vanilla-tweaks >= 0.1.2`, so `0.1.0` and the pre-sort `0.1.1` candidate
+still use the compiled root fallback.
+
+When `0.1.2` is present, the compatibility root skips its legacy payload,
+receiver, key binding and client Mixins. The module uses its own key category,
+which prevents duplicate category registration when TotemDiscordBridge is
+installed in the same client graph. Standalone GameTests cover container-side
+sorting, stack compaction and player-side sorting without hotbar mutation.
+
+## 0.1.3 bookshelf extension
+
+The `0.1.3` candidate owns the once-per-second survival inventory rule that
+turns each ordinary bookshelf into three books and the structure-template
+Mixin that turns generated bookshelves into filled chiseled bookshelves.
+DeadRecall selects this authority separately at
+`totem-vanilla-tweaks >=0.1.3`, preserving the compiled fallback for older
+rollback artifacts.
+
 ## Resource and runtime contract
 
 Every module build and Dedicated Server gate uses Java 25. The exact-version

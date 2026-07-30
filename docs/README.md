@@ -17,7 +17,7 @@
   - [採集模式](copper-golem/gather-mode.md)
   - [LLM 設定](copper-golem/llm.md)
   - [故障排除](copper-golem/troubleshooting.md)
-- [Totem Nexus／Space Unit](nexus/README.md)
+- [圖靈騰樞紐（Totem Nexus）／Space Unit](nexus/README.md)
   - [磁石註冊、探索與羅盤操作](nexus/space-units.md)
   - [Space Unit 地圖](nexus/map.md)
   - [傳送成本與安全條件](nexus/teleportation.md)
@@ -44,7 +44,7 @@
   - [Mixin](developer/mixins.md)
   - [Client Rendering](developer/rendering.md)
 - [OpenSpec 索引](../OPENSPEC_INDEX.md)
-- [OpenSpec 目錄](../openspec/README.md)
+- [TOTEM 圖靈騰系統總覽與進度](../openspec/README.md)
 - [架構說明](../openspec/architecture.md)
 - [開發路線圖](../openspec/roadmap.md)
 

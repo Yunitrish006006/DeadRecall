@@ -1,15 +1,12 @@
 # Remaining gameplay repository proposals
 
-These are proposed bounded contexts, not approved extractions. Until each has
-its own OpenSpec and validation plan, its code remains in DeadRecall.
+There are no remaining approved gameplay extractions. Alchemy, Automata,
+Discord, Enchanting, Nexus, Remnant and the general vanilla rules all have
+standalone owners. Small crafting, bookshelf and world-interaction rules belong
+to TotemVanillaTweaks unless a future OpenSpec establishes a genuinely separate
+bounded context.
 
-| Proposed repository | Owns | Required seam before extraction |
-|---|---|---|
-| `TotemAlchemy` | cauldron recipes and alchemy effects | no dependency on Remnant/Nexus registries |
-| `TotemCraftingRules` | lectern recipe override and recipe policy | explicit Fabric recipe hook API |
-| `TotemEnchanting` | enchanting-table and enchantment gameplay | no direct menu/item ownership from another feature |
-| `TotemContainerSafety` | portable-container nesting policy and diagnostics | a versioned policy API for Remnant consumers |
-| `TotemWorldInteractions` | concrete-powder item behavior and future vanilla interaction tweaks | standalone item/entity hooks and GameTests |
-
-None of these owns a Core API merely because it has two callers. Core additions
-require two independently extracted modules and a separate API proposal.
+DeadRecall retains `/back` and its last-death-location record by explicit
+product decision. Compiled legacy implementations remain only as
+observation-window rollback paths and are disabled by versioned authority
+cutovers in the complete bundle.

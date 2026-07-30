@@ -1,10 +1,25 @@
-# Totem Remnant：Offline Player Body 離線玩家身體規格
+# 圖靈騰殘響（Totem Remnant）：Offline Player Body 離線玩家身體規格
 
-## 1. 目標
+## Purpose
 
 玩家離開伺服器後，世界中仍保留一具代表該玩家的離線身體。離線身體承接玩家登出時的生存狀態，能受到環境、怪物及符合規則的玩家攻擊影響，並在玩家重新登入、身體死亡、伺服器重啟或管理員介入時保持資料一致。
 
-此系統屬於 Totem Remnant，因為它管理玩家死亡、物品保全、死亡紀錄與離線殘留狀態。Nexus、Discord Bridge 與其他模組只能透過事件或公開 API 取得結果，不得直接修改離線身體資料。
+此系統屬於圖靈騰殘響（Totem Remnant），因為它管理玩家死亡、物品保全、死亡紀錄與離線殘留狀態。圖靈騰樞紐（Nexus）、Discord Bridge 與其他模組只能透過事件或公開 API 取得結果，不得直接修改離線身體資料。
+
+## Requirements
+
+### Requirement: Offline player bodies follow the detailed lifecycle contract
+
+Totem Remnant SHALL implement offline-player-body creation, ownership transfer, persistence, death, recovery, administration and integration according to every rule in the detailed contract below.
+
+#### Scenario: An eligible player disconnects and later reconnects
+
+- **GIVEN** offline player bodies are enabled and an eligible player disconnects outside Server shutdown
+- **WHEN** the Server creates, persists and later reconnects that player's body
+- **THEN** inventory and survival state SHALL have exactly one authoritative owner at every step
+- **AND** reconnect, death, restart or recovery SHALL NOT duplicate or silently delete that state
+
+## Detailed contract
 
 ## 2. 範圍
 

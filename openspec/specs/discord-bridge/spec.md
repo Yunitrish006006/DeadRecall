@@ -1,10 +1,25 @@
 # DeadRecall Discord Bridge 規格
 
-## 1. 目標
+## Purpose
 
 Discord Bridge 將伺服器端可公開的 Minecraft 事件轉送到 Discord，經由 Cloudflare Worker 統一處理 API Key 驗證、Webhook 或 Bot Token 發送、多頻道路由與錯誤隔離。
 
 Bridge 是管理與觀測功能，不得影響遊戲邏輯。Discord API、Worker、網路或本地化失敗時，Minecraft Server 必須繼續運作。
+
+## Requirements
+
+### Requirement: Discord Bridge follows the detailed Server contract
+
+Discord Bridge SHALL comply with every event-scope, Server-authority, localization, routing, security and acceptance rule in the detailed contract below.
+
+#### Scenario: A supported Server event is forwarded
+
+- **GIVEN** Discord Bridge is enabled and a supported public Server event occurs
+- **WHEN** the bridge prepares and routes the notification
+- **THEN** it SHALL apply the detailed authority, localization, privacy and secret-handling rules
+- **AND** any localization, Worker, Discord or network failure SHALL NOT interrupt gameplay
+
+## Detailed contract
 
 ## 2. 事件範圍
 

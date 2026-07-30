@@ -1,8 +1,8 @@
-# Totem Platform 開發狀態與 Roadmap
+# TOTEM 圖靈騰系統開發狀態與 Roadmap
 
 ## 已完成或已有可運作基礎
 
-### Totem Remnant / DeadRecall
+### 圖靈騰殘響（Totem Remnant）/ DeadRecall
 
 - 死亡背包核心流程。
 - 死亡物品收集與回收。
@@ -21,7 +21,7 @@
 - 多人伺服器運作基礎。
 - Minecraft 26.2 / Fabric 遷移工作。
 
-### Totem Automata / Copper Golem
+### 圖靈騰機巧（Totem Automata）/ Copper Golem
 
 - `SORTING`／`GATHERING` 雙模式、伺服器原子切換、欄位清空驗證、revision 與 stale payload 防護已完成。
 - 管理介面已使用 `Menu`／`Slot`／`AbstractContainerScreen`；玩家原版背包、燃料、採集工具與採集倉庫皆為伺服器權威真實 slot，支援拖曳、Shift 點擊及即時 live-state 驗證。
@@ -34,7 +34,7 @@
 - stale revision、雙玩家同 revision、真實 Menu 點擊、128 隻 Copper Golem scanner 壓力及 controller unload／rediscovery GameTests 已通過。
 - `copper-golem-operation-modes` OpenSpec 1–14 已完成，測試與限制記錄於 `docs/developer/testing.md`。
 
-### Totem Nexus / Space Unit
+### 圖靈騰樞紐（Totem Nexus）/ Space Unit
 
 - Space Unit 世界 SavedData 基礎。
 - 磁石以羅盤右鍵註冊與綁定。
@@ -91,11 +91,16 @@
 
 ## 進行中
 
-- **最高優先：安全多 repository 拆分與 compatibility-bundle 收斂。** 在 Automata、Nexus 完成可逆 cutover、DeadRecall 成為 exact-version compatibility bundle、完成跨 repository E2E／rollback 驗證前，不新增或擴大其他功能工作；既有功能僅處理阻礙拆分、資料相容或發布安全的修正。
+- **最高優先：安全多 repository 拆分與 compatibility-bundle 收斂。** 在圖靈騰機巧（Automata）、圖靈騰樞紐（Nexus）完成可逆 cutover、DeadRecall 成為 exact-version compatibility bundle、完成跨 repository E2E／rollback 驗證前，不新增或擴大其他功能工作；既有功能僅處理阻礙拆分、資料相容或發布安全的修正。
 - 離線玩家身體 OpenSpec 與實作：登出保留身體、重連接回、死亡處理與防複製。
 - OpenSpec 統一與平台架構整理。
-- DeadRecall 向 Totem 模組化架構過渡。
-- 安全多 repository 拆分：repository ownership、相容 identifier/resource 基線、CI 護欄、內部 bootstrap／Payload／Mixin／registry ownership 拆分與 Core、Discord、Remnant、Automata、Nexus repository 初始化已完成。Discord 已完成兩個 lockstep release 與 rollback baseline；Remnant、Automata 與 Nexus 仍處於 additive extraction，下一步是各模組的完整資格驗證與 cutover，以及 DeadRecall 的 exact-version compatibility bundle／E2E 驗收。
+- DeadRecall 向圖靈騰模組化架構過渡。
+- 安全多 repository 拆分：Core、Discord、Remnant、Automata、Nexus、Alchemy、Enchanting 與 VanillaTweaks 均已有獨立 repository／artifact，完整 authority 已完成可逆 bundle cutover，DeadRecall exact-version assembled E2E、legacy-world migration、restart、Dedicated Server、resource ownership 與 rollback pin 驗證均已建立。Discord 已完成兩個 lockstep release；其餘 feature repositories 處於 cutover-qualified observation window，尚不得宣告獨立版本或發布。
+- 下一組本機候選版本已分配：DeadRecall `2.4.4`、Core `0.2.0`、Remnant
+  `0.1.4`、Nexus `0.2.0`、Automata `0.1.6`、Alchemy `0.1.4`、Enchanting
+  `0.1.1`、VanillaTweaks `0.1.3`、Discord Bridge `0.1.2`。在各 repository commit、
+  最終 SHA-512 與 assembled E2E 完成前，不得改寫現行 immutable manifest；
+  詳見 `safe-multi-repo-modularization/next-lockstep-candidate.md`。
 - Nexus 進階地圖功能、石碑管理與好友權限模型。
 - 混凝土粉末掉落物硬化：Server GameTest 與 512 個 ItemEntity 壓力回歸已完成；只剩兩名以上真人玩家水流驗收。
 - 傳送介面物品特化：Phase A–D 自動化排程完成；只剩兩名以上真人 Client 的 UI、動態目標與多人驗收。
@@ -106,24 +111,21 @@
 
 ### 短週期完成順序
 
-1. 合併並發行 Automata、Nexus 的不可變 module artifacts，將它們加入 DeadRecall lockstep manifest。
-2. 完成 TotemAutomata 與 TotemNexus 的可逆 compatibility-bundle cutover、standalone／legacy-world／restart 驗證與 rollback evidence。
-3. 將 DeadRecall 收斂為 exact-version compatibility bundle 與跨 repository E2E repository，完成兩個 lockstep release observation 後才開放獨立版本與發布。
+1. 將目前已通過本機驗證的 ownership／UI／安全修正整理成下一組不可變 module artifacts，更新 exact-version manifest 並重跑 assembled E2E。
+2. 以兩個不同的 DeadRecall 正式 release 消費 cutover-qualified graph，逐次保留前一組 immutable rollback pin；本機重建不得冒充 observation release。
+3. 各 repository 完成自己的兩個 release observation 後，才個別啟用獨立版本與發布。
 4. 僅在不影響上述拆分工作時，執行混凝土粉末、傳送介面與 Copper Golem 的真人 Client 驗收。
-5. 在 modularization 收斂後，才恢復離線玩家身體、Nexus UX 與其他新功能開發。
+5. 在 modularization 收斂後，才恢復離線玩家身體、圖靈騰樞紐 UX 與其他新功能開發。
 
 ## 尚未完成
 
-### Totem Core
+### 圖靈騰核心（Totem Core）
 
-- 獨立 repository／module。
-- 穩定公開 API。
-- 共用 Payload registry。
-- SavedData migration framework。
-- 共用 Config、GUI 與 permission API。
-- 第三方 addon 範例與文件。
+- 獨立 repository／module 與最小穩定公開 API 已完成。
+- 共用 Payload registry、SavedData migration framework、Config、GUI 或額外 permission API 只有在兩個獨立 feature repository 證明需要同一抽象後，才能透過新的 Core API OpenSpec 提案。
+- 第三方 addon 範例與文件仍可在不擴張 Core gameplay ownership 的前提下補齊。
 
-### Totem Remnant
+### 圖靈騰殘響（Totem Remnant）
 
 - 離線玩家身體 Entity、SavedData、playerdata body lock 與 data migration。
 - 登出建立身體、重連接回身體、身體死亡及一次性死亡流程。
@@ -132,7 +134,7 @@
 - 多玩家、PVP、區塊卸載、fake player、Creative／Spectator 與 Dedicated Server 測試。
 - 尚無 Minecraft 26.2 直接版本的特定 Accessories adapter；其他 addon 已可使用公開死亡 inventory SPI。
 
-### Totem Nexus
+### 圖靈騰樞紐（Totem Nexus）
 
 - 磁石完整管理介面整合與 UX 打磨。
 - 石碑完整管理介面的離線玩家查詢、名單瀏覽與批次調整。
@@ -140,7 +142,7 @@
 - 死亡節點傳送成本細節與回收後歷史紀錄介面。
 - 傳送介面物品特化：Phase A–D 四物品入口、Server context、回生羅盤、路線典籍、地圖覆蓋及 base／final 報價明細已完成；只剩真人多人 UI／動態目標驗收。
 
-### Totem Excavation
+### 圖靈騰掘進（Totem Excavation）
 
 - Blossom 錘子移植至 26.2。
 - ItemStack Data Component 選區。
@@ -149,7 +151,7 @@
 - Tag 驅動採掘規則。
 - Client-side 選區框線。
 
-### Totem Cognition
+### 圖靈騰智識（Totem Cognition）
 
 - Agent API。
 - Provider abstraction。
@@ -160,17 +162,17 @@
 
 ## 建議開發順序
 
-1. 完成 Remnant、Automata 與 Nexus 的完整資格驗證與 compatibility-bundle cutover。
-2. 將 DeadRecall 收斂為 exact-version compatibility bundle 與跨 repository E2E 驗收；Discord 的兩個 lockstep releases 與 rollback evidence 已完成，後續 feature cutover 必須保留同等觀察與 rollback 證據後才開放獨立版本與發布。
+1. 將已通過本機驗證的模組修正形成下一組 immutable lockstep artifacts，完成 exact-version compatibility-bundle E2E。
+2. Discord 的 observation 已完成；Remnant、Automata、Nexus、Alchemy、Enchanting 與 VanillaTweaks 必須各自累積兩個 DeadRecall 正式 release 的 observation 與 rollback evidence，才可開放獨立版本與發布。
 3. 在 lockstep observation 與 rollback evidence 完備前，只處理會阻礙 modularization 的相容性、安全性或建置問題。
-4. Modularization 收斂後，再依序進行真人 Client 驗收、Remnant 離線玩家身體、Nexus UX、Excavation 與可選 Cognition。
+4. Modularization 收斂後，再依序進行真人 Client 驗收、圖靈騰殘響離線玩家身體、圖靈騰樞紐 UX、圖靈騰掘進與可選圖靈騰智識。
 
 ## 重新命名策略
 
 在模組真正拆分前：
 
 - repository、mod ID 與 package 可暫時維持 DeadRecall。
-- UI 與文件可逐步使用 Totem 品牌。
+- UI 與文件使用圖靈騰中文顯示品牌；`Totem` 保留作為技術名稱。
 - 不直接更改現有 component、SavedData、item 或 block identifier。
 
 正式拆分時：

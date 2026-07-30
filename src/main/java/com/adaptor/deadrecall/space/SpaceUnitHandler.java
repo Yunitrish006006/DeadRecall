@@ -185,6 +185,14 @@ public final class SpaceUnitHandler {
         return unit.id();
     }
 
+    public static void bindDeathBackpack(ServerLevel level, UUID nodeId, UUID backpackEntityId) {
+        boolean bound = units(level.getServer())
+                .bindDeathBackpack(nodeId, backpackEntityId, level.getGameTime());
+        if (!bound) {
+            throw new IllegalStateException("Could not persist death backpack reverse binding");
+        }
+    }
+
     public static void writeDeathNodeBinding(ItemStack deathBackpack, UUID unitId) {
         if (deathBackpack.isEmpty() || unitId == null) {
             return;

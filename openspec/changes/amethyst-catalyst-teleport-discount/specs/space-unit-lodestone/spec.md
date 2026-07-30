@@ -36,3 +36,10 @@
 ### Requirement: Catalyst quote details
 
 Server 報價 SHALL 分別提供原始紫水晶成本、催化方塊總數、折抵數量與最終紫水晶成本。Client SHALL NOT 自行推算或提交折抵。
+
+#### Scenario: Server supplies authoritative catalyst details
+
+- **GIVEN** 玩家請求一條跨 Dimension 傳送路線的報價
+- **WHEN** Server 完成石碑掃描與催化折抵計算
+- **THEN** 報價 SHALL 包含原始成本、催化方塊總數、折抵數量與最終成本
+- **AND** Server SHALL 忽略 Client 提交的任何催化數量或折抵值

@@ -2,6 +2,7 @@ package com.adaptor.deadrecall.client;
 
 import com.adaptor.deadrecall.bootstrap.AutomataCutover;
 import com.adaptor.deadrecall.bootstrap.NexusCutover;
+import com.adaptor.deadrecall.bootstrap.VanillaTweaksCutover;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import net.fabricmc.loader.api.FabricLoader;
@@ -18,15 +19,26 @@ public final class DeadRecallClientBootstrap {
             TotemAutomataClientBootstrap.registerScreens();
         }
 
-        KeyMapping.Category category = KeyMapping.Category.register(
-                Identifier.fromNamespaceAndPath("deadrecall", "category")
-        );
-        if (!usesExternalDiscordBridge()) {
-            DeadrecallClient.openDiscordConfigKey = TotemDiscordBridgeClientBootstrap.createKeyMapping(category);
+        boolean externalDiscordBridge = usesExternalDiscordBridge();
+        boolean externalContainerSort = VanillaTweaksCutover.usesExternalContainerSortAuthority();
+        KeyMapping.Category legacyCategory = null;
+        if (!externalDiscordBridge) {
+            legacyCategory = KeyMapping.Category.register(
+                    Identifier.fromNamespaceAndPath("deadrecall", "category")
+            );
         }
-        DeadrecallClient.sortBackpackKey = LegacyContainerClientBootstrap.createKeyMapping(category);
+        if (!externalDiscordBridge) {
+            DeadrecallClient.openDiscordConfigKey =
+                    TotemDiscordBridgeClientBootstrap.createKeyMapping(legacyCategory);
+        }
+        if (!externalContainerSort) {
+            KeyMapping.Category sortCategory =
+                    legacyCategory != null ? legacyCategory : KeyMapping.Category.INVENTORY;
+            DeadrecallClient.sortBackpackKey =
+                    LegacyContainerClientBootstrap.createKeyMapping(sortCategory);
+        }
 
-        if (!usesExternalDiscordBridge()) {
+        if (!externalDiscordBridge) {
             TotemDiscordBridgeClientBootstrap.registerRuntime();
         }
         if (!AutomataCutover.usesExternalAuthority()) {
@@ -35,7 +47,7 @@ public final class DeadRecallClientBootstrap {
         if (!NexusCutover.usesExternalAuthority()) {
             TotemNexusClientBootstrap.registerNetworking();
         }
-        if (!usesExternalDiscordBridge()) {
+        if (!externalDiscordBridge) {
             TotemDiscordBridgeClientBootstrap.registerCommands();
         }
     }

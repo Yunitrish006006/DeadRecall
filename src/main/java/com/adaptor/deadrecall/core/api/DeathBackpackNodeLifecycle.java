@@ -10,6 +10,7 @@ import java.util.UUID;
 /** Versioned Core contract for an optional death-backpack location marker. */
 public interface DeathBackpackNodeLifecycle {
     UUID create(ServerPlayer owner, ServerLevel level, BlockPos position);
+    default void bind(ServerLevel level, UUID nodeId, UUID backpackEntityId) { }
     void rollback(ServerPlayer owner, ServerLevel level, UUID nodeId);
     boolean recover(ServerPlayer recoveringPlayer, UUID nodeId);
     static void register(DeathBackpackNodeLifecycle adapter) { Holder.adapter = adapter; }

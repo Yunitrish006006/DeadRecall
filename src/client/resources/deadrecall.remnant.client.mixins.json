@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.adaptor.deadrecall.mixin.client",
+  "plugin": "com.adaptor.deadrecall.mixin.client.DeadRecallRemnantClientMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "ItemEntityRenderStateMixin",

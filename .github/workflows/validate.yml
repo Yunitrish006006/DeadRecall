@@ -249,7 +249,7 @@ jobs:
           bash .github/scripts/verify-lockstep-bundle.sh \
             --output "${bundle_root}" \
             --java java \
-            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --deadrecall build/libs/deadrecall-2.4.2.jar \
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --source totem-core=.lockstep/TotemCore \
@@ -298,11 +298,11 @@ jobs:
           bash .github/scripts/verify-lockstep-bundle.sh \
             --output "${migration_bundle}" \
             --java java \
-            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --deadrecall build/libs/deadrecall-2.4.2.jar \
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${legacy_run}/world" \
-            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.2-gametest.jar \
             --environment "DEADRECALL_LEGACY_AUTOMATA_MIGRATION_PHASE=migrate" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_LEGACY_MARKER_DIR=${legacy_marker}" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
@@ -327,11 +327,11 @@ jobs:
           bash .github/scripts/verify-lockstep-bundle.sh \
             --output "${verification_bundle}" \
             --java java \
-            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --deadrecall build/libs/deadrecall-2.4.2.jar \
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${migration_bundle}/server/world" \
-            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.2-gametest.jar \
             --environment "DEADRECALL_LEGACY_AUTOMATA_MIGRATION_PHASE=verify" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_LEGACY_MARKER_DIR=${legacy_marker}" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
@@ -384,11 +384,11 @@ jobs:
           bash .github/scripts/verify-lockstep-bundle.sh \
             --output "${migration_bundle}" \
             --java java \
-            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --deadrecall build/libs/deadrecall-2.4.2.jar \
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${legacy_run}/world" \
-            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.2-gametest.jar \
             --environment "DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=migrate" \
             --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
             --completion-marker "${marker_root}/migrate.ok" \
@@ -412,11 +412,11 @@ jobs:
           bash .github/scripts/verify-lockstep-bundle.sh \
             --output "${verification_bundle}" \
             --java java \
-            --deadrecall build/libs/deadrecall-2.4.1.jar \
+            --deadrecall build/libs/deadrecall-2.4.2.jar \
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${migration_bundle}/server/world" \
-            --extra-mod build/libs/deadrecall-2.4.1-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.2-gametest.jar \
             --environment "DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=verify" \
             --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
             --completion-marker "${marker_root}/verify.ok" \

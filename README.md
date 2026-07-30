@@ -1,14 +1,17 @@
 # DeadRecall
 
-DeadRecall 是 Minecraft Fabric 26.2 模組，整合死亡物品保護、可升級背包、銅魁儡分類與採集、Totem Nexus 傳送、雕紋書櫃附魔、煉藥鍋配方、Discord Bridge 與跨維度 `/back`。
+DeadRecall 是 Minecraft Fabric 26.2 模組，整合死亡物品保護、可升級背包、銅魁儡分類與採集、圖靈騰樞紐（Totem Nexus）傳送、雕紋書櫃附魔、煉藥鍋配方、Discord Bridge 與跨維度 `/back`。
 
-目前穩定收尾版本為 **2.4.1**，重點是死亡背包、死亡節點與 Dedicated Server 世界保存的資料安全。詳細內容見 [2.4.1 變更清單](docs/releases/2.4.1.md)。
+目前開發候選版本為 **2.4.4**；上一個穩定版本為 **2.4.1**。2.4.4
+將八個已拆分模組以 Fabric nested JAR 封裝回單一安裝檔，同時保留各
+repository 的獨立建置能力。詳細內容見
+[2.4.4 變更清單](docs/releases/2.4.4.md)。
 
 ## 專案資訊
 
 | 項目 | 內容 |
 | --- | --- |
-| 版本 | 2.4.1 |
+| 版本 | 2.4.4（候選） |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3+ |
 | Fabric API | 0.154.2+26.2 |
@@ -23,7 +26,7 @@ DeadRecall 是 Minecraft Fabric 26.2 模組，整合死亡物品保護、可升�
 - 死亡背包、紅色定位光柱、永久保存與虛空保護。
 - `/back` 跨維度返回最近死亡地點。
 - 銅板手管理銅魁儡分類、採集、燃料、工具與 LLM 判斷。
-- Totem Nexus 磁石 Space Unit、探索地圖、傳送報價與安全傳送 session。
+- 圖靈騰樞紐（Totem Nexus）磁石 Space Unit、探索地圖、傳送報價與安全傳送 session。
 - 雕紋書櫃依實際書本與附魔等級提供最高 64 點附魔力。
 - 豬糞、木灰、硝石、缽及資料驅動煉藥鍋配方。
 - Minecraft 聊天、玩家動態、管理稽核、公開事件與伺服器狀態轉送到 Discord。
@@ -39,11 +42,12 @@ DeadRecall 是 Minecraft Fabric 26.2 模組，整合死亡物品保護、可升�
 | 玩家 | [背包系統](docs/backpacks/README.md) |
 | 玩家 | [死亡背包與 `/back`](docs/backpacks/death-backpack.md) |
 | 玩家 | [銅魁儡指南](docs/copper-golem/README.md) |
-| 玩家 | [Totem Nexus／Space Unit](docs/nexus/README.md) |
+| 玩家 | [圖靈騰樞紐（Totem Nexus）／Space Unit](docs/nexus/README.md) |
 | 玩家 | [附魔台與雕紋書櫃](docs/enchanting/README.md) |
 | 玩家 | [煉金系統](docs/alchemy/README.md) |
 | 管理員 | [Discord Bridge](docs/discord/README.md) |
 | 開發者 | [開發者文件](docs/developer/README.md) |
+| 規格 | [TOTEM 圖靈騰系統總覽與進度](openspec/README.md) |
 | 規格 | [OpenSpec 索引](OPENSPEC_INDEX.md) |
 
 ## 建置
@@ -51,6 +55,15 @@ DeadRecall 是 Minecraft Fabric 26.2 模組，整合死亡物品保護、可升�
 ```bash
 ./gradlew build
 ```
+
+建立包含八個獨立模組的單一安裝檔：
+
+```bash
+./gradlew build -PbundleModuleDirectory=/path/to/standalone-modules
+```
+
+輸出檔名為 `deadrecall-2.4.4-bundled.jar`。整合版已內含所有 Totem
+模組，不可再與同版本的獨立 Totem JAR 一起放入 `mods`。
 
 正式 JAR 輸出至：
 

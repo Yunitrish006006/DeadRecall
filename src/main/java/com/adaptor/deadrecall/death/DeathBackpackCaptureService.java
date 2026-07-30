@@ -120,6 +120,12 @@ public final class DeathBackpackCaptureService {
             deathNodeId = DeathBackpackNodeLifecycle.current().map(adapter -> adapter.create(player, level, deathPos)).orElse(null);
             failIfRequested(player, CaptureFailurePoint.AFTER_DEATH_NODE_CREATE);
 
+            if (deathNodeId != null) {
+                UUID boundNodeId = deathNodeId;
+                UUID backpackEntityId = backpackEntity.getUUID();
+                DeathBackpackNodeLifecycle.current()
+                        .ifPresent(adapter -> adapter.bind(level, boundNodeId, backpackEntityId));
+            }
             DeathBackpackNodeBinding.write(deathBackpack, deathNodeId);
             backpackEntity.setItem(deathBackpack);
         } catch (RuntimeException exception) {

@@ -463,3 +463,42 @@ The corresponding Nexus legacy-world probe also retained its historical
 `0.1.1` current-artifact assertion after the manifest advanced to Nexus
 `0.1.4`. It now requires the current `0.1.4` artifact while retaining the
 separate `0.1.1` rollback pin and the existing cutover threshold.
+
+## Shared TOTEM advancement root ownership
+
+The standalone feature repositories now place their module-owned advancement
+branches below one presentation-only `deadrecall:root` supplied by TotemCore.
+The Core root uses `minecraft:totem_of_undying` and `minecraft:tick`, so it
+does not class-load or register gameplay owned by Remnant, Automata, Nexus,
+Alchemy, Enchanting or VanillaTweaks.
+
+DeadRecall delegates the production `data/deadrecall/advancement/root.json`
+path to Core and keeps its former feature-aware root only as a root-only
+GameTest fixture. The compatibility path remains in the committed baseline;
+the assembled-resource guard requires exactly one production owner. Each
+feature keeps its own branch advancement and translations, preserving
+standalone installation while rendering all installed branches on the same
+TOTEM advancement page.
+
+The same assembled-resource audit found that Remnant's newly self-contained
+backpack assets and data were still present in the production DeadRecall JAR.
+Those preserved paths are now delegated to TotemRemnant as required by its
+extraction contract. DeadRecall keeps only the server-side recipe,
+advancement and portable-container tag copies in its GameTest resources for
+root-only rollback tests. Module icons use their own mod-id asset namespaces,
+so Mod Menu metadata cannot create duplicate `assets/deadrecall/icon.png`
+owners in the exact bundle.
+
+The compatibility fallback and every feature module maintain only
+`zh_tw.json`; `processResources` emits the same object as `zh_cn.json`.
+Overlapping English and Traditional Chinese keys use the external feature
+owner's current value in DeadRecall as well. The assembled locale guard
+therefore verifies identical fallback behavior without maintaining a separate
+Simplified Chinese translation set.
+
+The post-transfer Java 25 root-only GameTest run loaded the retained fixture
+with 1,588 recipes and 1,694 advancements and passed all 113 required tests.
+As in the prior recorded diagnostic, the GameTest JVM completed the suite and
+then remained in `Saving chunks`; it was interrupted only after the successful
+test summary. The production nine-JAR assembled-surface guard passed with no
+duplicate resource and every module artifact retained its owned resources.

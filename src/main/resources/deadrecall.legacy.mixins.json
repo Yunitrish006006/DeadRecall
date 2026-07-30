@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.adaptor.deadrecall.mixin",
+  "plugin": "com.adaptor.deadrecall.mixin.DeadRecallLegacyMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ShulkerBoxBlockEntityMixin",

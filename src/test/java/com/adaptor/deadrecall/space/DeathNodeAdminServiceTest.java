@@ -185,6 +185,7 @@ class DeathNodeAdminServiceTest {
         UUID cleanId = UUID.fromString("00000000-0000-0000-0000-000000000061");
         UUID inconsistentId = UUID.fromString("00000000-0000-0000-0000-000000000062");
         UUID inactiveId = UUID.fromString("00000000-0000-0000-0000-000000000063");
+        UUID sharedBackpackId = UUID.fromString("00000000-0000-0000-0000-000000000064");
         DeathNodeAdminService.DeathNodeDiagnosticInput clean = new DeathNodeAdminService.DeathNodeDiagnosticInput(
                 cleanId,
                 ALICE,
@@ -192,7 +193,8 @@ class DeathNodeAdminServiceTest {
                 true,
                 false,
                 false,
-                "alice|minecraft:overworld|10,64,10"
+                "alice|minecraft:overworld|10,64,10",
+                sharedBackpackId
         );
         DeathNodeAdminService.DeathNodeDiagnosticInput inconsistent = new DeathNodeAdminService.DeathNodeDiagnosticInput(
                 inconsistentId,
@@ -201,7 +203,8 @@ class DeathNodeAdminServiceTest {
                 false,
                 true,
                 true,
-                "alice|minecraft:overworld|10,64,10"
+                "alice|minecraft:overworld|10,64,10",
+                sharedBackpackId
         );
         DeathNodeAdminService.DeathNodeDiagnosticInput inactive = new DeathNodeAdminService.DeathNodeDiagnosticInput(
                 inactiveId,
@@ -210,7 +213,8 @@ class DeathNodeAdminServiceTest {
                 true,
                 false,
                 false,
-                "alice|minecraft:overworld|10,64,10"
+                "alice|minecraft:overworld|10,64,10",
+                sharedBackpackId
         );
         Set<UUID> discovered = new HashSet<>(Set.of(cleanId));
         Map<UUID, Set<UUID>> discoveryByPlayer = new HashMap<>();
@@ -224,12 +228,15 @@ class DeathNodeAdminServiceTest {
 
         assertTrue(diagnostics.get(cleanId).flags().contains(
                 DeathNodeAdminService.DiagnosticFlag.DUPLICATE_ACTIVE_LOCATION));
+        assertTrue(diagnostics.get(cleanId).flags().contains(
+                DeathNodeAdminService.DiagnosticFlag.DUPLICATE_BACKPACK_BINDING));
         assertTrue(diagnostics.get(inconsistentId).flags().containsAll(Set.of(
                 DeathNodeAdminService.DiagnosticFlag.ORPHANED_OWNER_DISCOVERY,
                 DeathNodeAdminService.DiagnosticFlag.NON_PRIVATE_VISIBILITY,
                 DeathNodeAdminService.DiagnosticFlag.UNEXPECTED_ACCESS_LIST,
                 DeathNodeAdminService.DiagnosticFlag.UNEXPECTED_STRUCTURE,
-                DeathNodeAdminService.DiagnosticFlag.DUPLICATE_ACTIVE_LOCATION
+                DeathNodeAdminService.DiagnosticFlag.DUPLICATE_ACTIVE_LOCATION,
+                DeathNodeAdminService.DiagnosticFlag.DUPLICATE_BACKPACK_BINDING
         )));
         assertFalse(diagnostics.get(inactiveId).hasFlags());
         assertEquals(Set.of(cleanId), discovered);

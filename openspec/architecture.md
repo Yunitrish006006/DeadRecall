@@ -1,10 +1,10 @@
-# Totem Platform Architecture
+# TOTEM 圖靈騰系統架構
 
-本文件是 Totem 生態系的架構基準。所有模組與後續 OpenSpec 必須遵守本文件。
+本文件是 TOTEM 圖靈騰系統的架構基準。所有模組與後續 OpenSpec 必須遵守本文件。
 
 ## 1. 模組邊界
 
-### Totem Core
+### 圖靈騰核心（Totem Core）
 
 提供共用能力：
 
@@ -15,7 +15,7 @@
 - GUI 共用元件。
 - 權限、識別碼、序列化及事件 API。
 
-Core 不得包含具體玩法，不得直接註冊死亡背包、銅傀儡、傳送石碑或採掘錘。
+圖靈騰核心不得包含具體玩法，不得直接註冊死亡背包、銅傀儡、傳送石碑或採掘錘。
 
 ### 功能模組
 
@@ -107,17 +107,17 @@ Client 只傳送操作意圖、目標 UUID、UI 選項及 revision。
 
 模組不得因可選功能缺席而崩潰。
 
-- Remnant 可發布死亡背包建立／回收事件。
-- Nexus 可選擇訂閱事件建立死亡節點。
-- Automata 可發布工作工具 API。
-- Cognition 可選擇註冊自然語言解譯器。
-- 未安裝 Cognition 時，Automata 使用 GUI、規則與手動設定。
+- 圖靈騰殘響（Remnant）可發布死亡背包建立／回收事件。
+- 圖靈騰樞紐（Nexus）可選擇訂閱事件建立死亡節點。
+- 圖靈騰機巧（Automata）可發布工作工具 API。
+- 圖靈騰智識（Cognition）可選擇註冊自然語言解譯器。
+- 未安裝圖靈騰智識時，圖靈騰機巧使用 GUI、規則與手動設定。
 
 ## 10. 命名與相容性
 
 - 公開 API package 必須穩定並標示版本。
 - Mod ID、component ID、payload ID 與 SavedData key 變更時必須 migration。
-- 顯示名稱可使用 Totem 品牌，但現有 DeadRecall 世界資料不可直接作廢。
+- 顯示名稱使用圖靈騰品牌，`Totem` 作為技術名稱；現有 DeadRecall 世界資料不可直接作廢。
 - 第三方擴充只應依賴公開 API，不依賴 internal package。
 
 ## 11. 驗收基準

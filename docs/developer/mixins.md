@@ -6,7 +6,7 @@ DeadRecall 使用 Mixin 攔截部分無法單靠事件 API 完成的原版行為
 | --- | --- |
 | Entity below-world handling | 防止死亡背包被虛空直接移除 |
 | ItemEntity damage／discard | 依背包等級處理防護與內容物掉落 |
-| Pig goal registration | 將豬糞相關 AI 加入豬的目標選擇器 |
+| Pig goal registration | 將成功餵食後的延遲排便 AI 加入豬的目標選擇器 |
 | Copper golem transport | 攔截並擴充銅魁儡容器搬運行為 |
 | ItemEntity rendering | 為地上的死亡背包加入紅色光柱 |
 | Structure template | 將結構中的普通書櫃轉成預先帶有物品 NBT 的雕紋書櫃 |

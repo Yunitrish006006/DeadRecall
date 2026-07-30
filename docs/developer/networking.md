@@ -1,6 +1,6 @@
 # 網路與執行緒
 
-DeadRecall 的 GUI、銅魁儡設定、Totem Nexus 與 Discord Bridge 都涉及 client／server 或外部 HTTP 通訊。
+DeadRecall 的 GUI、銅魁儡設定、圖靈騰樞紐（Totem Nexus）與 Discord Bridge 都涉及 client／server 或外部 HTTP 通訊。
 
 ## Client 與 Server
 
@@ -10,7 +10,7 @@ DeadRecall 的 GUI、銅魁儡設定、Totem Nexus 與 Discord Bridge 都涉及 
 - 不可信任 Client 傳入的 ItemStack、座標、模式或容器狀態。
 - 修改世界、實體或物品欄必須回到伺服器主執行緒。
 
-## Totem Nexus Payload
+## 圖靈騰樞紐（Totem Nexus）Payload
 
 | Payload | 方向 | 用途 |
 | --- | --- | --- |

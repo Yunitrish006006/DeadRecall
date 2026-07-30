@@ -11,7 +11,7 @@ DeadRecall 是 Minecraft Fabric 模組，整合攜帶式儲存、死亡物品保
 | `/back` | 記錄死亡維度與座標，支援跨維度返回死亡地點 |
 | 銅魁儡 | 透過銅板手管理分類與採集模式，可選配 LLM 判斷 |
 | Discord Bridge | 將遊戲聊天、玩家動態、管理稽核、公開事件及伺服器狀態經 Cloudflare Worker 傳送到 Discord |
-| Totem Nexus | 使用磁石與羅盤註冊、探索 Space Unit，透過地圖與 Server 驗證進行傳送 |
+| 圖靈騰樞紐（Totem Nexus） | 使用磁石與羅盤註冊、探索 Space Unit，透過地圖與 Server 驗證進行傳送 |
 | 附魔台 | 雕紋書櫃依實際書本與附魔等級提供最高 64 點附魔力 |
 | Discord Bridge | 將遊戲聊天及伺服器狀態經 Cloudflare Worker 傳送到 Discord |
 | 生存煉金 | 包含豬糞、木灰、硝石、缽與煉藥鍋配方流程 |
@@ -21,7 +21,7 @@ DeadRecall 是 Minecraft Fabric 模組，整合攜帶式儲存、死亡物品保
 
 - 背包與死亡保護：參閱 [背包系統](backpacks/README.md) 與 [死亡背包與 `/back`](backpacks/death-backpack.md)。
 - 銅魁儡：參閱 [銅魁儡使用指南](copper-golem/README.md)。
-- Totem Nexus：參閱 [Totem Nexus／Space Unit](nexus/README.md)。
+- 圖靈騰樞紐（Totem Nexus）：參閱 [圖靈騰樞紐（Totem Nexus）／Space Unit](nexus/README.md)。
 - 附魔台：參閱 [附魔台與雕紋書櫃](enchanting/README.md)。
 - 煉金內容：參閱 [煉金系統](alchemy/README.md)。
 

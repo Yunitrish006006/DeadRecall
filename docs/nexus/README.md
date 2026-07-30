@@ -1,6 +1,6 @@
-# Totem Nexus／Space Unit
+# 圖靈騰樞紐（Totem Nexus）／Space Unit
 
-最新的 DeadRecall 已加入 Totem Nexus 的第一階段實作。此系統使用磁石、羅盤與 Space Unit 世界資料，讓玩家探索可見節點、開啟相對位置地圖，並以伺服器計算的成本與安全條件進行傳送。
+最新的 DeadRecall 已具備圖靈騰樞紐（Totem Nexus）的主體功能。此系統使用磁石、羅盤與 Space Unit 世界資料，讓玩家探索可見節點、開啟相對位置地圖，並以伺服器計算的成本與安全條件進行傳送。
 
 ## 文件
 
@@ -10,7 +10,7 @@
 - [死亡節點管理介面](death-node-admin.md)
 - [目前完成與未完成內容](status.md)
 - [完整 OpenSpec](../../openspec/specs/space-unit-lodestone/spec.md)
-- [未來自適應多方塊傳送陣設計](../../openspec/future/totem-nexus-adaptive-multiblock.md)（Totem Nexus 拆分後再開發）
+- [未來自適應多方塊傳送陣設計](../../openspec/future/totem-nexus-adaptive-multiblock.md)（圖靈騰樞紐拆分後再開發）
 
 ## 快速操作
 

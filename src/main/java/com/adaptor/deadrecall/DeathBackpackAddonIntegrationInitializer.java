@@ -2,6 +2,7 @@ package com.adaptor.deadrecall;
 
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonInventoryProvider;
 import com.adaptor.deadrecall.api.death.DeathBackpackAddonInventoryRegistry;
+import com.adaptor.deadrecall.bootstrap.RemnantCompletionCutover;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -12,6 +13,9 @@ public final class DeathBackpackAddonIntegrationInitializer implements ModInitia
 
     @Override
     public void onInitialize() {
+        if (RemnantCompletionCutover.usesExternalAuthority()) {
+            return;
+        }
         if (!FabricLoader.getInstance().isModLoaded("trinkets_updated")) {
             return;
         }

@@ -128,7 +128,8 @@ public final class DeathNodeAdminService {
         NON_PRIVATE_VISIBILITY("non_private_visibility"),
         UNEXPECTED_ACCESS_LIST("unexpected_access_list"),
         UNEXPECTED_STRUCTURE("unexpected_structure"),
-        DUPLICATE_ACTIVE_LOCATION("duplicate_active_location");
+        DUPLICATE_ACTIVE_LOCATION("duplicate_active_location"),
+        DUPLICATE_BACKPACK_BINDING("duplicate_backpack_binding");
 
         private final String id;
 
@@ -167,7 +168,8 @@ public final class DeathNodeAdminService {
             boolean privateVisibility,
             boolean hasAccessList,
             boolean hasStructure,
-            String locationKey) {
+            String locationKey,
+            UUID backpackId) {
     }
 
     record DestructiveConfirmation(
@@ -399,7 +401,8 @@ public final class DeathNodeAdminService {
                             unit.visibility() == SpaceUnitVisibility.PRIVATE,
                             !unit.administrators().isEmpty() || !unit.allowedPlayers().isEmpty(),
                             !SpaceStructureSnapshot.EMPTY.equals(unit.structure()),
-                            deathNodeLocationKey(unit)
+                            deathNodeLocationKey(unit),
+                            unit.backpackId().orElse(null)
                     ));
                 }
             }
@@ -412,10 +415,14 @@ public final class DeathNodeAdminService {
             Map<UUID, Set<UUID>> discoveredByPlayer) {
         Map<UUID, Set<UUID>> discovery = discoveredByPlayer == null ? Map.of() : discoveredByPlayer;
         Map<String, Integer> activeLocationCounts = new HashMap<>();
+        Map<UUID, Integer> activeBackpackCounts = new HashMap<>();
         if (inputs != null) {
             for (DeathNodeDiagnosticInput input : inputs) {
                 if (input != null && input.active()) {
                     activeLocationCounts.merge(input.locationKey(), 1, Integer::sum);
+                    if (input.backpackId() != null) {
+                        activeBackpackCounts.merge(input.backpackId(), 1, Integer::sum);
+                    }
                 }
             }
         }
@@ -444,6 +451,11 @@ public final class DeathNodeAdminService {
             }
             if (input.active() && activeLocationCounts.getOrDefault(input.locationKey(), 0) > 1) {
                 flags.add(DiagnosticFlag.DUPLICATE_ACTIVE_LOCATION);
+            }
+            if (input.active()
+                    && input.backpackId() != null
+                    && activeBackpackCounts.getOrDefault(input.backpackId(), 0) > 1) {
+                flags.add(DiagnosticFlag.DUPLICATE_BACKPACK_BINDING);
             }
             diagnosticsByNode.put(input.id(), new DeathNodeDiagnostics(flags));
         }

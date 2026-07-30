@@ -1,8 +1,8 @@
-# Totem Nexus：自適應多方塊傳送陣設計備忘
+# 圖靈騰樞紐（Totem Nexus）：自適應多方塊傳送陣設計備忘
 
 > 狀態：Future / Deferred
 >
-> 此文件只記錄未來把 Totem Nexus 從 DeadRecall 拆成獨立模組後的設計方向，不納入目前 DeadRecall 的實作與發行範圍。正式開發前必須另建 OpenSpec change，重新確認數值、相容性、遷移與測試需求。
+> 此文件只記錄未來把圖靈騰樞紐（Totem Nexus）從 DeadRecall 拆成獨立模組後的設計方向，不納入目前 DeadRecall 的實作與發行範圍。正式開發前必須另建 OpenSpec change，重新確認數值、相容性、遷移與測試需求。
 
 ## 1. 設計目標
 
@@ -264,7 +264,7 @@ Client 只能顯示 Server 計算結果，不得提交最終能力、負載或�
 
 ## 12. 與目前 DeadRecall 的邊界
 
-在 Totem Nexus 正式拆分前：
+在圖靈騰樞紐（Totem Nexus）正式拆分前：
 
 - 現有磁石 Space Unit、傳送成本、安全落點及穩定度規格維持有效。
 - 本文件不要求目前版本改造為完整自由多方塊網路。

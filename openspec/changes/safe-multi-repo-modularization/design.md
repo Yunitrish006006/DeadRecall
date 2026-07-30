@@ -72,6 +72,13 @@ Core is created first but contains no gameplay. Its first release provides only:
 - migration/version helpers;
 - common identifier and permission primitives that are proven to have at least two consumers.
 
+Core may also own the single presentation-only `deadrecall:root` advancement
+used to place independently installed feature branches on one TOTEM page. This
+root uses only a vanilla icon and an unconditional vanilla criterion; it must
+not reference a feature registry, criterion, SavedData or gameplay class.
+Feature advancements and their translations remain owned by their respective
+feature repositories.
+
 Existing death addon interfaces remain compatible. Moving or replacing their package requires forwarding types and a separate addon migration window.
 
 ### TotemDiscordBridge pilot
@@ -107,8 +114,10 @@ behavioral unit rather than leaving individual Enchanting Mixins in DeadRecall.
 
 VanillaTweaks owns general recipe overrides, concrete-powder behavior and other
 small vanilla gameplay changes that do not belong to an existing feature
-repository. Portable-container policy is explicitly excluded: it remains owned
-by TotemRemnant, so the new module cannot duplicate its registrations or data.
+repository. This includes the client-requested, server-authoritative sorting of
+the container or player side of an open menu. Portable-container policy is
+explicitly excluded: it remains owned by TotemRemnant, so the new module cannot
+duplicate its registrations or data.
 
 ## 5. Unassigned gameplay
 

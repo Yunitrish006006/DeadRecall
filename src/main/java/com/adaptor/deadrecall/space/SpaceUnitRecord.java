@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,7 +25,8 @@ public record SpaceUnitRecord(
         Set<UUID> allowedPlayers,
         SpaceStructureSnapshot structure,
         long createdGameTime,
-        long updatedGameTime) {
+        long updatedGameTime,
+        Optional<UUID> backpackId) {
 
     private static final Codec<SpaceUnitType> TYPE_CODEC =
             Codec.STRING.xmap(SpaceUnitType::fromId, SpaceUnitType::id);
@@ -46,7 +48,8 @@ public record SpaceUnitRecord(
             UUIDUtil.CODEC_SET.optionalFieldOf("allowed_players", Set.of()).forGetter(SpaceUnitRecord::allowedPlayers),
             SpaceStructureSnapshot.CODEC.optionalFieldOf("structure", SpaceStructureSnapshot.EMPTY).forGetter(SpaceUnitRecord::structure),
             Codec.LONG.optionalFieldOf("created_game_time", 0L).forGetter(SpaceUnitRecord::createdGameTime),
-            Codec.LONG.optionalFieldOf("updated_game_time", 0L).forGetter(SpaceUnitRecord::updatedGameTime)
+            Codec.LONG.optionalFieldOf("updated_game_time", 0L).forGetter(SpaceUnitRecord::updatedGameTime),
+            UUIDUtil.CODEC.optionalFieldOf("backpack_id").forGetter(SpaceUnitRecord::backpackId)
     ).apply(instance, SpaceUnitRecord::new));
 
     public SpaceUnitRecord {
@@ -54,6 +57,26 @@ public record SpaceUnitRecord(
         administrators = Set.copyOf(administrators);
         allowedPlayers = Set.copyOf(allowedPlayers);
         structure = structure == null ? SpaceStructureSnapshot.EMPTY : structure;
+        backpackId = backpackId == null ? Optional.empty() : backpackId;
+    }
+
+    /** Backwards-compatible constructor for records created before reverse backpack binding existed. */
+    public SpaceUnitRecord(
+            UUID id,
+            SpaceUnitType type,
+            ResourceKey<Level> dimension,
+            BlockPos pos,
+            UUID owner,
+            String name,
+            SpaceUnitVisibility visibility,
+            SpaceUnitStatus status,
+            Set<UUID> administrators,
+            Set<UUID> allowedPlayers,
+            SpaceStructureSnapshot structure,
+            long createdGameTime,
+            long updatedGameTime) {
+        this(id, type, dimension, pos, owner, name, visibility, status, administrators,
+                allowedPlayers, structure, createdGameTime, updatedGameTime, Optional.empty());
     }
 
     public boolean isLodestoneAnchor() {
@@ -94,7 +117,8 @@ public record SpaceUnitRecord(
                 this.allowedPlayers,
                 nextStructure,
                 this.createdGameTime,
-                gameTime
+                gameTime,
+                this.backpackId
         );
     }
 
@@ -112,7 +136,8 @@ public record SpaceUnitRecord(
                 this.allowedPlayers,
                 this.structure,
                 this.createdGameTime,
-                gameTime
+                gameTime,
+                this.backpackId
         );
     }
 
@@ -130,7 +155,8 @@ public record SpaceUnitRecord(
                 this.allowedPlayers,
                 this.structure,
                 this.createdGameTime,
-                gameTime
+                gameTime,
+                this.backpackId
         );
     }
 
@@ -148,7 +174,8 @@ public record SpaceUnitRecord(
                 this.allowedPlayers,
                 this.structure,
                 this.createdGameTime,
-                gameTime
+                gameTime,
+                this.backpackId
         );
     }
 
@@ -172,7 +199,8 @@ public record SpaceUnitRecord(
                 this.allowedPlayers,
                 this.structure,
                 this.createdGameTime,
-                gameTime
+                gameTime,
+                this.backpackId
         );
     }
 
@@ -196,7 +224,27 @@ public record SpaceUnitRecord(
                 nextAllowedPlayers,
                 this.structure,
                 this.createdGameTime,
-                gameTime
+                gameTime,
+                this.backpackId
+        );
+    }
+
+    public SpaceUnitRecord withBackpackId(UUID nextBackpackId, long gameTime) {
+        return new SpaceUnitRecord(
+                this.id,
+                this.type,
+                this.dimension,
+                this.pos,
+                this.owner,
+                this.name,
+                this.visibility,
+                this.status,
+                this.administrators,
+                this.allowedPlayers,
+                this.structure,
+                this.createdGameTime,
+                gameTime,
+                Optional.ofNullable(nextBackpackId)
         );
     }
 

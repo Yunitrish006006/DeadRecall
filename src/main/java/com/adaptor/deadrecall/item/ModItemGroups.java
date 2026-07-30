@@ -3,6 +3,7 @@ package com.adaptor.deadrecall.item;
 import com.adaptor.deadrecall.Deadrecall;
 import com.adaptor.deadrecall.bootstrap.AlchemyCutover;
 import com.adaptor.deadrecall.bootstrap.AutomataCutover;
+import com.adaptor.deadrecall.bootstrap.RemnantCompletionCutover;
 import com.adaptor.deadrecall.registry.LegacyGameplayItemGroupRegistration;
 import com.adaptor.deadrecall.registry.TotemAutomataItemGroupRegistration;
 import com.adaptor.deadrecall.registry.TotemRemnantItemGroupRegistration;
@@ -25,21 +26,31 @@ public final class ModItemGroups {
     public static final ResourceKey<CreativeModeTab> DEADRECALL_TAB_KEY =
             ResourceKey.create(Registries.CREATIVE_MODE_TAB, DEADRECALL_TAB_ID);
 
-    public static final CreativeModeTab DEADRECALL_TAB = Registry.register(
-            BuiltInRegistries.CREATIVE_MODE_TAB,
-            DEADRECALL_TAB_KEY,
-            FabricCreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.deadrecall.main"))
-                    .icon(ModItemGroups::copperWrenchIcon)
-                    .build()
-    );
-
     private ModItemGroups() {
     }
 
     public static void registerModItemGroups() {
+        if (RemnantCompletionCutover.usesExternalAuthority()) {
+            Deadrecall.LOGGER.info("由 TotemRemnant 註冊模組創造模式頁籤");
+            return;
+        }
+        registerFallbackTab();
         CreativeModeTabEvents.modifyOutputEvent(DEADRECALL_TAB_KEY).register(ModItemGroups::addDeadRecallItems);
         Deadrecall.LOGGER.info("正在註冊模組創造模式頁籤...");
+    }
+
+    private static void registerFallbackTab() {
+        if (BuiltInRegistries.CREATIVE_MODE_TAB.getOptional(DEADRECALL_TAB_KEY).isPresent()) {
+            return;
+        }
+        Registry.register(
+                BuiltInRegistries.CREATIVE_MODE_TAB,
+                DEADRECALL_TAB_KEY,
+                FabricCreativeModeTab.builder()
+                        .title(Component.translatable("itemGroup.deadrecall.main"))
+                        .icon(ModItemGroups::copperWrenchIcon)
+                        .build()
+        );
     }
 
     private static void addDeadRecallItems(FabricCreativeModeTabOutput output) {

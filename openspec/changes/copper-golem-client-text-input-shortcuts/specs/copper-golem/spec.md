@@ -42,3 +42,10 @@ The fix SHALL be conditional on an active focused `EditBox`. When no text field 
 ### Requirement: All Copper Golem text fields share the same policy
 
 Sorting Prompt, Gathering Prompt, API URL, API Key, and Model fields SHALL use the same focused-text shortcut protection. The fix SHALL NOT alter their maximum lengths, visibility rules, payloads, permission checks, or Server-side revision validation.
+
+#### Scenario: Every editable configuration field receives the protection
+
+- **GIVEN** any one of Sorting Prompt, Gathering Prompt, API URL, API Key, or Model is visible and focused
+- **WHEN** the user enters printable text including the Inventory-key character
+- **THEN** the focused field SHALL receive the text without closing the screen
+- **AND** saving SHALL continue to use the existing payload, permission, length, and revision rules

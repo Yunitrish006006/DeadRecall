@@ -1,10 +1,25 @@
-# Totem Nexus：Space Unit 磁石傳送規格
+# 圖靈騰樞紐（Totem Nexus）：Space Unit 磁石傳送規格
 
-## 1. 目標
+## Purpose
 
 以世界中的磁石與傳送石碑作為固定空間錨點，保留 Blossom 的 Space Unit 概念，但改為 Server authoritative、世界 SavedData、探索後解鎖及地圖式介面。
 
 系統包含固定磁石、羅盤、石碑穩定度、傳送偏差、食物成本、跨維度紫水晶、好友、人體磁石、死亡節點與分散重生。
+
+## Requirements
+
+### Requirement: Space Unit follows the detailed Server-authoritative contract
+
+Totem Nexus SHALL implement Space Unit identity, discovery, permissions, lodestone management, teleportation, friends, death nodes, distributed respawn, persistence and networking according to every rule in the detailed contract below.
+
+#### Scenario: A player uses a Space Unit route
+
+- **GIVEN** a player interacts with a visible and explored Space Unit destination
+- **WHEN** the Server quotes, starts and completes or cancels the route
+- **THEN** identity, permission, cost, safety and persistence decisions SHALL come from current Server state
+- **AND** the Client SHALL NOT supply authoritative coordinates, eligibility, structure state or payment
+
+## Detailed contract
 
 ## 2. Space Unit
 

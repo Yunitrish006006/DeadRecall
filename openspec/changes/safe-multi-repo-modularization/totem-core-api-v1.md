@@ -20,10 +20,21 @@ Only the following API families may be added in v1:
   interface, without feature command names or policies.
 - `version` — API-version negotiation and feature metadata used by the
   compatibility bundle.
+- `death` — the narrow optional `DeathBackpackNodeLifecycle` bridge shared by
+  Remnant and Nexus. Remnant invokes `create`, `bind`, rollback and recovery;
+  Nexus may register the authority. The default `bind` callback carries only
+  the node UUID and spawned ItemEntity UUID so Nexus can persist a reverse
+  binding without Core owning the feature schema.
 
 Core may depend on Minecraft, Fabric Loader and Fabric API only where needed to
 implement these contracts.  Its public API must not expose an implementation
 class from another Totem module.
+
+Core additionally owns one non-API presentation resource:
+`data/deadrecall/advancement/root.json`, plus only the two locale keys used by
+that root.  It is the neutral parent for independently owned feature
+advancement branches.  The root must use a vanilla icon and unconditional
+vanilla criterion and must not depend on any feature registry or criterion.
 
 ## Explicit exclusions
 
@@ -31,8 +42,10 @@ The following are rejected from Core even when more than one module currently
 uses them:
 
 - item, block, entity, menu, registry, recipe or creative-tab registration;
-- death backpack capture or recovery, inventories, Trinkets, or the existing
-  `com.adaptor.deadrecall.api.death` addon API;
+- advancement gameplay below the neutral shared `deadrecall:root`;
+- death backpack capture or recovery implementations, inventories, Trinkets,
+  or the existing `com.adaptor.deadrecall.api.death` addon API; the narrow
+  cross-module lifecycle bridge listed above is the only v1 exception;
 - Space Unit, lodestone, teleport, friend, death-node, or distributed-spawn
   behaviour and SavedData;
 - Copper Golem behaviour, screens, data components, scanners, or Cognition

@@ -15,6 +15,11 @@ public final class NexusDeathBackpackNodeAdapter implements DeathBackpackNodeLif
     }
 
     @Override
+    public void bind(ServerLevel level, UUID nodeId, UUID backpackEntityId) {
+        SpaceUnitHandler.bindDeathBackpack(level, nodeId, backpackEntityId);
+    }
+
+    @Override
     public void rollback(ServerPlayer owner, ServerLevel level, UUID nodeId) {
         SpaceUnitHandler.rollbackDeathNode(owner, level, nodeId);
     }

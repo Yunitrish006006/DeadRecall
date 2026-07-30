@@ -1,14 +1,16 @@
-# DeadRecall / Totem Platform OpenSpec Index
+# DeadRecall / TOTEM 圖靈騰系統 OpenSpec 索引
 
-此 repository 同時保存 DeadRecall 現有功能規格，以及未來拆分為 Totem 模組化生態系的架構文件。
+此 repository 同時保存 DeadRecall 現有功能規格，以及未來拆分為 TOTEM 圖靈騰系統的架構文件。
 
 ## 平台文件
 
-- [`openspec/README.md`](openspec/README.md)：平台定位、模組名稱與依賴關係。
+- [`openspec/README.md`](openspec/README.md)：圖靈騰系統定位、模組中文名稱、依賴關係與統一進度總覽。
 - [`openspec/architecture.md`](openspec/architecture.md)：共用開發架構、資料安全與相容性規範。
 - [`openspec/roadmap.md`](openspec/roadmap.md)：完成狀態、進行中工作與開發順序。
+- [`openspec/changes/safe-multi-repo-modularization/`](openspec/changes/safe-multi-repo-modularization/)：獨立 repository ownership、exact-version compatibility bundle、cutover、rollback 與 observation 契約。目前各 gameplay repository 已完成可逆 cutover 與 assembled E2E，除 Discord 外仍等待各自兩個 DeadRecall 正式 release 的 observation。
+- [`openspec/changes/safe-multi-repo-modularization/next-lockstep-candidate.md`](openspec/changes/safe-multi-repo-modularization/next-lockstep-candidate.md)：下一組本機候選版本矩陣，以及建立新 immutable graph 前必須完成的 commit、SHA-512、CI 與 assembled E2E gate。
 
-## Totem Nexus / Space Unit
+## 圖靈騰樞紐（Totem Nexus）/ Space Unit
 
 - [`openspec/specs/space-unit-lodestone/spec.md`](openspec/specs/space-unit-lodestone/spec.md)
 - [`openspec/changes/direct-friend-player-teleport/`](openspec/changes/direct-friend-player-teleport/)
@@ -18,14 +20,14 @@
 
 涵蓋磁石與石碑、探索與權限、傳送 session、成本／偏差／風險、好友、人體磁石、死亡節點、分散重生，以及傳送介面物品特化。Future 文件另記錄目的地負載、逐步擴建、核心 UUID 歸屬、連結力／擴張力／準確力／傳送力、對稱效率、當地材料共鳴與材料遞減收益；不屬於目前 DeadRecall 發行範圍。
 
-## Totem Nexus / Death Node Administration
+## 圖靈騰樞紐（Totem Nexus）/ Death Node Administration
 
 - [`openspec/changes/admin-death-node-manager/`](openspec/changes/admin-death-node-manager/)
 - [`openspec/changes/admin-death-node-manager/specs/death-node-administration/spec.md`](openspec/changes/admin-death-node-manager/specs/death-node-administration/spec.md)
 
 涵蓋依玩家／Dimension／狀態／時間查詢，以及檢視、傳送、停用、永久刪除、批次清理、確認 token 與稽核紀錄。
 
-## Totem Automata / Copper Golem
+## 圖靈騰機巧（Totem Automata）/ Copper Golem
 
 - [`openspec/specs/copper-golem/spec.md`](openspec/specs/copper-golem/spec.md)
 - [`openspec/changes/copper-golem-operation-modes/`](openspec/changes/copper-golem-operation-modes/)
@@ -41,13 +43,13 @@
 
 涵蓋 Minecraft 聊天、玩家生命週期、死亡背包、Space Unit、管理稽核、健康告警、Boss／raid、村民升級與伺服器狀態通知。`discord-zh-tw-event-localization` 已統一處理 advancement、村民、死亡、Boss／實體、raid 與 difficulty 的繁體中文解析、custom text 保留、安全 fallback、missing-key 節流、Worker 失敗隔離，以及 Server Data runtime reload 與原子 snapshot 替換。
 
-## Totem Remnant / Offline Player Body
+## 圖靈騰殘響（Totem Remnant）/ Offline Player Body
 
 - [`openspec/specs/offline-player-body/spec.md`](openspec/specs/offline-player-body/spec.md)
 
 涵蓋登出身體、重連接回、playerdata body lock、防複製、身體死亡、死亡背包／死亡節點／Discord 整合，以及 restart／crash recovery。
 
-## Totem Remnant / Death Backpack Capture
+## 圖靈騰殘響（Totem Remnant）/ Death Backpack Capture
 
 - [`openspec/changes/death-backpack-pre-drop-capture/`](openspec/changes/death-backpack-pre-drop-capture/)
 - [`openspec/changes/death-backpack-pre-drop-capture/specs/death-backpack/spec.md`](openspec/changes/death-backpack-pre-drop-capture/specs/death-backpack/spec.md)
@@ -94,15 +96,15 @@
 
 `master` 上版本號變更會在完整 build 後發布到 Modrinth；project ID 與 token 由 GitHub Actions variable／secret 提供，且以版本號及 JAR SHA-512 防止重複或覆蓋發布。
 
-## 模組命名方向
+## 圖靈騰模組名稱
 
-| 模組 | 內容 |
-|---|---|
-| Totem Core | 共用 Library 與 API |
-| Totem Nexus | 傳送、磁石、好友、Space Unit |
-| Totem Remnant | 死亡背包、死亡紀錄與離線身體 |
-| Totem Automata | 銅傀儡與自動化 |
-| Totem Excavation | 區域採掘與工程工具 |
-| Totem Cognition | 可選 Agent Framework |
+| 中文顯示名稱 | 技術名稱 | 內容 |
+|---|---|---|
+| 圖靈騰核心 | `Totem Core` | 共用 Library 與 API |
+| 圖靈騰樞紐 | `Totem Nexus` | 傳送、磁石、好友、Space Unit |
+| 圖靈騰殘響 | `Totem Remnant` | 死亡背包、死亡紀錄與離線身體 |
+| 圖靈騰機巧 | `Totem Automata` | 銅傀儡與自動化 |
+| 圖靈騰掘進 | `Totem Excavation` | 區域採掘與工程工具 |
+| 圖靈騰智識 | `Totem Cognition` | 可選 Agent Framework |
 
-在正式拆分前，repository、mod ID 與既有世界資料 identifier 暫時維持 DeadRecall。功能完成狀態以 [`openspec/roadmap.md`](openspec/roadmap.md) 及各 change 的 `tasks.md` 為準。
+完整進度請統一參閱 [`openspec/README.md`](openspec/README.md) 的「模組總覽與進度」。在正式拆分前，repository、mod ID 與既有世界資料 identifier 暫時維持 DeadRecall。

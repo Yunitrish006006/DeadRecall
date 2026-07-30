@@ -9,15 +9,15 @@
 | `DeathLocationManager.java` | 玩家死亡維度與座標管理 |
 | `alchemy/` | 投料、煉藥鍋與豬糞流程 |
 | `block/` | 自訂方塊、煉藥鍋與 Block Entity |
-| `entity/ai/` | 豬吃草與產生豬糞方塊的 AI |
+| `entity/ai/` | 豬在成功餵食後延遲產生、逐層堆疊豬糞的 AI |
 | `item/` | 物品註冊、背包與創造模式頁籤 |
 | `item/copper/` | 銅板手與銅魁儡互動 |
 | `inventory/` | 背包容器資料讀寫 |
 | `network/` | Client／Server 自訂 Payload |
-| `space/` | Totem Nexus Space Unit、SavedData、地圖查詢、報價與傳送 session |
+| `space/` | 圖靈騰樞紐（Totem Nexus）Space Unit、SavedData、地圖查詢、報價與傳送 session |
 | `mixin/` | 原版行為攔截與擴充 |
 
-## Totem Nexus 主要類別
+## 圖靈騰樞紐（Totem Nexus）主要類別
 
 | 類別 | 責任 |
 | --- | --- |

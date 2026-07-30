@@ -1,5 +1,6 @@
 package com.adaptor.deadrecall;
 
+import com.adaptor.deadrecall.bootstrap.RemnantContainerSafetyCutover;
 import com.adaptor.deadrecall.inventory.ContainerNestingDiagnostics;
 import com.adaptor.deadrecall.inventory.ContainerNestingDiagnostics.Finding;
 import com.adaptor.deadrecall.inventory.ContainerNestingDiagnostics.ScanReport;
@@ -22,6 +23,9 @@ public final class ContainerSafetyAdminInitializer implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        if (RemnantContainerSafetyCutover.usesExternalAuthority()) {
+            return;
+        }
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(Commands.literal("deadrecall")
                         .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_ADMIN))

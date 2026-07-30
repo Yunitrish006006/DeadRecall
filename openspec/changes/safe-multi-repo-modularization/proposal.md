@@ -35,4 +35,4 @@ DeadRecall 目前以單一 Fabric mod、單一 Gradle project 與單一 reposito
 - 修改 `deadrecall` mod ID、registry namespace、SavedData key 或 Payload ID。
 - 修改玩家世界資料格式。
 - 改變目前 DeadRecall JAR 的執行行為。
-- 啟用各 Totem 模組的獨立正式發布。
+- 啟用各圖靈騰模組的獨立正式發布。

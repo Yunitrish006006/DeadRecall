@@ -180,6 +180,22 @@ public class DeadRecallSpaceUnitSavedData extends SavedData {
         return created;
     }
 
+    public boolean bindDeathBackpack(UUID unitId, UUID backpackEntityId, long gameTime) {
+        if (unitId == null || backpackEntityId == null) {
+            return false;
+        }
+        Optional<SpaceUnitRecord> unit = get(unitId);
+        if (unit.isEmpty()
+                || unit.get().type() != SpaceUnitType.DEATH
+                || unit.get().status() != SpaceUnitStatus.ACTIVE) {
+            return false;
+        }
+        SpaceUnitRecord bound = unit.get().withBackpackId(backpackEntityId, gameTime);
+        this.unitsById.put(bound.id(), bound);
+        setDirty();
+        return true;
+    }
+
     public boolean disableDeathUnit(UUID ownerId, UUID unitId, long gameTime) {
         Optional<SpaceUnitRecord> unit = get(unitId);
         if (unit.isEmpty()

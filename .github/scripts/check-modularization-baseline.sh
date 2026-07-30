@@ -50,6 +50,11 @@ collect_surface() {
             ! -path 'src/main/resources/assets/deadrecall/lang/legacy_discord_zh_tw/*' \
             | sed 's#^src/main/resources/#resource #'
 
+        # processResources intentionally derives zh_cn byte-for-byte from the
+        # maintained zh_tw source. Keep the generated compatibility path in
+        # the baseline even though no separate source translation exists.
+        printf '%s\n' 'resource assets/deadrecall/lang/zh_cn.json'
+
         collect_identifiers
 
         # Extracted resources remain part of the compatibility contract, but

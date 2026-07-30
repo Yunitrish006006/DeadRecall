@@ -6,9 +6,8 @@ import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PortableContainerTagResourceTest {
-    private static final String TAG_PATH = "/data/deadrecall/tags/item/portable_containers.json";
+    private static final Path TAG_PATH = Path.of(
+            "src/gametest/resources/data/deadrecall/tags/item/portable_containers.json");
 
     @Test
     void tagIsAppendableByDatapacksAndAddons() throws IOException {
@@ -48,11 +48,10 @@ class PortableContainerTagResourceTest {
     }
 
     private static JsonObject loadTag() throws IOException {
-        try (InputStream stream = PortableContainerTagResourceTest.class.getResourceAsStream(TAG_PATH)) {
-            assertNotNull(stream, "Missing portable-container tag resource " + TAG_PATH);
-            try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                return JsonParser.parseReader(reader).getAsJsonObject();
-            }
+        assertTrue(Files.isRegularFile(TAG_PATH),
+                "Missing root-only GameTest rollback fixture " + TAG_PATH);
+        try (var reader = Files.newBufferedReader(TAG_PATH)) {
+            return JsonParser.parseReader(reader).getAsJsonObject();
         }
     }
 }

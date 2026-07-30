@@ -2,6 +2,7 @@ package com.adaptor.deadrecall;
 
 import com.adaptor.deadrecall.bootstrap.DeadRecallServerBootstrap;
 import com.adaptor.deadrecall.bootstrap.TotemDiscordBridgeBootstrap;
+import com.adaptor.deadrecall.bootstrap.VanillaTweaksCutover;
 import com.adaptor.deadrecall.network.registration.DeadRecallPayloadRegistration;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -69,20 +70,22 @@ public class Deadrecall implements ModInitializer {
         // Discord owns its chat, lifecycle and health hooks through TotemDiscordBridgeBootstrap.
 
         // 生存模式不允許持有一般書櫃：統一替換為書本（每個書櫃 3 本）
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            bookshelfReplaceTicker++;
-            if (bookshelfReplaceTicker < BOOKSHELF_REPLACE_INTERVAL_TICKS) {
-                return;
-            }
-            bookshelfReplaceTicker = 0;
-
-            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                if (player.getAbilities().instabuild) {
-                    continue;
+        if (!VanillaTweaksCutover.usesExternalBookshelfAuthority()) {
+            ServerTickEvents.END_SERVER_TICK.register(server -> {
+                bookshelfReplaceTicker++;
+                if (bookshelfReplaceTicker < BOOKSHELF_REPLACE_INTERVAL_TICKS) {
+                    return;
                 }
-                replaceVanillaBookshelfInInventory(player);
-            }
-        });
+                bookshelfReplaceTicker = 0;
+
+                for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                    if (player.getAbilities().instabuild) {
+                        continue;
+                    }
+                    replaceVanillaBookshelfInInventory(player);
+                }
+            });
+        }
 
         // 註冊 /back 指令
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {

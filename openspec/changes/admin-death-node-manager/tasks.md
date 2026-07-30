@@ -25,10 +25,24 @@
 ## Tests
 
 - [x] Mutation permission denial against a forged death-node UUID test.
-- [ ] Query-payload permission denial test proving no private snapshot is returned.
+- [x] Query-payload permission denial test proving no private snapshot is returned.
 - [x] Offline player filtering and old-name/UUID lookup tests.
 - [x] Pagination stability under concurrent node changes.
 - [x] Single and batch confirmation expiry tests.
 - [x] Delete-node-then-recover-backpack test.
-- [ ] Duplicate backpack-binding diagnostics and persisted reverse-binding tests.
-- [ ] Dedicated Server restart persistence test.
+- [x] Duplicate backpack-binding diagnostics and persisted reverse-binding tests.
+- [x] Dedicated Server restart persistence test.
+
+## Verification evidence
+
+- TotemNexus unit suite: 21 tests passed, including legacy records without
+  `backpack_id`, codec round-trip persistence, and duplicate active binding
+  diagnostics.
+- TotemNexus Fabric GameTest: 26/26 required tests passed, including denial of
+  a forged non-administrator query before any private snapshot is sent.
+- TotemRemnant Fabric GameTest: 9/9 required tests passed, including delivery
+  of the spawned backpack ItemEntity UUID to the Core lifecycle authority and
+  transactional rollback when reverse-binding persistence fails.
+- Three isolated Java 25 Dedicated Server JVMs produced `seed.ok`,
+  `migrate.ok`, and `verify.ok`; the external Nexus authority retained the
+  reverse backpack binding through migration and the following restart.

@@ -51,7 +51,7 @@ Death capture must never recursively package a restricted portable container int
 
 ## Extensibility
 
-Provide tags or a small registry/predicate API so future Totem modules and addons can mark portable containers as restricted without depending on concrete DeadRecall implementation classes.
+Provide tags or a small registry/predicate API so future modules in the 圖靈騰 (Totem) series and addons can mark portable containers as restricted without depending on concrete DeadRecall implementation classes.
 
 ## User feedback
 

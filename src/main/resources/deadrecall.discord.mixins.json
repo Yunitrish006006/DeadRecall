@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.adaptor.deadrecall.mixin",
+  "plugin": "com.adaptor.deadrecall.mixin.DeadRecallDiscordMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BanPlayerCommandsMixin",

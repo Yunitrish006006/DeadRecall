@@ -43,7 +43,10 @@ public final class LegacyNexusMigrationProbe implements ModInitializer {
     private static final UUID OWNER = UUID.fromString("71a8a033-2494-4055-8de9-2b6dbb741000");
     private static final UUID FRIEND = UUID.fromString("0f8bca6d-6cb4-4ef0-b9b5-f1e5c3da1000");
     private static final UUID UNIT_ID = UUID.fromString("1f1e1100-6f6f-4a44-92ed-a061beefa001");
+    private static final UUID DEATH_UNIT_ID = UUID.fromString("1f1e1100-6f6f-4a44-92ed-a061beefa002");
+    private static final UUID DEATH_BACKPACK_ID = UUID.fromString("1f1e1100-6f6f-4a44-92ed-a061beefa003");
     private static final BlockPos ANCHOR_POS = new BlockPos(176, 96, 176);
+    private static final BlockPos DEATH_POS = new BlockPos(184, 72, 184);
     private static final String LEGACY_NAME = "Legacy Nexus Anchor";
     private static final String MIGRATED_NAME = "External Nexus Anchor";
 
@@ -93,6 +96,22 @@ public final class LegacyNexusMigrationProbe implements ModInitializer {
                 level.getGameTime(),
                 level.getGameTime()
         ));
+        records.put(DEATH_UNIT_ID, new SpaceUnitRecord(
+                DEATH_UNIT_ID,
+                SpaceUnitType.DEATH,
+                level.dimension(),
+                DEATH_POS,
+                OWNER,
+                "Legacy bound death node",
+                SpaceUnitVisibility.PRIVATE,
+                SpaceUnitStatus.ACTIVE,
+                Set.of(),
+                Set.of(),
+                SpaceStructureSnapshot.EMPTY,
+                level.getGameTime(),
+                level.getGameTime(),
+                Optional.of(DEATH_BACKPACK_ID)
+        ));
         units.setDirty();
 
         DeadRecallSpaceDiscoverySavedData discovery = server.overworld().getDataStorage()
@@ -100,6 +119,8 @@ public final class LegacyNexusMigrationProbe implements ModInitializer {
         require(discovery.markDiscovered(OWNER, UNIT_ID), "Could not seed legacy Nexus discovery");
         require(discovery.markDiscovered(FRIEND, UNIT_ID), "Could not seed legacy Nexus friend discovery");
         require(discovery.setFavorite(OWNER, UNIT_ID, true), "Could not seed legacy Nexus favorite");
+        require(discovery.markDiscovered(OWNER, DEATH_UNIT_ID),
+                "Could not seed legacy bound death-node discovery");
 
         DeadRecallFriendSavedData friends = server.overworld().getDataStorage()
                 .computeIfAbsent(DeadRecallFriendSavedData.TYPE);
@@ -148,6 +169,11 @@ public final class LegacyNexusMigrationProbe implements ModInitializer {
                 "External Nexus changed the legacy Space Unit type");
         require("ACTIVE".equals(String.valueOf(invoke(record, "status", new Class<?>[0]))),
                 "External Nexus changed the legacy Space Unit status");
+        Optional<?> deathNode = optional(invoke(units, "get", new Class<?>[]{UUID.class}, DEATH_UNIT_ID));
+        require(deathNode.isPresent(), "External Nexus lost the legacy bound death node");
+        Optional<?> backpackId = optional(invoke(deathNode.get(), "backpackId", new Class<?>[0]));
+        require(backpackId.isPresent() && DEATH_BACKPACK_ID.equals(backpackId.get()),
+                "External Nexus did not retain the death-node reverse backpack binding");
 
         Object discovery = externalData(server, "dev.totem.nexus.space.NexusSpaceDiscoverySavedData");
         require(Boolean.TRUE.equals(invoke(discovery, "hasDiscovered", new Class<?>[]{UUID.class, UUID.class}, OWNER, UNIT_ID)),
@@ -198,7 +224,7 @@ public final class LegacyNexusMigrationProbe implements ModInitializer {
         String version = FabricLoader.getInstance().getModContainer("totem-nexus")
                 .orElseThrow(() -> new IllegalStateException("Legacy Nexus migration probe requires TotemNexus"))
                 .getMetadata().getVersion().getFriendlyString();
-        require("0.1.4".equals(version), "Legacy Nexus migration probe requires pinned Nexus 0.1.4, found " + version);
+        require("0.2.0".equals(version), "Legacy Nexus migration probe requires candidate Nexus 0.2.0, found " + version);
         require(NexusCutover.usesExternalAuthority(), "DeadRecall retained its legacy Nexus authority");
     }
 
