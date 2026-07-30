@@ -45,10 +45,15 @@ collect_surface() {
     cd "${REPOSITORY_ROOT}"
 
     {
-        find src/main/resources/assets/deadrecall src/main/resources/data/deadrecall \
-            -type f \
-            ! -path 'src/main/resources/assets/deadrecall/lang/legacy_discord_zh_tw/*' \
-            | sed 's#^src/main/resources/#resource #'
+        for resource_root in \
+            src/main/resources/assets/deadrecall \
+            src/main/resources/data/deadrecall
+        do
+            [[ -d "${resource_root}" ]] || continue
+            find "${resource_root}" \
+                -type f \
+                ! -path 'src/main/resources/assets/deadrecall/lang/legacy_discord_zh_tw/*'
+        done | sed 's#^src/main/resources/#resource #'
 
         # processResources intentionally derives zh_cn byte-for-byte from the
         # maintained zh_tw source. Keep the generated compatibility path in
