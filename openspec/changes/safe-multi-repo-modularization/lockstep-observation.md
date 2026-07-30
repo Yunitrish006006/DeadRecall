@@ -502,3 +502,42 @@ As in the prior recorded diagnostic, the GameTest JVM completed the suite and
 then remained in `Saving chunks`; it was interrupted only after the successful
 test summary. The production nine-JAR assembled-surface guard passed with no
 duplicate resource and every module artifact retained its owned resources.
+
+## DeadRecall 2.4.4 local exact-graph qualification
+
+On 2026-07-31, all nine candidate production source trees were committed
+locally and rebuilt with Java 25. The current manifest now pins Core `0.2.0`,
+Remnant `0.1.4`, Discord Bridge `0.1.2`, Automata `0.1.6`, Alchemy `0.1.4`,
+Enchanting `0.1.1`, Vanilla Tweaks `0.1.3` and Nexus `0.2.0` to their exact
+source commits and production-JAR SHA-512 values. The previous DeadRecall
+`2.4.1` eight-module graph remains complete in the rollback section.
+
+Both graphs passed checksum-locked local assembly. The current graph also
+passed the compatibility-surface, module-resource, workflow-YAML and
+feature-dependency-boundary guards. The eight standalone module builds
+completed successfully, including Remnant 23/23, Automata 16/16, Nexus 26/26,
+Alchemy 6/6, Enchanting 3/3 and Vanilla Tweaks 13/13 required Fabric
+GameTests. The DeadRecall root build completed with 113/113 required GameTests.
+The single-file DeadRecall `2.4.4` nested-JAR distribution and the equivalent
+nine-JAR graph each reached `Done` on an isolated Dedicated Server and saved
+all dimensions normally.
+
+The Automata migration gate used a root-only seed JVM followed by two exact
+bundle JVMs. Automata `0.1.6` retained and changed the legacy Copper Golem
+sorting, gathering, inventory and target state, then reloaded the changed
+world. The independent `seed.ok`, `migrate.ok` and `verify.ok` markers were
+produced.
+
+The Nexus gate repeated the same three-JVM boundary with Nexus `0.2.0`. It
+loaded the four legacy `deadrecall` SavedData sets, retained the Space Unit,
+discovery and favorite state, friendship, distributed spawn, and Death Node
+reverse backpack binding, renamed the unit through the external authority,
+then verified every saved field after another restart. Its three success
+markers were also produced. Every exact-bundle phase reported one live
+initializer per Totem module and no duplicate compatibility resources.
+
+This evidence qualifies the content-addressed local graph. It does not close
+the Automata, Nexus or remaining-gameplay observation windows: the new commits
+are not yet remote-reachable, the exact-source GitHub Actions run has not yet
+passed, and no formal release observation has been recorded. The corresponding
+parent tasks therefore remain open.

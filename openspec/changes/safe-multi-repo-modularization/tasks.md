@@ -56,6 +56,7 @@
   - [x] 5.4.2 Activate Automata-owned item, menu, criterion, Payload, client-screen and Mixin registrations as one atomic path, while gating the matching legacy registrations when `totem-automata` is present.
   - [x] 5.4.3 Prove the assembled bundle has exactly one registration for every preserved identifier, payload receiver, event callback and Mixin, and pass standalone, bundle, legacy-world, restart and Dedicated Server gates.
   - [x] 5.4.4 Publish or stage an immutable Automata artifact, pin it in the exact-version bundle manifest, and retain the previous pin as the rollback target through the observation window.
+  - Local follow-on: Automata `0.1.6` passed the content-addressed `2.4.4` exact-graph and three-JVM migration gates; the parent remains open for remote CI and formal release observation.
 
 ## 6. TotemNexus repository
 
@@ -67,6 +68,7 @@
   - [x] 6.4.2 Activate Nexus-owned payload, client UI, interaction and Mixin registrations as one atomic path, while gating the matching legacy registrations when `totem-nexus` is present.
   - [x] 6.4.3 Prove the assembled bundle has exactly one registration for every preserved identifier, payload receiver, event callback and Mixin, and pass standalone, bundle, legacy-world, restart, multi-player and Dedicated Server gates.
   - [x] 6.4.4 Publish or stage an immutable Nexus artifact, pin it in the exact-version bundle manifest, and retain the previous pin as the rollback target through the observation window.
+  - Local follow-on: Nexus `0.2.0` passed the content-addressed `2.4.4` exact-graph and three-JVM legacy-SavedData gates; the parent remains open for remote CI and formal release observation.
 
 ## 7. Remaining gameplay and compatibility bundle
 
@@ -80,6 +82,7 @@
 - [ ] 7.5 Enable independent versions and Modrinth publishing for stable repositories.
   - [ ] 7.5.1 Complete the Automata and Nexus cutover gates and two-release observation windows before declaring either repository stable.
   - [ ] 7.5.2 Configure independent release/version metadata and Modrinth publication only for modules with completed observation windows.
+  - The local `2.4.4` graph is qualified, but its commits still require remote CI and formal release observation before either stability checkbox can close.
 - [x] 7.6 Approve the three remaining bounded-context repositories without moving their implementation into Core.
   - [x] 7.6.1 Assign Alchemy Cauldron gameplay and its resources to `TotemAlchemy`.
   - [x] 7.6.2 Assign enchanting-power behavior and its Mixins to `TotemEnchanting`.
@@ -92,3 +95,4 @@
   - [x] 7.7.4 Inventory and stage TotemEnchanting 0.1.0 with its atomic Mixin cutover; record exact-bundle evidence and retain its two-release observation window.
   - [x] 7.7.5 Inventory and stage TotemVanillaTweaks 0.1.0 with its atomic Mixin cutover; record exact-bundle evidence and retain its two-release observation window.
   - [x] 7.7.6 Move the preserved Stone-Bowl Flint recipe into TotemAlchemy 0.1.3; record Java 25 module and exact-bundle evidence while retaining its observation window.
+  - The local follow-on versions Alchemy `0.1.4`, Enchanting `0.1.1` and Vanilla Tweaks `0.1.3` passed the `2.4.4` exact graph; the parent remains open until remote/release observation evidence is recorded.
