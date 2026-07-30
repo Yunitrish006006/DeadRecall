@@ -16,7 +16,7 @@
       "version": "0.2.0",
       "repository": "TotemCore exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemCore.git",
-      "sourceCommit": "831ac1fd60f3c413549bd350924cd7fee3ce0c4c",
+      "sourceCommit": "a8bd13a640198ba857a02b10a92f90e6e9fb8883",
       "sha512": "83dd4eaa762b192b644806abc051d00faace7617fa773b28646591b3c7c6779b3cc54f8a3d6e968722ca642a3a4c9fec8f5f23d1bf36f403356aa9da6d69df60"
     },
     {
@@ -24,7 +24,7 @@
       "version": "0.1.4",
       "repository": "TotemRemnant exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemRemnant.git",
-      "sourceCommit": "0b9c2e77129bba3301e6d856cabc48fd2a96a78e",
+      "sourceCommit": "42ed2fe0407cb819435108cfdacd4eabd88fe5b1",
       "sha512": "7de0329ac40ab7edab5cc55b003b6d92a7c560cab11ad911d3d4e26ca8fce616cd90c4d09ea494940a14bca92829d15d88e46363405eb73bd6ac93bb31ccfe70"
     },
     {
@@ -32,7 +32,7 @@
       "version": "0.1.2",
       "repository": "TotemDiscordBridge exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemDiscordBridge.git",
-      "sourceCommit": "b716f83b368192734f8716d93d612466ec9db30b",
+      "sourceCommit": "7f62e11f0e0f521f9440338b9c98c956baca3a14",
       "sha512": "6d9942f3e4234a8248905179f34b684566bd7d2a59e49aabdddaebce56733149104b91c9707acb7e80917ec770f0eedf77ff2e37fc70a27d7e15bd5e20e30fd3"
     },
     {
@@ -40,7 +40,7 @@
       "version": "0.1.6",
       "repository": "TotemAutomata exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAutomata.git",
-      "sourceCommit": "7149bbc2cf7cdc7df6561ce279781c4313e3a22e",
+      "sourceCommit": "228dda212a682eb1388a6c0f5e4ffae4465dea3d",
       "sha512": "34f87f634660310253d33b01efd9a9c6dc5de1ccd7d1d0ee427152adb017949901b2b9a2a25416172e1e155ee7d83f3c5517e4a7435f9866851e7644a5c8a167"
     },
     {
@@ -48,7 +48,7 @@
       "version": "0.1.4",
       "repository": "TotemAlchemy exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAlchemy.git",
-      "sourceCommit": "43d472b632d69b220bb037b225a5eef543c07d56",
+      "sourceCommit": "9e40d0367dc5fba8ecbe96657981f8e11b55cedd",
       "sha512": "b26ca33a693e7ef722251dce72de153026f2930aa06874f229e7de80410c56de1af290fc0b94caeff459a25d253df098fdbd4dd443e5a1a29c13153303cc0c1c"
     },
     {
@@ -56,7 +56,7 @@
       "version": "0.1.1",
       "repository": "TotemEnchanting exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemEnchanting.git",
-      "sourceCommit": "30e9faa81862d2d4ecf0380e5762d7676d158459",
+      "sourceCommit": "baebddcce8727fada1925031c92db9bd99b8653a",
       "sha512": "164e2454680e84ecdbc157753fb63913b54f946af01b0c792e232a9b64ab6a598c2fe6e882e9bc82d7a66dd3eb9465e35421f58851787a23f98f39d7524843be"
     },
     {
@@ -64,7 +64,7 @@
       "version": "0.1.3",
       "repository": "TotemVanillaTweaks exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemVanillaTweaks.git",
-      "sourceCommit": "9a5775157dbd5a0036422d05a67ca1c74e6bc522",
+      "sourceCommit": "82a0a32a787084ca4b428a502a8c46b33fa96f19",
       "sha512": "1c53d4fc77473b0ea744982bc66f7dc42e20c09dddbe61f36863af5259bd834207d4f630a8e73845f08d48b3231e0e93b095017e78140dc82411a825d355ed93"
     },
     {
@@ -72,7 +72,7 @@
       "version": "0.2.0",
       "repository": "TotemNexus exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemNexus.git",
-      "sourceCommit": "2030c3e6bc3758efaeee57451ceaa8ecf2da0109",
+      "sourceCommit": "015deeb25b67af3010e2b133fb385ad61f1758c9",
       "sha512": "cedd17b3402a8235256dff298e40d1db4a456ec949bfb5a8031f97bf6fdf2f981067ffc988a5f9f233c2a1d14f2ae9fde9c3411046fea7352b5c69b7357d565a"
     }
   ],

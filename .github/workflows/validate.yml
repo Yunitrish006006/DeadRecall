@@ -83,7 +83,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemCore
-          ref: 831ac1fd60f3c413549bd350924cd7fee3ce0c4c
+          ref: a8bd13a640198ba857a02b10a92f90e6e9fb8883
           path: .lockstep/TotemCore
           persist-credentials: false
 
@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemRemnant
-          ref: 0b9c2e77129bba3301e6d856cabc48fd2a96a78e
+          ref: 42ed2fe0407cb819435108cfdacd4eabd88fe5b1
           path: .lockstep/TotemRemnant
           persist-credentials: false
 
@@ -99,7 +99,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemDiscordBridge
-          ref: b716f83b368192734f8716d93d612466ec9db30b
+          ref: 7f62e11f0e0f521f9440338b9c98c956baca3a14
           path: .lockstep/TotemDiscordBridge
           persist-credentials: false
 
@@ -107,7 +107,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemAutomata
-          ref: 7149bbc2cf7cdc7df6561ce279781c4313e3a22e
+          ref: 228dda212a682eb1388a6c0f5e4ffae4465dea3d
           path: .lockstep/TotemAutomata
           persist-credentials: false
 
@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemAlchemy
-          ref: 43d472b632d69b220bb037b225a5eef543c07d56
+          ref: 9e40d0367dc5fba8ecbe96657981f8e11b55cedd
           path: .lockstep/TotemAlchemy
           persist-credentials: false
 
@@ -123,7 +123,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemEnchanting
-          ref: 30e9faa81862d2d4ecf0380e5762d7676d158459
+          ref: baebddcce8727fada1925031c92db9bd99b8653a
           path: .lockstep/TotemEnchanting
           persist-credentials: false
 
@@ -131,7 +131,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemVanillaTweaks
-          ref: 9a5775157dbd5a0036422d05a67ca1c74e6bc522
+          ref: 82a0a32a787084ca4b428a502a8c46b33fa96f19
           path: .lockstep/TotemVanillaTweaks
           persist-credentials: false
 
@@ -139,7 +139,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemNexus
-          ref: 2030c3e6bc3758efaeee57451ceaa8ecf2da0109
+          ref: 015deeb25b67af3010e2b133fb385ad61f1758c9
           path: .lockstep/TotemNexus
           persist-credentials: false
 
