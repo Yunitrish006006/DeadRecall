@@ -3,64 +3,26 @@
   "id": "deadrecall",
   "version": "${version}",
   "name": "DeadRecall",
-  "description": "",
-  "authors": [],
-  "contact": {},
+  "description": "Exact-version Totem compatibility bundle and legacy item-ID migration host.",
   "license": "BSD-3-Clause",
   "icon": "assets/deadrecall/icon.png",
   "environment": "*",
   "entrypoints": {
-    "fabric-datagen": [
-      "com.adaptor.deadrecall.client.DeadrecallDataGenerator"
-    ],
-    "client": [
-      "com.adaptor.deadrecall.client.DeadrecallClient",
-      "com.adaptor.deadrecall.client.DeathNodeAdminClientInitializer"
-    ],
     "main": [
-      "com.adaptor.deadrecall.Deadrecall",
-      "com.adaptor.deadrecall.ContainerSafetyAdminInitializer",
-      "com.adaptor.deadrecall.DeathBackpackAddonIntegrationInitializer",
-      "com.adaptor.deadrecall.DeathNodeAdminInitializer",
-      "com.adaptor.deadrecall.space.SpaceUnitRefreshNetworking"
+      "com.adaptor.deadrecall.Deadrecall"
     ]
   },
-  "mixins": [
-    "deadrecall.discord.mixins.json",
-    "deadrecall.remnant.mixins.json",
-    "deadrecall.automata.mixins.json",
-    "deadrecall.alchemy.mixins.json",
-    "deadrecall.enchanting.mixins.json",
-    "deadrecall.vanilla-tweaks.mixins.json",
-    "deadrecall.nexus.mixins.json",
-    "deadrecall.legacy.mixins.json",
-    {
-      "config": "deadrecall.discord.client.mixins.json",
-      "environment": "client"
-    },
-    {
-      "config": "deadrecall.legacy.client.mixins.json",
-      "environment": "client"
-    },
-    {
-      "config": "deadrecall.automata.client.mixins.json",
-      "environment": "client"
-    },
-    {
-      "config": "deadrecall.remnant.client.mixins.json",
-      "environment": "client"
-    },
-    {
-      "config": "deadrecall.nexus.client.mixins.json",
-      "environment": "client"
-    }
-  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
-    "minecraft": "${minecraft_version}"
-  },
-  "suggests": {
-    "trinkets_updated": ">=4.1.0-beta.2"
+    "minecraft": "${minecraft_version}",
+    "totem-core": "=0.4.0",
+    "totem-remnant": "=0.1.7",
+    "totem-discord-bridge": "=0.1.4",
+    "totem-automata": "=0.1.9",
+    "totem-alchemy": "=0.1.7",
+    "totem-enchanting": "=0.1.3",
+    "totem-vanilla-tweaks": "=0.1.5",
+    "totem-nexus": "=0.2.2"
   }
 }
