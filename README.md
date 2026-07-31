@@ -2,11 +2,11 @@
 
 DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合包。單一 JAR
 整合可升級背包與死亡保護、銅魁儡分類／採集、Totem Nexus 傳送、
-雕紋書櫃附魔、生存煉金、Discord Bridge、容器整理與跨維度 `/back`。
+雕紋書櫃附魔、生存煉金、Discord Bridge 與容器整理。
 
-目前版本為 **2.4.5**。此版本讓一般背包可染色，並為 Remnant、Automata
-與 Alchemy 自訂物品加入 canonical ID 與舊世界相容遷移。詳細內容見
-[2.4.5 變更清單](docs/releases/2.4.5.md)。
+目前候選版本為 **2.4.6**。此版本以「上一次成功使用的 Nexus 傳送介面」
+取代 `/back`，並讓 Discord Bridge 直接讀取原版與其他模組的語言資源。
+詳細內容見 [2.4.6 變更清單](docs/releases/2.4.6.md)。
 
 ## 安裝
 
@@ -15,11 +15,11 @@ DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合包。單一 JA
 1. 安裝 Java 25。
 2. 建立 Minecraft 26.2 的 Fabric Loader 0.19.3+ 遊戲實例。
 3. 將 Fabric API `0.154.2+26.2` 放入 `mods/`。
-4. 將 DeadRecall 2.4.5 的單一發佈 JAR 放入 `mods/`。
+4. 將 DeadRecall 2.4.6 的單一發佈 JAR 放入 `mods/`。
 5. Client 與 Server 使用相同版本；啟動後確認 log 同時載入八個
    `totem-*` 模組。
 
-> DeadRecall 2.4.5 已內含 TotemCore、Remnant、Automata、Nexus、
+> DeadRecall 2.4.6 已內含 TotemCore、Remnant、Automata、Nexus、
 > Discord Bridge、Alchemy、Enchanting 與 Vanilla Tweaks。不要再把
 > 這些模組的獨立 JAR 放入同一個 `mods/`，否則 Fabric 會偵測到重複
 > mod ID。
@@ -30,16 +30,16 @@ DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合包。單一 JA
 
 | 模組 | 功能 | Repository |
 | --- | --- | --- |
-| TotemCore `0.2.0` | 所有功能模組共用的 API | [TotemCore](https://github.com/Yunitrish006006/TotemCore) |
-| TotemRemnant `0.1.5` | 背包、死亡背包、容器安全 | [TotemRemnant](https://github.com/Yunitrish006006/TotemRemnant) |
-| TotemAutomata `0.1.7` | 銅魁儡分類與採集 | [TotemAutomata](https://github.com/Yunitrish006006/TotemAutomata) |
-| TotemNexus `0.2.0` | Space Unit、好友與傳送 | [TotemNexus](https://github.com/Yunitrish006006/TotemNexus) |
-| TotemDiscordBridge `0.1.2` | Minecraft ↔ Discord | [TotemDiscordBridge](https://github.com/Yunitrish006006/TotemDiscordBridge) |
-| TotemAlchemy `0.1.5` | 生存煉金與煉藥鍋 | [TotemAlchemy](https://github.com/Yunitrish006006/TotemAlchemy) |
-| TotemEnchanting `0.1.1` | 雕紋書櫃附魔力 | [TotemEnchanting](https://github.com/Yunitrish006006/TotemEnchanting) |
-| TotemVanillaTweaks `0.1.3` | 整理、配方與原版調整 | [TotemVanillaTweaks](https://github.com/Yunitrish006006/TotemVanillaTweaks) |
+| TotemCore `0.3.0` | 所有功能模組共用的 API | [TotemCore](https://github.com/Yunitrish006006/TotemCore) |
+| TotemRemnant `0.1.6` | 背包、死亡背包、容器安全 | [TotemRemnant](https://github.com/Yunitrish006006/TotemRemnant) |
+| TotemAutomata `0.1.8` | 銅魁儡分類與採集 | [TotemAutomata](https://github.com/Yunitrish006006/TotemAutomata) |
+| TotemNexus `0.2.1` | Space Unit、好友與傳送 | [TotemNexus](https://github.com/Yunitrish006006/TotemNexus) |
+| TotemDiscordBridge `0.1.3` | Minecraft ↔ Discord | [TotemDiscordBridge](https://github.com/Yunitrish006006/TotemDiscordBridge) |
+| TotemAlchemy `0.1.6` | 生存煉金與煉藥鍋 | [TotemAlchemy](https://github.com/Yunitrish006006/TotemAlchemy) |
+| TotemEnchanting `0.1.2` | 雕紋書櫃附魔力 | [TotemEnchanting](https://github.com/Yunitrish006006/TotemEnchanting) |
+| TotemVanillaTweaks `0.1.4` | 整理、配方與原版調整 | [TotemVanillaTweaks](https://github.com/Yunitrish006006/TotemVanillaTweaks) |
 
-每個功能模組都要求 `totem-core =0.2.0` 與 Fabric API。不要混用其他
+每個功能模組都要求 `totem-core =0.3.0` 與 Fabric API。不要混用其他
 候選版本；完整精確組合記錄於
 [lockstep manifest](openspec/changes/safe-multi-repo-modularization/lockstep-manifest.json)。
 
@@ -48,7 +48,7 @@ DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合包。單一 JA
 | 想做的事 | 操作 |
 | --- | --- |
 | 使用一般背包 | 右鍵開啟；可升級為 9／18／27／36 格，並在工作台用原版染料染色 |
-| 找回死亡物品 | 前往紅色光柱處打開死亡背包，或使用一次性的 `/back` |
+| 找回死亡物品 | 前往紅色光柱；曾成功使用 Nexus 傳送時，靈魂綁定介面會留在重生物品欄 |
 | 管理銅魁儡 | 合成銅扳手，右鍵銅魁儡選取並開啟 GUI |
 | 設定分類 | 綁定來源銅箱、加入目的地、放入燃料後啟動 |
 | 設定採集 | 設定 Home、兩個角點、採集目標、工具與燃料後啟動 |
@@ -69,7 +69,8 @@ DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合包。單一 JA
 - 新合成的銅扳手使用 `totem:automata/copper_wrench`，八個煉金物品使用
   `totem:alchemy/*`；對應 `deadrecall:*` ID 繼續可讀。扳手互動、煉金
   recipes 與 cauldron 流程會接受舊物品並安全轉成 canonical 結果。
-- `/back` 跨維度返回最近一次死亡位置，成功後清除紀錄。
+- 上次成功完成 Nexus 傳送時使用的介面物品會成為唯一靈魂綁定；Remnant
+  在死亡時保留一個，重生後仍可依正常成本與安全規則傳送。
 - 銅扳手管理銅魁儡分類、採集、燃料、工具、快取與選配 LLM 判斷。
 - Totem Nexus 磁石 Space Unit、好友、地圖、成本報價與安全傳送
   session。
@@ -77,6 +78,8 @@ DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合包。單一 JA
 - 豬糞、木灰、硝石、缽、熱可可與櫻花釀等資料驅動煉金內容。
 - Minecraft 聊天、玩家動態、管理稽核、公開事件與伺服器狀態轉送
   Discord。
+- Remnant 與 Nexus 透過 TotemCore event bus 發布跨模組事件，Discord
+  Bridge 自行訂閱；整合包不再安裝功能專屬的反射 listener。
 - 原版容器整理、講台配方、混凝土粉末硬化、漏斗熔爐經驗與書櫃
   生存規則。
 
@@ -98,7 +101,7 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 
 | 項目 | 內容 |
 | --- | --- |
-| 版本 | 2.4.5 |
+| 版本 | 2.4.6 |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3+ |
 | Fabric API | 0.154.2+26.2 |
@@ -114,7 +117,7 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 | 發佈 | [Release Notes](docs/releases/README.md) |
 | 玩家 | [模組概覽](docs/overview.md) |
 | 玩家 | [背包系統](docs/backpacks/README.md) |
-| 玩家 | [死亡背包與 `/back`](docs/backpacks/death-backpack.md) |
+| 玩家 | [死亡背包與靈魂綁定傳送物品](docs/backpacks/death-backpack.md) |
 | 玩家 | [銅魁儡指南](docs/copper-golem/README.md) |
 | 玩家 | [圖靈騰樞紐（Totem Nexus）／Space Unit](docs/nexus/README.md) |
 | 玩家 | [附魔台與雕紋書櫃](docs/enchanting/README.md) |
@@ -139,7 +142,7 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 ./gradlew build -PbundleModuleDirectory=/path/to/standalone-modules
 ```
 
-輸出為 `build/libs/deadrecall-2.4.5-bundled.jar`。輸入目錄必須是同一份
+輸出為 `build/libs/deadrecall-2.4.6-bundled.jar`。輸入目錄必須是同一份
 lockstep manifest 驗證過的八個 JAR。
 
 ## 文件分工

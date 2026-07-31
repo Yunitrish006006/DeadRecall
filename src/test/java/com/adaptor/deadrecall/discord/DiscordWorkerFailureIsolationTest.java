@@ -10,6 +10,8 @@ import org.junit.jupiter.api.io.TempDir;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -56,7 +58,11 @@ class DiscordWorkerFailureIsolationTest {
         });
         worker.start();
 
+        Map<String, String> previous = DiscordLocalizationService.snapshotForTesting();
+        Map<String, String> downloadedVanillaFixture = new LinkedHashMap<>(previous);
+        downloadedVanillaFixture.put("death.attack.generic", "%1$s 死亡");
         try {
+            DiscordLocalizationService.replaceSnapshotForTesting(downloadedVanillaFixture);
             DiscordBridge.init(tempDir);
             DiscordBridge.updateConfig(
                     true,
@@ -71,6 +77,7 @@ class DiscordWorkerFailureIsolationTest {
             assertTrue(requestReceived.await(5, TimeUnit.SECONDS), "Worker did not receive the localized event");
             assertTrue(requestBody.get().contains("Alex 死亡"), requestBody.get());
         } finally {
+            DiscordLocalizationService.replaceSnapshotForTesting(previous);
             DiscordBridge.updateConfig(false, "", "");
             worker.stop(0);
         }

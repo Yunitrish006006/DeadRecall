@@ -124,12 +124,6 @@ resource assets/deadrecall/items/saltpeter.json
 resource assets/deadrecall/items/stone_bowl.json
 resource assets/deadrecall/items/sulfur_bowl.json
 resource assets/deadrecall/items/wood_ash.json
-resource assets/deadrecall/lang/discord_zh_tw/adventure.json
-resource assets/deadrecall/lang/discord_zh_tw/end.json
-resource assets/deadrecall/lang/discord_zh_tw/events.json
-resource assets/deadrecall/lang/discord_zh_tw/husbandry.json
-resource assets/deadrecall/lang/discord_zh_tw/nether.json
-resource assets/deadrecall/lang/discord_zh_tw/story.json
 resource assets/deadrecall/lang/discord_zh_tw/system.json
 resource assets/deadrecall/lang/en_us.json
 resource assets/deadrecall/lang/zh_cn.json

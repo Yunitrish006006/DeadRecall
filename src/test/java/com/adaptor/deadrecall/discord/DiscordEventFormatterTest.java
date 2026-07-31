@@ -1,9 +1,12 @@
 package com.adaptor.deadrecall.discord;
 
 import net.minecraft.network.chat.Component;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,8 +20,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class DiscordEventFormatterTest {
+    private static Map<String, String> originalTranslations;
+
+    @BeforeAll
+    static void installDownloadedVanillaLanguageFixture() {
+        originalTranslations = DiscordLocalizationService.snapshotForTesting();
+        Map<String, String> fixture = new LinkedHashMap<>(originalTranslations);
+        fixture.putAll(Map.of(
+                "advancements.story.mine_stone.title", "石器時代",
+                "advancements.story.mine_diamond.title", "鑽石！",
+                "death.attack.mob.item", "%1$s 被 %2$s 用 %3$s 殺死",
+                "death.attack.generic", "%1$s 死亡",
+                "entity.minecraft.zombie", "殭屍"
+        ));
+        DiscordLocalizationService.replaceSnapshotForTesting(fixture);
+    }
+
+    @AfterAll
+    static void restoreTranslations() {
+        DiscordLocalizationService.replaceSnapshotForTesting(originalTranslations);
+    }
+
     @Test
-    void rendersVanillaAdvancementTitleInTraditionalChinese() {
+    void rendersVanillaAdvancementTitleFromDownloadedLanguageTable() {
         assertEquals(
                 "Alex 完成了進度「石器時代」",
                 DiscordEventFormatter.advancementMessage(
@@ -35,6 +59,35 @@ class DiscordEventFormatterTest {
         assertEquals("Alex 完成了進度「鑽石！」", DiscordEventFormatter.advancementMessage("Alex", title, "task"));
         assertEquals("Alex 完成了目標「鑽石！」", DiscordEventFormatter.advancementMessage("Alex", title, "goal"));
         assertEquals("Alex 完成了挑戰「鑽石！」", DiscordEventFormatter.advancementMessage("Alex", title, "challenge"));
+    }
+
+    @Test
+    void missingAdvancementTranslationUsesComponentFallbackBeforeUnknownLabel() {
+        assertEquals(
+                "Alex 完成了挑戰「Sky High」",
+                DiscordEventFormatter.advancementMessage(
+                        "Alex",
+                        "example:quests/sky_high",
+                        Component.translatableWithFallback(
+                                "advancements.example.sky_high.title",
+                                "Sky High"
+                        ),
+                        "challenge"
+                )
+        );
+    }
+
+    @Test
+    void missingAdvancementTranslationUsesReadableIdWhenNoFallbackExists() {
+        assertEquals(
+                "Alex 完成了進度「Sky High」",
+                DiscordEventFormatter.advancementMessage(
+                        "Alex",
+                        "example:quests/sky_high",
+                        Component.translatable("advancements.example.sky_high.title"),
+                        "task"
+                )
+        );
     }
 
     @Test
@@ -123,6 +176,24 @@ class DiscordEventFormatterTest {
                 "advancement",
                 "Alex",
                 "Alex 完成了進度「石器時代」"
+        )), captured);
+    }
+
+    @Test
+    void advancementNotificationCarriesIdIntoReadableFallback() throws Exception {
+        List<DiscordEventPayload> captured = new ArrayList<>();
+        try (AutoCloseable ignored = DiscordEventDispatcher.observeForTesting(captured::add)) {
+            DiscordEventNotifications.advancement(
+                    "Alex",
+                    "example:quests/sky_high",
+                    Component.translatable("advancements.example.sky_high.title"),
+                    "task"
+            );
+        }
+        assertEquals(List.of(new DiscordEventPayload(
+                "advancement",
+                "Alex",
+                "Alex 完成了進度「Sky High」"
         )), captured);
     }
 

@@ -18,7 +18,8 @@ API Key 不一致。重新設定 `MC_API_KEY`，並同步更新伺服器設定�
 
 ## 指令沒有權限
 
-`/discordbridgeui` 與所有設定指令需要 OP 權限。一般玩家只能使用 `/back`。
+`/discordbridgeui` 與所有 Discord 設定指令都需要 OP 權限；一般玩家沒有
+Discord Bridge 管理指令。
 
 ## 多頻道未生效
 

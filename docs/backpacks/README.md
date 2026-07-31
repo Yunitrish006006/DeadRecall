@@ -5,7 +5,7 @@ DeadRecall 提供四級一般背包，以及獨立的死亡背包與整理功能
 ## 文件
 
 - [背包等級與防護](tiers.md)
-- [死亡背包與 `/back`](death-backpack.md)
+- [死亡背包與靈魂綁定傳送物品](death-backpack.md)
 - [可攜式容器安全規則](container-safety.md)
 - [整理功能](sorting.md)
 

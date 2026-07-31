@@ -5,17 +5,21 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MinecraftZhTwLanguageClasspathProbeTest {
     private static final String SYSTEM_TABLE = "/assets/deadrecall/lang/legacy_discord_zh_tw/system.json";
 
     @Test
-    void deadRecallProvidesDedicatedServerTranslationSnapshot() throws Exception {
+    void deadRecallBundlesOnlyItsSystemTranslationTable() throws Exception {
         try (InputStream stream = DiscordLocalizationService.class.getResourceAsStream(SYSTEM_TABLE)) {
             assertNotNull(stream, "Missing bundled Discord zh_tw translation table");
         }
-        assertTrue(DiscordLocalizationService.translationCount() >= 140,
-                "Discord zh_tw snapshot does not cover the expected Minecraft 26.2 event subset");
+        assertNull(DiscordLocalizationService.class.getResourceAsStream(
+                "/assets/deadrecall/lang/legacy_discord_zh_tw/events.json"
+        ));
+        assertTrue(DiscordLocalizationService.translationCount() >= 30,
+                "Discord Bridge system translation table is incomplete");
     }
 }

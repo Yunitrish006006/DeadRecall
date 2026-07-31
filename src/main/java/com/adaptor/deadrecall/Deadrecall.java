@@ -4,8 +4,6 @@ import com.adaptor.deadrecall.bootstrap.DeadRecallServerBootstrap;
 import com.adaptor.deadrecall.bootstrap.TotemDiscordBridgeBootstrap;
 import com.adaptor.deadrecall.bootstrap.VanillaTweaksCutover;
 import com.adaptor.deadrecall.network.registration.DeadRecallPayloadRegistration;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -14,16 +12,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.ChatFormatting;
-import net.minecraft.commands.Commands;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -62,9 +53,6 @@ public class Deadrecall implements ModInitializer {
             if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
                 TotemDiscordBridgeBootstrap.onEntityDeath(entity, damageSource.getEntity());
             }
-            if (entity instanceof ServerPlayer player) {
-                DeathLocationManager.setDeathLocation(player, player.blockPosition(), player.level());
-            }
         });
 
         // Discord owns its chat, lifecycle and health hooks through TotemDiscordBridgeBootstrap.
@@ -87,29 +75,7 @@ public class Deadrecall implements ModInitializer {
             });
         }
 
-        // 註冊 /back 指令
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            dispatcher.register(Commands.literal("back")
-                .executes(context -> {
-                    ServerPlayer player = context.getSource().getPlayerOrException();
-                    DeathLocationManager.DeathLocation loc = DeathLocationManager.getDeathLocation(player);
-                    if (loc == null) {
-                        player.sendSystemMessage(Component.translatable("message.deadrecall.back.no_position").withStyle(ChatFormatting.RED));
-                        return 0;
-                    }
-
-                    ServerLevel world = context.getSource().getServer().getLevel(loc.dimension);
-                    if (world == null) {
-                        player.sendSystemMessage(Component.translatable("message.deadrecall.back.no_world").withStyle(ChatFormatting.RED));
-                        return 0;
-                    }
-                    player.teleportTo(world, loc.pos.getX() + 0.5, loc.pos.getY(), loc.pos.getZ() + 0.5, Relative.DELTA, player.getYRot(), player.getXRot(), false);
-                    player.sendSystemMessage(Component.translatable("message.deadrecall.back.success").withStyle(ChatFormatting.GREEN));
-                    DeathLocationManager.clearDeathLocation(player);
-                    return 1;
-                })
-            );
-
             if (!FabricLoader.getInstance().isModLoaded("totem-discord-bridge")) {
                 TotemDiscordBridgeBootstrap.registerCommands(dispatcher);
             }

@@ -6,7 +6,6 @@
 | --- | --- |
 | `Deadrecall.java` | 模組入口、註冊、事件、Payload 與指令 |
 | `DiscordBridge.java` | Discord Bridge HTTP 傳輸 |
-| `DeathLocationManager.java` | 玩家死亡維度與座標管理 |
 | `alchemy/` | 投料、煉藥鍋與豬糞流程 |
 | `block/` | 自訂方塊、煉藥鍋與 Block Entity |
 | `entity/ai/` | 豬在成功餵食後延遲產生、逐層堆疊豬糞的 AI |

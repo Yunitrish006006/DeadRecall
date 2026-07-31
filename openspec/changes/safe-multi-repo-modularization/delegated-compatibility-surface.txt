@@ -3,12 +3,6 @@
 # assembled bundle, not against DeadRecall's source JAR.
 identifier deadrecall:item/copper_wrench
 resource assets/deadrecall/items/copper_wrench.json
-resource assets/deadrecall/lang/discord_zh_tw/adventure.json
-resource assets/deadrecall/lang/discord_zh_tw/end.json
-resource assets/deadrecall/lang/discord_zh_tw/events.json
-resource assets/deadrecall/lang/discord_zh_tw/husbandry.json
-resource assets/deadrecall/lang/discord_zh_tw/nether.json
-resource assets/deadrecall/lang/discord_zh_tw/story.json
 resource assets/deadrecall/lang/discord_zh_tw/system.json
 resource assets/deadrecall/models/item/copper_wrench.json
 resource assets/deadrecall/textures/item/copper_wrench.png
