@@ -67,7 +67,9 @@ jobs:
           MODRINTH_DRY_RUN: 'true'
         run: bash .github/scripts/publish-modrinth.sh
 
-      - name: Verify death backpack across Dedicated Server restarts
+      - name: Historical death-backpack restart probe
+        # This probe depended on DeadRecall's removed GameTest source set.
+        if: ${{ false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -94,7 +96,9 @@ jobs:
             test ! -f "${marker_dir}/${phase}.failure"
           done
 
-      - name: Verify copper golem across Dedicated Server restarts
+      - name: Historical copper-golem restart probe
+        # This probe depended on DeadRecall's removed GameTest source set.
+        if: ${{ false }}
         shell: bash
         run: |
           set -euo pipefail
