@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "migrations": [
+    {
+      "legacy": "deadrecall:backpack_basic",
+      "canonical": "totem:remnant/backpack_basic"
+    },
+    {
+      "legacy": "deadrecall:backpack_standard",
+      "canonical": "totem:remnant/backpack_standard"
+    },
+    {
+      "legacy": "deadrecall:backpack_advanced",
+      "canonical": "totem:remnant/backpack_advanced"
+    },
+    {
+      "legacy": "deadrecall:backpack_netherite",
+      "canonical": "totem:remnant/backpack_netherite"
+    },
+    {
+      "legacy": "deadrecall:death_backpack",
+      "canonical": "totem:remnant/death_backpack"
+    },
+    {
+      "legacy": "deadrecall:copper_wrench",
+      "canonical": "totem:automata/copper_wrench"
+    },
+    {
+      "legacy": "deadrecall:saltpeter",
+      "canonical": "totem:alchemy/saltpeter"
+    },
+    {
+      "legacy": "deadrecall:pig_manure",
+      "canonical": "totem:alchemy/pig_manure"
+    },
+    {
+      "legacy": "deadrecall:wood_ash",
+      "canonical": "totem:alchemy/wood_ash"
+    },
+    {
+      "legacy": "deadrecall:cocoa_powder",
+      "canonical": "totem:alchemy/cocoa_powder"
+    },
+    {
+      "legacy": "deadrecall:hot_cocoa",
+      "canonical": "totem:alchemy/hot_cocoa"
+    },
+    {
+      "legacy": "deadrecall:cherry_brew",
+      "canonical": "totem:alchemy/cherry_brew"
+    },
+    {
+      "legacy": "deadrecall:stone_bowl",
+      "canonical": "totem:alchemy/stone_bowl"
+    },
+    {
+      "legacy": "deadrecall:sulfur_bowl",
+      "canonical": "totem:alchemy/sulfur_bowl"
+    }
+  ]
+}

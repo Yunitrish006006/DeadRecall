@@ -28,6 +28,7 @@ identifier deadrecall:copper_golem_visualization
 identifier deadrecall:copper_wrench
 identifier deadrecall:copper_wrench_bindings
 identifier deadrecall:dead_recall_distributed_spawning
+identifier deadrecall:death_backpack
 identifier deadrecall:death_node_admin
 identifier deadrecall:discord_config_sync
 identifier deadrecall:discord_zh_tw
@@ -124,12 +125,6 @@ resource assets/deadrecall/items/saltpeter.json
 resource assets/deadrecall/items/stone_bowl.json
 resource assets/deadrecall/items/sulfur_bowl.json
 resource assets/deadrecall/items/wood_ash.json
-resource assets/deadrecall/lang/discord_zh_tw/adventure.json
-resource assets/deadrecall/lang/discord_zh_tw/end.json
-resource assets/deadrecall/lang/discord_zh_tw/events.json
-resource assets/deadrecall/lang/discord_zh_tw/husbandry.json
-resource assets/deadrecall/lang/discord_zh_tw/nether.json
-resource assets/deadrecall/lang/discord_zh_tw/story.json
 resource assets/deadrecall/lang/discord_zh_tw/system.json
 resource assets/deadrecall/lang/en_us.json
 resource assets/deadrecall/lang/zh_cn.json
@@ -179,6 +174,7 @@ resource data/deadrecall/deadrecall/cauldron_recipes/cherry_brew.json
 resource data/deadrecall/deadrecall/cauldron_recipes/hot_cocoa.json
 resource data/deadrecall/deadrecall/cauldron_recipes/saltpeter.json
 resource data/deadrecall/deadrecall/space_unit_degradation/vanilla.json
+resource data/deadrecall/migration/item_ids.json
 resource data/deadrecall/recipe/backpack_advanced_smithing.json
 resource data/deadrecall/recipe/backpack_basic.json
 resource data/deadrecall/recipe/backpack_netherite_smithing.json

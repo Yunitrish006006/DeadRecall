@@ -9,7 +9,7 @@
 - [Gameplay Quality of Life](gameplay-qol.md)
 - [背包系統](backpacks/README.md)
   - [背包等級與防護](backpacks/tiers.md)
-  - [死亡背包與 `/back`](backpacks/death-backpack.md)
+  - [死亡背包與靈魂綁定傳送物品](backpacks/death-backpack.md)
   - [整理功能](backpacks/sorting.md)
 - [銅魁儡使用指南](copper-golem/README.md)
   - [管理 GUI](copper-golem/gui.md)

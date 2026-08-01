@@ -7,8 +7,17 @@ public final class DiscordEventFormatter {
     }
 
     public static String advancementMessage(String playerName, Component title, String frameType) {
+        return advancementMessage(playerName, "", title, frameType);
+    }
+
+    public static String advancementMessage(
+            String playerName,
+            String advancementId,
+            Component title,
+            String frameType
+    ) {
         String name = normalize(playerName);
-        String localizedTitle = DiscordLocalizationService.render(title);
+        String localizedTitle = DiscordLocalizationService.renderAdvancementTitle(title, advancementId);
         if (localizedTitle.isEmpty()) {
             localizedTitle = DiscordLocalizationService.translate("discord.deadrecall.advancement.unknown");
         }

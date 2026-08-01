@@ -1,21 +1,28 @@
 # Next lockstep candidate
 
-Status: GitHub release promoted. The content-addressed graph is remotely
-reachable and the exact-source Build and Validate workflows passed.
+Status: DeadRecall 2.4.6 candidate graph; not yet promoted as a GitHub release.
 
-| Repository | Released version | Previous immutable version | Reason |
+| Repository | Candidate version | Previous immutable version | Reason |
 | --- | --- | --- | --- |
-| DeadRecall | `2.4.5` | `2.4.4` | Backpack dyeing and reversible custom-item ID migration |
-| TotemCore | `0.2.0` | `0.1.2` | Backwards-compatible public lifecycle API addition |
-| TotemRemnant | `0.1.5` | `0.1.4` | Dyeable backpacks and canonical Remnant item IDs |
-| TotemNexus | `0.2.0` | `0.1.4` | Persisted reverse binding, diagnostics and authority coverage |
-| TotemAutomata | `0.1.7` | `0.1.6` | Canonical copper-wrench ID with legacy migration |
-| TotemAlchemy | `0.1.5` | `0.1.4` | Canonical Alchemy item IDs with legacy recipe and cauldron bridges |
-| TotemEnchanting | `0.1.1` | `0.1.0` | Candidate ownership/resource fixes |
-| TotemVanillaTweaks | `0.1.3` | `0.1.0` | Survival and generated-structure bookshelf rules |
-| TotemDiscordBridge | `0.1.2` | `0.1.1` | Candidate compatibility/resource fixes |
+| DeadRecall | `2.4.6` | `2.4.5` | Soulbound teleport interface, event extraction and dynamic Discord localization |
+| TotemCore | `0.3.0` | `0.2.0` | Backwards-compatible typed event bus and death-retained item policy |
+| TotemRemnant | `0.1.6` | `0.1.5` | Persistent exactly-once soulbound death-item retention |
+| TotemNexus | `0.2.1` | `0.2.0` | Last-successful teleport-interface token and typed event publishing |
+| TotemAutomata | `0.1.8` | `0.1.7` | Exact TotemCore 0.3.0 compatibility pin |
+| TotemAlchemy | `0.1.6` | `0.1.5` | Exact TotemCore 0.3.0 compatibility pin |
+| TotemEnchanting | `0.1.2` | `0.1.1` | Exact TotemCore 0.3.0 compatibility pin |
+| TotemVanillaTweaks | `0.1.4` | `0.1.3` | Exact TotemCore 0.3.0 compatibility pin |
+| TotemDiscordBridge | `0.1.3` | `0.1.2` | Installed-mod languages, Mojang zh_tw cache and typed event subscribers |
 
-All nine candidate production source trees now have intentional local commits.
+The 2.4.6 manifest records all eight exact module source commits and Java 25
+production-JAR SHA-512 values. Every feature module declares the exact runtime
+dependency `totem-core =0.3.0`; the complete `2.4.1` rollback graph remains
+unchanged.
+
+## Previous 2.4.5 promotion record
+
+The 2.4.5 graph was promoted as a GitHub release. All nine production source
+trees had intentional commits.
 `lockstep-manifest.json` records the eight exact module source commits and
 Java 25 production-JAR SHA-512 values as the current graph, while retaining
 the complete `2.4.1` graph as rollback. `validate.yml` checks out those exact

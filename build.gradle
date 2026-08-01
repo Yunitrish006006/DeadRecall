@@ -10,21 +10,20 @@ base {
     archivesName = project.archives_base_name
 }
 
-// Supplying -PbundleModuleDirectory=<directory> builds a single distributable
-// with the verified standalone Totem modules as Fabric nested JARs. Normal
-// development builds stay thin so each repository can still be tested alone.
+def totemCoreJar = file(providers.gradleProperty("totemCoreJar")
+        .getOrElse("../workspace/TotemCore/build/libs/totem-core-0.4.0.jar"))
 def bundleModuleDirectory = providers.gradleProperty("bundleModuleDirectory")
         .map { path -> file(path) }
         .orNull
 def bundledModuleNames = [
-        "totem-core-0.2.0.jar",
-        "totem-remnant-0.1.5.jar",
-        "totem-discord-bridge-0.1.2.jar",
-        "totem-automata-0.1.7.jar",
-        "totem-alchemy-0.1.5.jar",
-        "totem-enchanting-0.1.1.jar",
-        "totem-vanilla-tweaks-0.1.3.jar",
-        "totem-nexus-0.2.0.jar"
+        "totem-core-0.4.0.jar",
+        "totem-remnant-0.1.7.jar",
+        "totem-discord-bridge-0.1.4.jar",
+        "totem-automata-0.1.9.jar",
+        "totem-alchemy-0.1.7.jar",
+        "totem-enchanting-0.1.3.jar",
+        "totem-vanilla-tweaks-0.1.5.jar",
+        "totem-nexus-0.2.2.jar"
 ]
 def bundledModuleFiles = bundleModuleDirectory == null
         ? []
@@ -40,289 +39,135 @@ if (bundleModuleDirectory != null) {
     }
 }
 
-loom {
-    splitEnvironmentSourceSets()
+sourceSets {
+    main {
+        java {
+            setSrcDirs(["src/main/java"])
+            include "com/adaptor/deadrecall/Deadrecall.java"
+            include "com/adaptor/deadrecall/migration/**"
+        }
+        resources {
+            setSrcDirs(["src/main/resources"])
+            include "fabric.mod.json"
+            include "assets/deadrecall/icon.png"
+            include "data/deadrecall/migration/item_ids.json"
+        }
+    }
+    test {
+        java.setSrcDirs(["src/thinTest/java"])
+        resources.setSrcDirs(["src/thinTest/resources"])
+    }
+}
 
+loom {
     mods {
         "deadrecall" {
             sourceSet sourceSets.main
-            sourceSet sourceSets.client
-        }
-    }
-
-    runs {
-        client {
-            client()
-            setConfigName("Minecraft Client")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-        server {
-            server()
-            setConfigName("Minecraft Server")
-            ideConfigGenerated(true)
-            runDir("run")
-        }
-    }
-}
-
-fabricApi {
-    configureDataGeneration {
-        client = true
-    }
-
-    configureTests {
-        createSourceSet = true
-        modId = "deadrecall-gametest"
-        enableGameTests = true
-        enableClientGameTests = false
-        eula = true
-    }
-}
-
-// Keep the normal suite unchanged, while allowing a single GameTest to be
-// selected when diagnosing a failure. Fabric API reads this from the game JVM,
-// so a Gradle -D property alone is not sufficient.
-def gameTestFilter = providers.gradleProperty("gameTestFilter").map { value -> value.trim() }.orNull
-if (gameTestFilter) {
-    loom {
-        runs {
-            gameTest {
-                property("fabric-api.gametest.filter", gameTestFilter)
-            }
-        }
-    }
-}
-
-loom {
-    runs {
-        restartProbe {
-            server()
-            setConfigName("Death Backpack Restart Probe")
-            ideConfigGenerated(false)
-            runDir("run/restartProbe")
-            source sourceSets.gametest
-            programArg("--nogui")
-        }
-        copperRestartProbe {
-            server()
-            setConfigName("Copper Golem Restart Probe")
-            ideConfigGenerated(false)
-            runDir("run/copperRestartProbe")
-            source sourceSets.gametest
-            programArg("--nogui")
-        }
-        nexusRestartProbe {
-            server()
-            setConfigName("Nexus Legacy Migration Probe")
-            ideConfigGenerated(false)
-            runDir("run/nexusRestartProbe")
-            source sourceSets.gametest
-            programArg("--nogui")
         }
     }
 }
 
 repositories {
     mavenCentral()
-
     maven {
         url = "https://repo.codemc.io/repository/relativitymc/"
-    }
-
-    maven {
-        name = "Nucleoid"
-        url = "https://maven.nucleoid.xyz/releases"
     }
 }
 
 dependencies {
-    // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "org.relativitymc:modern-yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
     compileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation files(totemCoreJar)
 
-    // Optional runtime integration. Neither dependency is declared as required by DeadRecall.
-    compileOnly "eu.pb4:trinkets:4.1.0-beta.2+26.2"
-    runtimeOnly "eu.pb4:trinkets:4.1.0-beta.2+26.2"
-    compileOnly "dev.yumi.mc.core:yumi-mc-foundation:1.1.1+26.2"
-    runtimeOnly "dev.yumi.mc.core:yumi-mc-foundation:1.1.1+26.2"
-
-    // Gson for JSON parsing (used in DiscordBridge)
-    // Use Minecraft's built-in Gson instead of bundling it
-    // This is simpler and avoids version conflicts
-    compileOnly 'com.google.code.gson:gson:2.10.1'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-}
-
-tasks.register("normalizeFabricApiTweakersForNamedDevRuntime") {
-    group = "fabric"
-    description = "Normalizes Fabric API tweaker namespaces for the named development runtime."
-
-    doLast {
-        def jarFiles = new LinkedHashSet<File>()
-        jarFiles.addAll(configurations.runtimeClasspath.resolve().findAll { file ->
-            file.name.endsWith(".jar") && (
-                file.absolutePath.contains("${File.separator}net.fabricmc.fabric-api${File.separator}")
-                    || file.name.startsWith("trinkets-")
-                    || file.name.startsWith("yumi-mc-foundation-")
-            )
-        })
-
-        [gradle.gradleUserHomeDir, new File(System.getProperty("user.home"), ".gradle")].each { File cacheRoot ->
-            File fabricApiCache = new File(cacheRoot, "caches/modules-2/files-2.1/net.fabricmc.fabric-api")
-            if (fabricApiCache.isDirectory()) {
-                jarFiles.addAll(fileTree(dir: fabricApiCache, include: "**/*.jar").files.findAll { file ->
-                    !file.name.endsWith("-sources.jar")
-                })
-            }
-        }
-
-        int patchedFiles = 0
-        int patchedEntries = 0
-
-        jarFiles.each { File jarFile ->
-            File tempFile = new File(buildDir, "tmp/tweaker-normalized/${jarFile.name}.tmp")
-            tempFile.parentFile.mkdirs()
-            boolean fileChanged = false
-
-            def zipFile = new java.util.zip.ZipFile(jarFile)
-            def zipOut = new java.util.zip.ZipOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(tempFile)))
-
-            try {
-                def entries = zipFile.entries()
-                while (entries.hasMoreElements()) {
-                    def entry = entries.nextElement()
-                    def outEntry = new java.util.zip.ZipEntry(entry.name)
-                    zipOut.putNextEntry(outEntry)
-
-                    byte[] bytes = entry.isDirectory() ? new byte[0] : zipFile.getInputStream(entry).bytes
-                    if (!entry.isDirectory() && (entry.name.endsWith(".classtweaker") || entry.name.endsWith(".accesswidener"))) {
-                        String text = new String(bytes, java.nio.charset.StandardCharsets.UTF_8)
-                        String normalized = text
-                                .replaceFirst(/(?m)^(classTweaker\s+v\d+\s+)official(\s*)$/, '$1named$2')
-                                .replaceFirst(/(?m)^(accessWidener\s+v\d+\s+)official(\s*)$/, '$1named$2')
-
-                        if (normalized != text) {
-                            bytes = normalized.getBytes(java.nio.charset.StandardCharsets.UTF_8)
-                            fileChanged = true
-                            patchedEntries++
-                        }
-                    }
-
-                    zipOut.write(bytes)
-                    zipOut.closeEntry()
-                }
-            } finally {
-                zipOut.close()
-                zipFile.close()
-            }
-
-            if (fileChanged) {
-                java.nio.file.Files.move(
-                        tempFile.toPath(),
-                        jarFile.toPath(),
-                        java.nio.file.StandardCopyOption.REPLACE_EXISTING
-                )
-                patchedFiles++
-            } else {
-                tempFile.delete()
-            }
-        }
-
-        logger.lifecycle("Normalized ${patchedEntries} Fabric API tweaker entries in ${patchedFiles} jars for named dev runtime.")
-    }
-}
-
-tasks.matching { task ->
-    task.name in ["runClient", "runServer", "runDatagen", "runGameTest", "runRestartProbe", "runCopperRestartProbe", "runNexusRestartProbe"]
-}.configureEach {
-    dependsOn("normalizeFabricApiTweakersForNamedDevRuntime")
-}
-
-// The compatibility-bundle migration gate runs its server-only probe as a
-// separate mod beside the immutable production JARs. Keep its named classes
-// in build/devlibs and remap the emitted test mod before it is installed.
-def gametestJar = tasks.register("gametestJar", Jar) {
-    group = "verification"
-    description = "Assembles the server-only GameTest and migration-probe mod."
-    dependsOn(tasks.named("gametestClasses"))
-    archiveClassifier.set("gametest")
-    destinationDirectory.set(layout.buildDirectory.dir("devlibs"))
-    from(sourceSets.gametest.output)
-}
-
-tasks.register("remapGametestJar", net.fabricmc.loom.task.RemapJarTask) {
-    group = "verification"
-    description = "Remaps the server-only GameTest and migration-probe mod for a production server."
-    dependsOn(gametestJar)
-    inputFile.set(gametestJar.flatMap { it.archiveFile })
-    archiveClassifier.set("gametest")
-}
-
-processResources {
-
-    inputs.property "version", project.version
-    inputs.property "minecraft_version", project.minecraft_version
-    inputs.property "loader_version", project.loader_version
-    filteringCharset "UTF-8"
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version,
-                "minecraft_version": project.minecraft_version,
-                "loader_version": project.loader_version
-    }
-
-    // zh_cn intentionally reuses zh_tw; maintain only the Traditional Chinese source.
-    doLast {
-        copy {
-            from(file("src/main/resources/assets/deadrecall/lang/zh_tw.json"))
-            into(file("${destinationDir}/assets/deadrecall/lang"))
-            rename { "zh_cn.json" }
-        }
-    }
-}
-
-def targetJavaVersion = 25
-tasks.withType(JavaCompile).configureEach {
-    // ensure that the encoding is set to UTF-8, no matter what the system default is
-    // this fixes some edge cases with special characters not displaying correctly
-    // see http://yodaconditions.net/blog/fix-for-file-encoding-problems.html
-    // If Javadoc is generated, this must be specified in that task too.
-    it.options.encoding = "UTF-8"
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        it.options.release.set(targetJavaVersion)
-    }
+    testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
 
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+tasks.named("processResources", ProcessResources) {
+    inputs.property "version", project.version
+    inputs.property "minecraft_version", project.minecraft_version
+    inputs.property "loader_version", project.loader_version
+    filteringCharset = "UTF-8"
+
+    filesMatching("fabric.mod.json") {
+        expand(
+                version: project.version,
+                minecraft_version: project.minecraft_version,
+                loader_version: project.loader_version
+        )
     }
-    // MC 26.x uses an unobfuscated toolchain; avoid sources remap in this project setup.
 }
 
-jar {
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release.set(25)
+}
+
+tasks.named("jar", Jar) {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
     from("LICENSE.txt") {
         rename { "${it}_${project.archives_base_name}" }
     }
 }
 
+def verifyDeadRecallThinJar = tasks.register("verifyDeadRecallThinJar") {
+    group = "verification"
+    description = "Rejects gameplay, client, Mixin, Payload, GUI and fallback classes in the DeadRecall host JAR."
+    dependsOn(tasks.named("jar"))
+
+    doLast {
+        File archive = tasks.named("jar", Jar).get().archiveFile.get().asFile
+        def allowedClassPrefixes = [
+                "com/adaptor/deadrecall/Deadrecall.class",
+                "com/adaptor/deadrecall/migration/"
+        ]
+        def forbiddenEntries = []
+        def jarFile = new java.util.jar.JarFile(archive)
+        try {
+            jarFile.entries().each { entry ->
+                if (entry.name.endsWith(".class")
+                        && !allowedClassPrefixes.any { prefix -> entry.name.startsWith(prefix) }) {
+                    forbiddenEntries.add(entry.name)
+                }
+                if (entry.name.endsWith(".mixins.json")
+                        || (!entry.isDirectory()
+                            && entry.name.startsWith("data/")
+                            && entry.name != "data/deadrecall/migration/item_ids.json")
+                        || (!entry.isDirectory()
+                            && entry.name.startsWith("assets/")
+                            && entry.name != "assets/deadrecall/icon.png")) {
+                    forbiddenEntries.add(entry.name)
+                }
+            }
+        } finally {
+            jarFile.close()
+        }
+        if (!forbiddenEntries.isEmpty()) {
+            throw new GradleException(
+                    "DeadRecall host JAR contains non-migration functionality: "
+                            + forbiddenEntries.sort().join(", ")
+            )
+        }
+    }
+}
+
 def bundleJar = tasks.register("bundleJar") {
     group = "build"
-    description = "Packages the verified standalone Totem modules as Fabric nested JARs."
-    dependsOn(tasks.named("jar"))
+    description = "Packages the exact Totem module graph as Fabric nested JARs."
+    dependsOn(verifyDeadRecallThinJar)
 
     def thinJar = tasks.named("jar", Jar).flatMap { it.archiveFile }
     def bundledJar = layout.buildDirectory.file(
@@ -334,9 +179,7 @@ def bundleJar = tasks.register("bundleJar") {
 
     onlyIf {
         if (bundleModuleDirectory == null) {
-            throw new GradleException(
-                    "bundleJar requires -PbundleModuleDirectory=<directory>"
-            )
+            throw new GradleException("bundleJar requires -PbundleModuleDirectory=<directory>")
         }
         true
     }
@@ -352,9 +195,7 @@ def bundleJar = tasks.register("bundleJar") {
             if (metadataEntry == null) {
                 throw new GradleException("DeadRecall JAR is missing fabric.mod.json")
             }
-            def metadata = new groovy.json.JsonSlurper().parse(
-                    source.getInputStream(metadataEntry)
-            )
+            def metadata = new groovy.json.JsonSlurper().parse(source.getInputStream(metadataEntry))
             metadata.jars = bundledModuleFiles.collect { moduleJar ->
                 [file: "META-INF/jars/${moduleJar.name}"]
             }
@@ -363,9 +204,7 @@ def bundleJar = tasks.register("bundleJar") {
             ).getBytes(java.nio.charset.StandardCharsets.UTF_8)
 
             def output = new java.util.zip.ZipOutputStream(
-                    new java.io.BufferedOutputStream(
-                            new java.io.FileOutputStream(temporaryFile)
-                    )
+                    new java.io.BufferedOutputStream(new java.io.FileOutputStream(temporaryFile))
             )
             try {
                 def entries = source.entries()
@@ -392,9 +231,7 @@ def bundleJar = tasks.register("bundleJar") {
                 output.closeEntry()
 
                 bundledModuleFiles.each { moduleJar ->
-                    def nestedEntry = new java.util.zip.ZipEntry(
-                            "META-INF/jars/${moduleJar.name}"
-                    )
+                    def nestedEntry = new java.util.zip.ZipEntry("META-INF/jars/${moduleJar.name}")
                     nestedEntry.setTime(0L)
                     output.putNextEntry(nestedEntry)
                     moduleJar.withInputStream { input ->
@@ -423,18 +260,11 @@ if (bundleModuleDirectory != null) {
     }
 }
 
-// configure the maven publication
 publishing {
     publications {
         create("mavenJava", MavenPublication) {
             artifactId = project.archives_base_name
             from components.java
         }
-    }
-
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: this block does NOT have the same function as the one in the top level.
-        // The repositories here are for publishing your artifact, not for retrieving dependencies.
     }
 }

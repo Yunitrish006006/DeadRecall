@@ -49,6 +49,7 @@ TOTEM 圖靈騰系統（以下簡稱圖靈騰；技術品牌為 `Totem`）是由
 - [`changes/lectern-recipe-override/`](changes/lectern-recipe-override/)：以木半磚與書覆寫講台配方。
 - [`changes/concrete-powder-item-hardening/`](changes/concrete-powder-item-hardening/)：混凝土粉末掉落物水中硬化功能。
 - [`changes/backpack-dyeing/`](changes/backpack-dyeing/)：一般背包原版染色、混色與煉藥鍋洗色。
+- [`changes/soulbound-teleport-interface/`](changes/soulbound-teleport-interface/)：上次成功傳送介面的死亡保留與 `/back` 移除。
 - [`changes/remnant-item-id-migration/`](changes/remnant-item-id-migration/)：Remnant canonical item ID、legacy 雙註冊與 lazy migration。
 - [`changes/automata-alchemy-item-id-migration/`](changes/automata-alchemy-item-id-migration/)：Automata／Alchemy canonical item ID、legacy 雙註冊與 recipe bridge。
 - [`changes/safe-multi-repo-modularization/`](changes/safe-multi-repo-modularization/)：一次一個功能 repository、DeadRecall compatibility bundle、識別碼基線與可回滾拆分流程。
