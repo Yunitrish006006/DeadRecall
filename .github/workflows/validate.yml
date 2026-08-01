@@ -304,7 +304,7 @@ jobs:
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${legacy_run}/world" \
-            --extra-mod build/libs/deadrecall-2.4.6-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.7-gametest.jar \
             --environment "DEADRECALL_LEGACY_AUTOMATA_MIGRATION_PHASE=migrate" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_LEGACY_MARKER_DIR=${legacy_marker}" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
@@ -333,7 +333,7 @@ jobs:
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${migration_bundle}/server/world" \
-            --extra-mod build/libs/deadrecall-2.4.6-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.7-gametest.jar \
             --environment "DEADRECALL_LEGACY_AUTOMATA_MIGRATION_PHASE=verify" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_LEGACY_MARKER_DIR=${legacy_marker}" \
             --environment "DEADRECALL_LEGACY_AUTOMATA_PROBE_MARKER_DIR=${migration_marker}" \
@@ -390,7 +390,7 @@ jobs:
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${legacy_run}/world" \
-            --extra-mod build/libs/deadrecall-2.4.6-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.7-gametest.jar \
             --environment "DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=migrate" \
             --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
             --completion-marker "${marker_root}/migrate.ok" \
@@ -418,7 +418,7 @@ jobs:
             --fabric-api "${fabric_api_jar}" \
             --server-launcher "${RUNNER_TEMP}/fabric-server-launch.jar" \
             --world "${migration_bundle}/server/world" \
-            --extra-mod build/libs/deadrecall-2.4.6-gametest.jar \
+            --extra-mod build/libs/deadrecall-2.4.7-gametest.jar \
             --environment "DEADRECALL_LEGACY_NEXUS_MIGRATION_PHASE=verify" \
             --environment "DEADRECALL_LEGACY_NEXUS_PROBE_MARKER_DIR=${marker_root}" \
             --completion-marker "${marker_root}/verify.ok" \
