@@ -21,6 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout pinned TotemCore source
+        uses: actions/checkout@v4
+        with:
+          repository: Yunitrish006006/TotemCore
+          ref: eac4bb3e19dec6d6aca4433df995f95e9631bc9b
+          path: .lockstep/TotemCore
+          persist-credentials: false
+
       - name: Check modularization compatibility baseline
         run: bash .github/scripts/check-modularization-baseline.sh
 
@@ -46,9 +54,12 @@ jobs:
       - name: Build and test
         shell: bash
         run: |
+          ./gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
+          totem_core_jar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar"
+          test -f "${totem_core_jar}"
           # Keep a stuck GameTest shutdown diagnosable instead of consuming the entire job.
           timeout --signal=TERM --kill-after=30s 15m \
-            ./gradlew build --no-daemon --stacktrace
+            ./gradlew -PtotemCoreJar="${totem_core_jar}" build --no-daemon --stacktrace
 
       - name: Check assembled compatibility surface
         shell: bash
@@ -160,10 +171,10 @@ jobs:
           mkdir -p .lockstep/TotemDiscordBridge/TotemCore
           cp -a .lockstep/TotemCore/. .lockstep/TotemDiscordBridge/TotemCore/
 
-          # Core and Remnant need Loom's remapped production JARs in build/libs.
-          # The other split-source-set compatibility projects publish their
-          # production JARs directly through `jar` and do not expose remapJar.
-          ./gradlew -p .lockstep/TotemCore remapJar --no-daemon --stacktrace
+          # Core and the split-source-set compatibility projects publish their
+          # production JARs directly through `jar`. Only Remnant exposes
+          # `remapJar` for its production artifact.
+          ./gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
           test -f .lockstep/TotemCore/build/libs/totem-core-0.4.0.jar
           ./gradlew \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar" \
