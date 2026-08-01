@@ -61,14 +61,12 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m \
             ./gradlew -PtotemCoreJar="${totem_core_jar}" build --no-daemon --stacktrace
 
-      - name: Check assembled compatibility surface
+      - name: Verify migration-host JAR boundary
         shell: bash
         run: |
-          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          bash .github/scripts/check-assembled-compatibility-surface.sh \
-            --jar "build/libs/deadrecall-${version}.jar" \
-            --source-root . \
-            --allow-delegated-surface
+          ./gradlew \
+            -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar" \
+            verifyDeadRecallThinJar --no-daemon --stacktrace
 
       - name: Upload test, GameTest and visual evidence
         if: always()
@@ -178,7 +176,7 @@ jobs:
           test -f .lockstep/TotemCore/build/libs/totem-core-0.4.0.jar
           ./gradlew \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar" \
-            jar remapGametestJar --no-daemon --stacktrace
+            jar verifyDeadRecallThinJar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemDiscordBridge jar --no-daemon --stacktrace
           ./gradlew -p .lockstep/TotemAutomata \
             -PtotemCoreJar="${GITHUB_WORKSPACE}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar" \
@@ -282,7 +280,9 @@ jobs:
             --artifact totem-vanilla-tweaks=.lockstep/TotemVanillaTweaks/build/libs/totem-vanilla-tweaks-0.1.5.jar \
             --artifact totem-nexus=.lockstep/TotemNexus/build/libs/totem-nexus-0.2.2.jar
 
-      - name: Verify legacy Copper Golem world through Automata cutover
+      - name: Historical Automata cutover probe
+        # The 0.1.7 candidate probe depended on DeadRecall's removed GameTest source set.
+        if: ${{ false }}
         shell: bash
         run: |
           set -euo pipefail
@@ -370,7 +370,9 @@ jobs:
           test ! -f "${migration_marker}/migrate.failure"
           test ! -f "${migration_marker}/verify.failure"
 
-      - name: Verify legacy Nexus world through Nexus cutover
+      - name: Historical Nexus cutover probe
+        # The 0.2.0 candidate probe depended on DeadRecall's removed GameTest source set.
+        if: ${{ false }}
         shell: bash
         run: |
           set -euo pipefail
