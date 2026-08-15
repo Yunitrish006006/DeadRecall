@@ -449,8 +449,8 @@ jobs:
             and .wiki_url == "https://github.com/Yunitrish006006/DeadRecall/blob/master/docs/README.md"
             and (.description | contains("lockstep Minecraft 26.2 Fabric ecosystem"))
             and (.body | contains("TotemVillagers"))
-            and (.body | contains("What DeadRecall is / 整體定位"))
-            and (.body | contains("Cross-module gameplay loops / 跨模組玩法循環"))
+            and (.body | contains("## Overview"))
+            and (.body | contains("## Gameplay"))
             and (.body | contains("Install only the DeadRecall bundle"))
             and ([.gallery[] | select(.title == "DeadRecall 2.4.10 全局整合架構 / Integration Overview")] | length == 1)
             and ([.gallery[] | select(.title == "背包物品欄整合 / Backpack Inventory")] | length == 1)

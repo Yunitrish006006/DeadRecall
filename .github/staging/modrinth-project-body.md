@@ -1,4 +1,4 @@
-# DeadRecall 2.4.10
+# DeadRecall
 
 **One verified Fabric JAR, ten coordinated Totem modules, one continuous survival ecosystem.**
 
@@ -6,7 +6,7 @@ DeadRecall 是 Minecraft 26.2 / Fabric 的 Totem 系列整合發行版。它不�
 
 > **Install only the DeadRecall bundle.／只安裝 DeadRecall 整合 JAR。** The ten Totem modules listed below are already embedded. Installing the same standalone modules beside DeadRecall creates duplicate mod IDs and Fabric will refuse to start.
 
-## What DeadRecall is / 整體定位
+## Overview
 
 DeadRecall is the **distribution and compatibility host** for the current Totem ecosystem:
 
@@ -18,7 +18,7 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 
 換句話說，DeadRecall 的價值不只是「一次安裝十個功能」，而是讓十個功能使用同一套版本契約、教學入口、死亡流程與事件邊界，避免整合包常見的版本漂移與重複實作。
 
-## The whole system / 六個整體層次
+## Modules
 
 | Layer / 層次 | Modules | Role in the complete experience / 整體作用 |
 | --- | --- | --- |
@@ -29,9 +29,9 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 | Knowledge and progression / 知識成長 | **TotemAlchemy**, **TotemEnchanting** | Dynamic multi-effect brewing, ingredient research, potion variants, and content-driven enchanting power. |
 | Mobility and operations / 移動營運 | **TotemNexus**, **TotemDiscordBridge**, **TotemVanillaTweaks** | Space Unit travel, friends, death destinations, server event relay, container sorting, recipes, and vanilla-friendly utility rules. |
 
-## Cross-module gameplay loops / 跨模組玩法循環
+## Gameplay
 
-### 1. Gather → produce → trade → prepare
+### Production
 
 - Excavation tools and Copper Golems increase controlled resource gathering and storage throughput.
 - Farmers, miners, lumberjacks, fishermen, and crafters use actual inventories rather than infinite hidden stock.
@@ -40,7 +40,7 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 
 這使村莊、自動化與玩家裝備不是三套分離玩法，而是「採集 → 原料 → 工具／商品 → 交易 → 再生產」的同一條供應鏈。玩家仍然透過原版交易介面與村民互動。
 
-### 2. Travel → risk → death → recovery
+### Recovery
 
 - Nexus registers lodestone Space Units, maps destinations, quotes costs, manages friends, and validates travel sessions on the server.
 - Remnant captures ordinary drops into a server-authoritative death backpack and owns its physical recovery lifecycle.
@@ -50,21 +50,21 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 
 死亡背包、死亡傳送點與靈魂綁定介面因此是跨模組共同完成的一條流程，不是三套互相衝突的死亡保護。
 
-### 3. Discover → learn → retain knowledge
+### Knowledge
 
 - Alchemy, Remnant, Nexus, and other participating modules register their chapters with TotemCore.
 - When a player holds multiple Totem-series manuals, they can be combined into one ordered Totem Manual and later split back into individual books.
 - The manual supports illustrated two-page spreads, persistent discoveries, dynamic alchemy research, and current world-rule status.
 - Receiving the tutorial book unlocks the **Knowledge Is Power / 知識就是力量** advancement.
 
-### 4. Vanilla-first compatibility
+### Compatibility
 
 - Backpack screens extend the vanilla visual language instead of replacing the entire player inventory flow.
 - VanillaTweaks sorts compatible menus through generic container behavior, so Remnant backpacks work without a hard gameplay dependency.
 - Villager crafting checks the server's current recipe manager; removed or replaced recipes are not silently recreated by a fixed hidden list.
 - Sensitive operations such as death recovery, travel, inventory ownership, and economy stock changes are decided by the server.
 
-## Major player-facing systems / 玩家主要系統
+## Features
 
 - **Backpacks and recovery** — four sizes, dyeing, 9–36 base slots, capacity and utility modules, a single-row upgrade bay, integrated 3×3 crafting, inventory side panel, recovery beacon, void protection, and safe module removal checks.
 - **Configurable survival rules** — death-backpack generation, owner-only pickup, and portable-container nesting behavior can be governed per world; the Totem Manual exposes relevant current states.
@@ -75,7 +75,7 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 - **Nexus travel** — register, discover, map, favorite, and safely travel between material-sensitive Space Units; players can inspect and delete only their own death destinations with confirmation.
 - **Server integration** — optional Discord delivery for chat, player activity, public events, attachments, audit messages, and bot presence through a separately configured Worker.
 
-## Five-minute start / 五分鐘上手
+## Quick Start
 
 | Goal | What to do |
 | --- | --- |
@@ -89,7 +89,7 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 | Remove your death destination | Run `/deadrecall deathnodes`, select your own node, and confirm again within 30 seconds. The death backpack itself is not deleted. |
 | Sort a container | Hover the side to sort and press the middle mouse button. |
 
-## Exact bundled versions / 精確內嵌版本
+## Versions
 
 | Module | Version | Responsibility |
 | --- | ---: | --- |
@@ -106,7 +106,7 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 
 These versions form one lockstep release. Do not replace only one embedded module with a different standalone version.
 
-## Installation contract / 安裝契約
+## Requirements
 
 - Minecraft `26.2`
 - Fabric Loader `0.19.3` or newer
@@ -117,7 +117,7 @@ These versions form one lockstep release. Do not replace only one embedded modul
 - A separately configured Cloudflare Worker is optional and only needed for Discord delivery
 - License: Apache-2.0
 
-### Safe installation
+### Installation
 
 1. Install the matching Minecraft, Fabric Loader, Fabric API, and Java versions.
 2. Place `deadrecall-2.4.10-bundled.jar` in `mods/` on both client and server.
