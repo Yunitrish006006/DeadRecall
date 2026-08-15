@@ -63,8 +63,11 @@ jobs:
           project_response="$(mktemp)"
           user_response="$(mktemp)"
           projects_response="$(mktemp)"
+          project_create_data="$(mktemp)"
+          project_create_response="$(mktemp)"
           cleanup() {
-            rm -f "${project_response}" "${user_response}" "${projects_response}"
+            rm -f "${project_response}" "${user_response}" "${projects_response}" \
+              "${project_create_data}" "${project_create_response}"
           }
           trap cleanup EXIT
 
@@ -77,6 +80,8 @@ jobs:
           if [[ "${project_status}" == "200" ]]; then
             resolved_id="$(jq -er '.id' "${project_response}")"
             printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
+            printf 'created=false\n' >> "${GITHUB_OUTPUT}"
+            printf 'status=%s\n' "$(jq -er '.status' "${project_response}")" >> "${GITHUB_OUTPUT}"
             printf 'Using configured Modrinth project %s (%s).\n' \
               "$(jq -r '.title' "${project_response}")" "${resolved_id}"
             exit 0
@@ -118,6 +123,9 @@ jobs:
               or ((.slug | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
             )][0].id' "${projects_response}")"
             printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
+            printf 'created=false\n' >> "${GITHUB_OUTPUT}"
+            printf 'status=%s\n' "$(jq -er --arg id "${resolved_id}" \
+              '.[] | select(.id == $id) | .status' "${projects_response}")" >> "${GITHUB_OUTPUT}"
             printf 'Resolved DeadRecall to Modrinth project %s for user %s.\n' \
               "${resolved_id}" "${username}"
             exit 0
@@ -126,8 +134,52 @@ jobs:
           printf 'Configured project %s returned HTTP %s. Modrinth user %s has these accessible projects:\n' \
             "${CONFIGURED_PROJECT_ID}" "${project_status}" "${username}" >&2
           jq -r '.[] | [.title, .slug, .id, .status] | @tsv' "${projects_response}" >&2
-          printf 'Expected exactly one project matching DeadRecall; found %s.\n' "${match_count}" >&2
-          exit 1
+          if [[ "${match_count}" != "0" ]]; then
+            printf 'Expected no more than one project matching DeadRecall; found %s.\n' \
+              "${match_count}" >&2
+            exit 1
+          fi
+
+          jq -n \
+            --rawfile body .github/staging/modrinth-project-body.md \
+            '{
+              slug: "deadrecall",
+              title: "DeadRecall",
+              description: "Unified Minecraft 26.2 Fabric bundle for Totem backpacks, automation, alchemy, enchanting, travel, villagers, and compatibility migrations.",
+              categories: ["adventure", "storage", "utility"],
+              additional_categories: ["economy", "game-mechanics", "magic", "technology", "transportation"],
+              client_side: "required",
+              server_side: "required",
+              body: $body,
+              issues_url: "https://github.com/Yunitrish006006/DeadRecall/issues",
+              source_url: "https://github.com/Yunitrish006006/DeadRecall",
+              license_id: "Apache-2.0",
+              project_type: "mod",
+              is_draft: true
+            }' > "${project_create_data}"
+
+          create_status="$(curl --silent --show-error \
+            --request POST \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --form "data=@${project_create_data};type=application/json" \
+            --form "icon=@src/main/resources/assets/deadrecall/icon.png;type=image/png" \
+            --output "${project_create_response}" \
+            --write-out '%{http_code}' \
+            'https://api.modrinth.com/v2/project')"
+          if [[ "${create_status}" != "200" && "${create_status}" != "201" ]]; then
+            printf 'Could not create the DeadRecall Modrinth project (HTTP %s).\n' \
+              "${create_status}" >&2
+            jq . "${project_create_response}" >&2 2>/dev/null || true
+            exit 1
+          fi
+
+          resolved_id="$(jq -er '.id' "${project_create_response}")"
+          printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
+          printf 'created=true\n' >> "${GITHUB_OUTPUT}"
+          printf 'status=%s\n' "$(jq -er '.status' "${project_create_response}")" >> "${GITHUB_OUTPUT}"
+          printf 'Created draft Modrinth project DeadRecall (%s) for user %s.\n' \
+            "${resolved_id}" "${username}"
 
       - name: Stage bundled JAR
         shell: bash
@@ -143,11 +195,13 @@ jobs:
           MODRINTH_DRY_RUN: 'true'
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
           MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
-          EXPECTED_SHA512: 4acfeab469f4c10b9c4abe5402e6f9b2e4a81c5c3d3b0537c0c412efd7ce712653151529fa5ec123b47e4c44ce465670644a2d393edd4a1671092a89da07f10a
+          EXPECTED_SHA512: 885f27386e071a7062802845d8f854a982932c1f4f47dfbade3469dc16c47c4b9ad09fb5b8b71684d768b8cb54b20e010264f9aea94e942c496099f7ccab96da
         run: |
           set -euo pipefail
           actual="$(sha512sum "${MODRINTH_ARTIFACT}" | awk '{print $1}')"
           test "${actual}" = "${EXPECTED_SHA512}"
+          unzip -p "${MODRINTH_ARTIFACT}" fabric.mod.json \
+            | jq -e '.license == "Apache-2.0"' >/dev/null
           bash .github/scripts/publish-modrinth.sh
 
       - name: Publish version to Modrinth
@@ -158,3 +212,32 @@ jobs:
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
           MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
         run: bash .github/scripts/publish-modrinth.sh
+
+      - name: Submit draft project for review
+        if: success() && steps.project.outputs.status == 'draft'
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          review_response="$(mktemp)"
+          trap 'rm -f "${review_response}"' EXIT
+          review_status="$(curl --silent --show-error \
+            --request PATCH \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --header 'Content-Type: application/json' \
+            --data '{"requested_status":"approved"}' \
+            --output "${review_response}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}")"
+          if [[ "${review_status}" == "200" || "${review_status}" == "204" ]]; then
+            printf 'Submitted DeadRecall project %s for Modrinth review.\n' \
+              "${MODRINTH_PROJECT_ID}"
+            exit 0
+          fi
+
+          printf '::warning::DeadRecall was uploaded, but review submission returned HTTP %s.\n' \
+            "${review_status}"
+          jq . "${review_response}" 2>/dev/null || true
