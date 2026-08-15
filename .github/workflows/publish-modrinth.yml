@@ -155,7 +155,9 @@ jobs:
               source_url: "https://github.com/Yunitrish006006/DeadRecall",
               license_id: "Apache-2.0",
               project_type: "mod",
-              is_draft: true
+              initial_versions: [],
+              is_draft: true,
+              gallery_items: []
             }' > "${project_create_data}"
 
           create_status="$(curl --silent --show-error \
