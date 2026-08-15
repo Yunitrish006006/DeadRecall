@@ -8,6 +8,15 @@ on:
       - gradle.properties
   workflow_dispatch:
     inputs:
+      standalone_operation:
+        description: Audit or synchronize standalone Totem projects
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - audit
+          - apply
       version_type:
         description: Modrinth release channel (auto derives it from mod_version)
         required: true
@@ -27,8 +36,58 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  audit-standalone:
+    name: Audit standalone Totem projects
+    if: ${{ inputs.standalone_operation == 'audit' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: List accessible Totem projects
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_TOKEN}" || {
+            echo "Repository secret MODRINTH_TOKEN is not configured." >&2
+            exit 1
+          }
+
+          user_file="$(mktemp)"
+          projects_file="$(mktemp)"
+          cleanup() {
+            rm -f "${user_file}" "${projects_file}"
+          }
+          trap cleanup EXIT
+
+          curl --silent --show-error --fail \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${user_file}" \
+            'https://api.modrinth.com/v2/user'
+          user_id="$(jq -er '.id' "${user_file}")"
+          curl --silent --show-error --fail \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${projects_file}" \
+            "https://api.modrinth.com/v2/user/${user_id}/projects"
+
+          jq '
+            map(select(
+              (.slug | ascii_downcase | startswith("totem-"))
+              or (.title | ascii_downcase | startswith("totem"))
+            ))
+            | sort_by(.slug)
+            | map({
+                id, slug, title, status, requested_status,
+                versions: (.versions | length), game_versions, loaders
+              })
+          ' "${projects_file}"
+
   publish:
     name: Publish verified staged bundle
+    if: ${{ inputs.standalone_operation != 'audit' && inputs.standalone_operation != 'apply' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
