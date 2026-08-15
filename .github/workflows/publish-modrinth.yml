@@ -52,6 +52,83 @@ jobs:
             exit 1
           }
 
+      - name: Resolve Modrinth project
+        id: project
+        shell: bash
+        env:
+          CONFIGURED_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          project_response="$(mktemp)"
+          user_response="$(mktemp)"
+          projects_response="$(mktemp)"
+          cleanup() {
+            rm -f "${project_response}" "${user_response}" "${projects_response}"
+          }
+          trap cleanup EXIT
+
+          project_status="$(curl --silent --show-error \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${project_response}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/project/${CONFIGURED_PROJECT_ID}")"
+          if [[ "${project_status}" == "200" ]]; then
+            resolved_id="$(jq -er '.id' "${project_response}")"
+            printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
+            printf 'Using configured Modrinth project %s (%s).\n' \
+              "$(jq -r '.title' "${project_response}")" "${resolved_id}"
+            exit 0
+          fi
+
+          user_status="$(curl --silent --show-error \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${user_response}" \
+            --write-out '%{http_code}' \
+            'https://api.modrinth.com/v2/user')"
+          if [[ "${user_status}" != "200" ]]; then
+            printf 'Modrinth token authentication failed (HTTP %s, error %s).\n' \
+              "${user_status}" "$(jq -r '.error // "unknown"' "${user_response}" 2>/dev/null || printf unknown)" >&2
+            exit 1
+          fi
+
+          user_id="$(jq -er '.id' "${user_response}")"
+          username="$(jq -er '.username' "${user_response}")"
+          projects_status="$(curl --silent --show-error \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${projects_response}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/user/${user_id}/projects")"
+          if [[ "${projects_status}" != "200" ]]; then
+            printf 'Could not list projects accessible to Modrinth user %s (HTTP %s).\n' \
+              "${username}" "${projects_status}" >&2
+            exit 1
+          fi
+
+          match_count="$(jq '[.[] | select(
+            ((.title | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
+            or ((.slug | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
+          )] | length' "${projects_response}")"
+          if [[ "${match_count}" == "1" ]]; then
+            resolved_id="$(jq -er '[.[] | select(
+              ((.title | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
+              or ((.slug | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
+            )][0].id' "${projects_response}")"
+            printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
+            printf 'Resolved DeadRecall to Modrinth project %s for user %s.\n' \
+              "${resolved_id}" "${username}"
+            exit 0
+          fi
+
+          printf 'Configured project %s returned HTTP %s. Modrinth user %s has these accessible projects:\n' \
+            "${CONFIGURED_PROJECT_ID}" "${project_status}" "${username}" >&2
+          jq -r '.[] | [.title, .slug, .id, .status] | @tsv' "${projects_response}" >&2
+          printf 'Expected exactly one project matching DeadRecall; found %s.\n' "${match_count}" >&2
+          exit 1
+
       - name: Stage bundled JAR
         shell: bash
         run: |
@@ -64,7 +141,7 @@ jobs:
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
-          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
           MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
           EXPECTED_SHA512: 4acfeab469f4c10b9c4abe5402e6f9b2e4a81c5c3d3b0537c0c412efd7ce712653151529fa5ec123b47e4c44ce465670644a2d393edd4a1671092a89da07f10a
         run: |
@@ -76,7 +153,7 @@ jobs:
       - name: Publish version to Modrinth
         id: modrinth
         env:
-          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
           MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
