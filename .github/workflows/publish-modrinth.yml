@@ -84,6 +84,13 @@ jobs:
             printf 'status=%s\n' "$(jq -er '.status' "${project_response}")" >> "${GITHUB_OUTPUT}"
             printf 'Using configured Modrinth project %s (%s).\n' \
               "$(jq -r '.title' "${project_response}")" "${resolved_id}"
+            jq '{
+              id, slug, title, description, categories, additional_categories,
+              client_side, server_side, body, issues_url, source_url, wiki_url,
+              discord_url, donation_urls, license, status, requested_status,
+              icon_url, gallery, versions, game_versions, loaders,
+              moderator_message, monetization_status
+            }' "${project_response}"
             exit 0
           fi
 
@@ -184,6 +191,7 @@ jobs:
             "${resolved_id}" "${username}"
 
       - name: Stage bundled JAR
+        if: false
         shell: bash
         run: |
           set -euo pipefail
@@ -192,6 +200,7 @@ jobs:
             build/libs/deadrecall-2.4.10-bundled.jar
 
       - name: Verify exact staged artifact and metadata
+        if: false
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
@@ -207,6 +216,7 @@ jobs:
           bash .github/scripts/publish-modrinth.sh
 
       - name: Publish version to Modrinth
+        if: false
         id: modrinth
         env:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
@@ -216,7 +226,7 @@ jobs:
         run: bash .github/scripts/publish-modrinth.sh
 
       - name: Submit draft project for review
-        if: success() && steps.project.outputs.status == 'draft'
+        if: false
         shell: bash
         env:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
