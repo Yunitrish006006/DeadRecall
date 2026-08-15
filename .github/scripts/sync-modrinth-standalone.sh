@@ -504,7 +504,7 @@ upload_galleries() {
             file="$(jq -er '.file' <<< "${gallery_item}")"
             title="$(jq -er '.title' <<< "${gallery_item}")"
             description="$(jq -er '.description' <<< "${gallery_item}")"
-            featured="$(jq -er '.featured' <<< "${gallery_item}")"
+            featured="$(jq -r '.featured' <<< "${gallery_item}")"
             ordering="$(jq -er '.ordering' <<< "${gallery_item}")"
             [[ -f "${REPOSITORY_ROOT}/${file}" ]] || die "missing gallery image: ${file}"
 
