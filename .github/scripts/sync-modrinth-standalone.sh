@@ -546,13 +546,28 @@ upload_galleries() {
                     --output "${response_file}" \
                     --write-out '%{http_code}' \
                     "${API_BASE}/project/${project_id}/gallery?ext=png&featured=${featured}&title=${title_query}&description=${description_query}&ordering=${ordering}")"
-                require_success "${status}" "${response_file}" "Upload gallery image ${title}"
-
-                status="$(json_status GET "${API_BASE}/project/${project_id}" "${project_file}")"
-                require_success "${status}" "${project_file}" "Refresh gallery for ${module_id}"
-                image_url="$(jq -er --arg title "${title}" \
-                    '.gallery[] | select(.title == $title) | .url' "${project_file}")"
-                printf 'Uploaded gallery image for %s: %s\n' "${module_id}" "${title}"
+                if [[ "${status}" == "200" || "${status}" == "201" || "${status}" == "204" ]]; then
+                    status="$(json_status GET "${API_BASE}/project/${project_id}" "${project_file}")"
+                    require_success "${status}" "${project_file}" "Refresh gallery for ${module_id}"
+                    image_url="$(jq -er --arg title "${title}" \
+                        '.gallery[] | select(.title == $title) | .url' "${project_file}")"
+                    printf 'Uploaded gallery image for %s: %s\n' "${module_id}" "${title}"
+                elif [[ "${status}" == "400" ]] \
+                    && jq -e '.description | contains("duplicate gallery images")' \
+                        "${response_file}" >/dev/null; then
+                    status="$(json_status GET "${API_BASE}/project/${project_id}" "${project_file}")"
+                    require_success "${status}" "${project_file}" "Resolve duplicate gallery image for ${module_id}"
+                    if [[ "${gallery_count}" == "1" \
+                        && "$(jq '.gallery | length' "${project_file}")" == "1" ]]; then
+                        image_url="$(jq -er '.gallery[0].url' "${project_file}")"
+                        printf 'Reusing the sole existing duplicate gallery image for %s: %s\n' \
+                            "${module_id}" "${title}"
+                    else
+                        die "Modrinth reports a duplicate gallery image for ${module_id}, but it cannot be identified safely"
+                    fi
+                else
+                    require_success "${status}" "${response_file}" "Upload gallery image ${title}"
+                fi
             fi
 
             image_url_query="$(jq -rn --arg value "${image_url}" '$value | @uri')"
