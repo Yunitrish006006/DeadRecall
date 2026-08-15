@@ -106,7 +106,7 @@ validate_inputs() {
         and (.modules | length == 10)
         and (([.modules[].id] | unique | length) == 10)
         and (([.modules[].slug] | unique | length) == 10)
-        and ([.modules[] | select(.version_environment == "server_only") | .id]
+        and ([.modules[] | select(.version_environment == "server_only_client_optional") | .id]
             == ["totem-discord-bridge"])
         and all(.modules[];
             (.id | test("^[a-z0-9_-]+$"))
@@ -119,7 +119,17 @@ validate_inputs() {
             and (.additional_categories | length <= 3)
             and (.client_side | IN("required", "optional", "unsupported", "unknown"))
             and (.server_side | IN("required", "optional", "unsupported", "unknown"))
-            and (.version_environment | IN("client_only", "server_only", "client_and_server"))
+            and (.version_environment | IN(
+                "client_and_server",
+                "client_only",
+                "client_only_server_optional",
+                "singleplayer_only",
+                "server_only",
+                "server_only_client_optional",
+                "dedicated_server_only",
+                "client_or_server",
+                "client_or_server_prefers_both"
+            ))
         )
         and ([.modules[].id] as $module_ids
             | all(.modules[];
