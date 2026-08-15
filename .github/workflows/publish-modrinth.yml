@@ -115,6 +115,22 @@ jobs:
           done
           rm -f "${project_file}"
 
+  sync-standalone:
+    name: Synchronize standalone Totem projects
+    if: ${{ inputs.standalone_operation == 'apply' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create or update standalone projects
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/sync-modrinth-standalone.sh
+
   publish:
     name: Publish verified staged bundle
     if: ${{ inputs.standalone_operation != 'audit' && inputs.standalone_operation != 'apply' }}
