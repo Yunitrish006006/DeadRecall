@@ -106,6 +106,8 @@ validate_inputs() {
         and (.modules | length == 10)
         and (([.modules[].id] | unique | length) == 10)
         and (([.modules[].slug] | unique | length) == 10)
+        and ([.modules[] | select(.version_environment == "server_only") | .id]
+            == ["totem-discord-bridge"])
         and all(.modules[];
             (.id | test("^[a-z0-9_-]+$"))
             and (.slug | test("^[a-z0-9_-]+$"))
