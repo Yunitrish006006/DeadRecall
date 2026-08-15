@@ -73,17 +73,31 @@ jobs:
             --output "${projects_file}" \
             "https://api.modrinth.com/v2/user/${user_id}/projects"
 
-          jq '
+          mapfile -t project_ids < <(jq -r '
             map(select(
               (.slug | ascii_downcase | startswith("totem-"))
               or (.title | ascii_downcase | startswith("totem"))
             ))
             | sort_by(.slug)
-            | map({
-                id, slug, title, status, requested_status,
-                versions: (.versions | length), game_versions, loaders
-              })
-          ' "${projects_file}"
+            | .[].id
+          ' "${projects_file}")
+
+          project_file="$(mktemp)"
+          for project_id in "${project_ids[@]}"; do
+            curl --silent --show-error --fail \
+              --header "Authorization: ${MODRINTH_TOKEN}" \
+              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+              --output "${project_file}" \
+              "https://api.modrinth.com/v2/project/${project_id}"
+            jq '{
+              id, slug, title, description, categories, additional_categories,
+              client_side, server_side, source_url, issues_url, wiki_url,
+              license, status, requested_status, moderator_message,
+              versions, game_versions, loaders,
+              headers: [.body | split("\n")[] | select(test("^#{1,6} "))]
+            }' "${project_file}"
+          done
+          rm -f "${project_file}"
 
   publish:
     name: Publish verified staged bundle
