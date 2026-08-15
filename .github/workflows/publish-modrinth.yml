@@ -107,7 +107,7 @@ jobs:
                 "https://api.modrinth.com/v2/version/${version_id}"
               jq '{
                 id, project_id, name, version_number, status, requested_status,
-                version_type, game_versions, loaders, dependencies,
+                version_type, environment, game_versions, loaders, dependencies,
                 files: [.files[] | {filename, primary, size, hashes}]
               }' "${version_file}"
             done
