@@ -52,18 +52,13 @@ jobs:
             exit 1
           }
 
-      - name: Download staged bundled JAR
+      - name: Stage bundled JAR
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          STAGING_ASSET_ID: '515426863'
         run: |
           set -euo pipefail
           mkdir -p build/libs
-          gh api \
-            -H 'Accept: application/octet-stream' \
-            "/repos/${GITHUB_REPOSITORY}/releases/assets/${STAGING_ASSET_ID}" \
-            > build/libs/deadrecall-2.4.10-bundled.jar
+          cp .github/staging/deadrecall-2.4.10-bundled.jar \
+            build/libs/deadrecall-2.4.10-bundled.jar
 
       - name: Verify exact staged artifact and metadata
         shell: bash
