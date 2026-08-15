@@ -500,6 +500,7 @@ upload_galleries() {
             local image_url_query
             local title_query
             local description_query
+            local local_image_sha512
 
             file="$(jq -er '.file' <<< "${gallery_item}")"
             title="$(jq -er '.title' <<< "${gallery_item}")"
@@ -512,10 +513,30 @@ upload_galleries() {
             require_success "${status}" "${project_file}" "Read gallery for ${module_id}"
             image_url="$(jq -r --arg title "${title}" \
                 'first(.gallery[]? | select(.title == $title) | .url) // empty' "${project_file}")"
+            title_query="$(jq -rn --arg value "${title}" '$value | @uri')"
+            description_query="$(jq -rn --arg value "${description}" '$value | @uri')"
 
             if [[ -z "${image_url}" ]]; then
-                title_query="$(jq -rn --arg value "${title}" '$value | @uri')"
-                description_query="$(jq -rn --arg value "${description}" '$value | @uri')"
+                local_image_sha512="$(sha512sum "${REPOSITORY_ROOT}/${file}" | awk '{print $1}')"
+                mapfile -t existing_gallery_urls < <(jq -r '.gallery[]?.url' "${project_file}")
+                local gallery_index=0
+                for existing_gallery_url in "${existing_gallery_urls[@]}"; do
+                    local existing_gallery_file="${TEMP_DIR}/gallery-${module_id}-${gallery_index}.img"
+                    if curl --silent --show-error --fail --retry 3 \
+                        --header "User-Agent: ${USER_AGENT}" \
+                        --output "${existing_gallery_file}" \
+                        "${existing_gallery_url}" \
+                        && [[ "$(sha512sum "${existing_gallery_file}" | awk '{print $1}')" == "${local_image_sha512}" ]]; then
+                        image_url="${existing_gallery_url}"
+                        printf 'Reusing byte-identical gallery image for %s: %s\n' \
+                            "${module_id}" "${title}"
+                        break
+                    fi
+                    gallery_index=$((gallery_index + 1))
+                done
+            fi
+
+            if [[ -z "${image_url}" ]]; then
                 status="$(curl --silent --show-error \
                     --request POST \
                     --header "Authorization: ${MODRINTH_TOKEN_VALUE}" \
@@ -541,7 +562,7 @@ upload_galleries() {
                 --header "User-Agent: ${USER_AGENT}" \
                 --output "${response_file}" \
                 --write-out '%{http_code}' \
-                "${API_BASE}/project/${project_id}/gallery?url=${image_url_query}&featured=${featured}&ordering=${ordering}")"
+                "${API_BASE}/project/${project_id}/gallery?url=${image_url_query}&featured=${featured}&title=${title_query}&description=${description_query}&ordering=${ordering}")"
             require_success "${status}" "${response_file}" "Update gallery image ${title}"
         done
     done
