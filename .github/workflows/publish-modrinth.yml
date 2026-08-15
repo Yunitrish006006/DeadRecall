@@ -150,6 +150,7 @@ jobs:
           jq -n \
             --rawfile body .github/staging/modrinth-project-body.md \
             '{
+              slug: "deadrecall",
               title: "DeadRecall",
               description: "Unified Minecraft 26.2 Fabric bundle for Totem backpacks, automation, alchemy, enchanting, travel, villagers, and compatibility migrations.",
               categories: ["adventure", "storage", "utility"],
@@ -206,7 +207,6 @@ jobs:
           jq -n \
             --rawfile body .github/staging/modrinth-project-body.md \
             '{
-              slug: "deadrecall",
               title: "DeadRecall",
               description: "Exact-version Minecraft 26.2 Fabric bundle for Totem backpacks, automation, alchemy, Nexus travel, villager economies, and safe legacy-world migration.",
               categories: ["adventure", "storage", "utility"],
