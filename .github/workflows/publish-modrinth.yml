@@ -190,6 +190,240 @@ jobs:
           printf 'Created draft Modrinth project DeadRecall (%s) for user %s.\n' \
             "${resolved_id}" "${username}"
 
+      - name: Update Modrinth project metadata
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          metadata_file="$(mktemp)"
+          response_file="$(mktemp)"
+          cleanup() {
+            rm -f "${metadata_file}" "${response_file}"
+          }
+          trap cleanup EXIT
+
+          jq -n \
+            --rawfile body .github/staging/modrinth-project-body.md \
+            '{
+              slug: "deadrecall",
+              title: "DeadRecall",
+              description: "Exact-version Minecraft 26.2 Fabric bundle for Totem backpacks, automation, alchemy, Nexus travel, villager economies, and safe legacy-world migration.",
+              categories: ["adventure", "storage", "utility"],
+              additional_categories: ["economy", "game-mechanics", "magic", "technology", "transportation"],
+              client_side: "required",
+              server_side: "required",
+              body: $body,
+              issues_url: "https://github.com/Yunitrish006006/DeadRecall/issues",
+              source_url: "https://github.com/Yunitrish006006/DeadRecall",
+              wiki_url: "https://github.com/Yunitrish006006/DeadRecall/blob/master/docs/README.md",
+              license_id: "Apache-2.0",
+              license_url: "https://github.com/Yunitrish006006/DeadRecall/blob/master/LICENSE.txt"
+            }' > "${metadata_file}"
+
+          status="$(curl --silent --show-error \
+            --request PATCH \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --header 'Content-Type: application/json' \
+            --data-binary "@${metadata_file}" \
+            --output "${response_file}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}")"
+          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
+            printf 'Could not update Modrinth project metadata (HTTP %s).\n' "${status}" >&2
+            jq . "${response_file}" >&2 2>/dev/null || true
+            exit 1
+          fi
+          printf 'Updated project description, categories, compatibility, documentation, license, and long-form body.\n'
+
+      - name: Update Modrinth 2.4.10 version notes
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_VERSION_ID: BiyEH3Uz
+        run: |
+          set -euo pipefail
+          version_file="$(mktemp)"
+          response_file="$(mktemp)"
+          cleanup() {
+            rm -f "${version_file}" "${response_file}"
+          }
+          trap cleanup EXIT
+
+          jq -n \
+            --rawfile changelog docs/releases/2.4.10.md \
+            '{
+              name: "DeadRecall 2.4.10",
+              version_number: "2.4.10",
+              changelog: $changelog
+            }' > "${version_file}"
+
+          status="$(curl --silent --show-error \
+            --request PATCH \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --header 'Content-Type: application/json' \
+            --data-binary "@${version_file}" \
+            --output "${response_file}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}")"
+          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
+            printf 'Could not update Modrinth version metadata (HTTP %s).\n' "${status}" >&2
+            jq . "${response_file}" >&2 2>/dev/null || true
+            exit 1
+          fi
+          printf 'Updated DeadRecall 2.4.10 version name and changelog.\n'
+
+      - name: Upload missing Modrinth gallery images
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          project_file="$(mktemp)"
+          response_file="$(mktemp)"
+          cleanup() {
+            rm -f "${project_file}" "${response_file}"
+          }
+          trap cleanup EXIT
+
+          upload_gallery_image() {
+            local file="$1"
+            local title="$2"
+            local description="$3"
+            local featured="$4"
+            local ordering="$5"
+
+            curl --silent --show-error --fail \
+              --header "Authorization: ${MODRINTH_TOKEN}" \
+              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+              --output "${project_file}" \
+              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
+            if jq -e --arg title "${title}" \
+              '.gallery[]? | select(.title == $title)' "${project_file}" >/dev/null; then
+              printf 'Gallery image already exists: %s\n' "${title}"
+              return
+            fi
+
+            local title_query
+            local description_query
+            title_query="$(jq -rn --arg value "${title}" '$value | @uri')"
+            description_query="$(jq -rn --arg value "${description}" '$value | @uri')"
+            local status
+            status="$(curl --silent --show-error \
+              --request POST \
+              --header "Authorization: ${MODRINTH_TOKEN}" \
+              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+              --header 'Content-Type: image/png' \
+              --data-binary "@${file}" \
+              --output "${response_file}" \
+              --write-out '%{http_code}' \
+              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/gallery?ext=png&featured=${featured}&title=${title_query}&description=${description_query}&ordering=${ordering}")"
+            if [[ "${status}" != "200" && "${status}" != "204" ]]; then
+              printf 'Could not upload gallery image %s (HTTP %s).\n' "${title}" "${status}" >&2
+              jq . "${response_file}" >&2 2>/dev/null || true
+              exit 1
+            fi
+            printf 'Uploaded gallery image: %s\n' "${title}"
+          }
+
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/inventory-backpack-side-panel.png \
+            '背包物品欄整合 / Backpack Inventory' \
+            '普通物品欄旁會直接顯示目前背包內容。The equipped backpack opens beside the vanilla inventory.' \
+            true 0
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/backpack-upgrade-bay.png \
+            '一排式升級欄 / Backpack Upgrade Bay' \
+            '背包介面中的一排式模組欄與內建 3×3 合成區。A single-row upgrade bay with integrated 3×3 crafting.' \
+            false 10
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/backpack-capacity-4-modules.png \
+            '四級容量擴充 / Capacity Expansion' \
+            '四個容量模組將一般背包擴充到 36 格。Four capacity modules expand the backpack to 36 slots.' \
+            false 20
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/alchemy-creative-showcase.png \
+            '動態煉金內容 / Dynamic Alchemy' \
+            'DeadRecall 創造模式分頁中的煉金材料與容器。Alchemy ingredients and vessels in the DeadRecall creative tab.' \
+            false 30
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/nexus-material-diagnostics.png \
+            'Nexus 材料診斷 / Nexus Materials' \
+            'Space Unit 會依材料顯示容量、穩定度、路線與跨維度特性。Material-driven Space Unit diagnostics and travel attributes.' \
+            false 40
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/mangrove-village-aerial.png \
+            '自然生成紅樹林村莊 / Mangrove Village' \
+            '依地形自然生成、包含生產工作區的紅樹林村莊。A terrain-aware mangrove village with integrated production areas.' \
+            false 50
+
+      - name: Verify completed Modrinth metadata
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_VERSION_ID: BiyEH3Uz
+        run: |
+          set -euo pipefail
+          project_file="$(mktemp)"
+          version_file="$(mktemp)"
+          cleanup() {
+            rm -f "${project_file}" "${version_file}"
+          }
+          trap cleanup EXIT
+
+          curl --silent --show-error --fail \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${project_file}" \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
+          curl --silent --show-error --fail \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${version_file}" \
+            "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}"
+
+          jq -e '
+            .title == "DeadRecall"
+            and .slug == "deadrecall"
+            and .license.id == "Apache-2.0"
+            and .client_side == "required"
+            and .server_side == "required"
+            and .wiki_url == "https://github.com/Yunitrish006006/DeadRecall/blob/master/docs/README.md"
+            and (.body | contains("TotemVillagers"))
+            and (.body | contains("不要再把相同子模組的獨立 JAR"))
+            and ([.gallery[] | select(.title == "背包物品欄整合 / Backpack Inventory")] | length == 1)
+            and ([.gallery[] | select(.title == "一排式升級欄 / Backpack Upgrade Bay")] | length == 1)
+            and ([.gallery[] | select(.title == "四級容量擴充 / Capacity Expansion")] | length == 1)
+            and ([.gallery[] | select(.title == "動態煉金內容 / Dynamic Alchemy")] | length == 1)
+            and ([.gallery[] | select(.title == "Nexus 材料診斷 / Nexus Materials")] | length == 1)
+            and ([.gallery[] | select(.title == "自然生成紅樹林村莊 / Mangrove Village")] | length == 1)
+          ' "${project_file}" >/dev/null
+          jq -e '
+            .project_id == "U2X0nXHi"
+            and .name == "DeadRecall 2.4.10"
+            and .version_number == "2.4.10"
+            and (.game_versions == ["26.2"])
+            and (.loaders == ["fabric"])
+            and (.changelog | contains("玩家死亡傳送點"))
+          ' "${version_file}" >/dev/null
+
+          jq '{
+            id, slug, title, description, categories, additional_categories,
+            client_side, server_side, wiki_url, source_url, issues_url,
+            license, status, requested_status,
+            gallery: [.gallery[] | {title, featured, ordering, url}]
+          }' "${project_file}"
+          jq '{
+            id, project_id, name, version_number, version_type, status,
+            game_versions, loaders, featured,
+            files: [.files[] | {filename, primary, size, hashes}]
+          }' "${version_file}"
+
       - name: Stage bundled JAR
         if: false
         shell: bash
