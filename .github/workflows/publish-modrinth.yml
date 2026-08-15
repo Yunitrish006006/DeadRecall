@@ -96,6 +96,22 @@ jobs:
               versions, game_versions, loaders,
               headers: [.body | split("\n")[] | select(test("^#{1,6} "))]
             }' "${project_file}"
+
+            mapfile -t version_ids < <(jq -r '.versions[]' "${project_file}")
+            version_file="$(mktemp)"
+            for version_id in "${version_ids[@]}"; do
+              curl --silent --show-error --fail \
+                --header "Authorization: ${MODRINTH_TOKEN}" \
+                --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+                --output "${version_file}" \
+                "https://api.modrinth.com/v2/version/${version_id}"
+              jq '{
+                id, project_id, name, version_number, status, requested_status,
+                version_type, game_versions, loaders, dependencies,
+                files: [.files[] | {filename, primary, size, hashes}]
+              }' "${version_file}"
+            done
+            rm -f "${version_file}"
           done
           rm -f "${project_file}"
 
