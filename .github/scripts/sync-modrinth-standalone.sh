@@ -882,8 +882,8 @@ readonly MODRINTH_TOKEN_VALUE="${MODRINTH_TOKEN:-}"
 
 validate_remote_tags
 resolve_projects
-update_projects
 upload_galleries
 sync_versions
+update_projects
 submit_for_review
 verify_remote

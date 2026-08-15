@@ -148,7 +148,7 @@
       "additional_categories": ["technology"],
       "client_side": "optional",
       "server_side": "required",
-      "version_environment": "server_only",
+      "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemDiscordBridge",
       "changelog": "Standalone TotemDiscordBridge 0.1.5 from DeadRecall 2.4.10. Relays configured chat, player activity, server lifecycle, Totem events, audits, attachments, and status through a separately deployed HTTPS Worker.",
       "dependencies": [
