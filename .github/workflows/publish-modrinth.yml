@@ -28,47 +28,15 @@ concurrency:
 
 jobs:
   publish:
-    name: Build and publish
+    name: Publish verified staged bundle
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar
+    timeout-minutes: 15
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect a new mod version
-        id: release
-        shell: bash
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          BEFORE_SHA: ${{ github.event.before }}
-        run: |
-          set -euo pipefail
-          current="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          test -n "${current}"
-
-          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
-            echo "Manual retry requested for ${current}."
-            echo "should_publish=true" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-
-          previous="$(git show "${BEFORE_SHA}:gradle.properties" 2>/dev/null \
-            | sed -n 's/^mod_version=//p' || true)"
-          if [[ -n "${previous}" && "${previous}" == "${current}" ]]; then
-            echo "mod_version is still ${current}; nothing to publish."
-            echo "should_publish=false" >> "${GITHUB_OUTPUT}"
-          else
-            echo "Detected mod_version change: ${previous:-unknown} -> ${current}."
-            echo "should_publish=true" >> "${GITHUB_OUTPUT}"
-          fi
 
       - name: Verify Modrinth configuration
-        if: steps.release.outputs.should_publish == 'true'
         shell: bash
         env:
           MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
@@ -84,61 +52,37 @@ jobs:
             exit 1
           }
 
-      - name: Set up Java 25
-        if: steps.release.outputs.should_publish == 'true'
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '25'
-
-      - name: Checkout pinned TotemCore source
-        if: steps.release.outputs.should_publish == 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: Yunitrish006006/TotemCore
-          ref: eac4bb3e19dec6d6aca4433df995f95e9631bc9b
-          path: .lockstep/TotemCore
-          persist-credentials: false
-
-      - name: Set up Gradle
-        if: steps.release.outputs.should_publish == 'true'
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Make scripts executable
-        if: steps.release.outputs.should_publish == 'true'
-        run: chmod +x gradlew .github/scripts/publish-modrinth.sh
-
-      - name: Verify release metadata
-        if: steps.release.outputs.should_publish == 'true'
+      - name: Download staged bundled JAR
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STAGING_TAG: modrinth-stage-2.4.10-4acfeab4
         run: |
           set -euo pipefail
-          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          test -n "${version}"
-          test -f "docs/releases/${version}.md"
-          grep -F -- "- [${version}](${version}.md)" docs/releases/README.md
+          mkdir -p build/libs
+          gh release download "${STAGING_TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern deadrecall-2.4.10-bundled.jar \
+            --dir build/libs
 
-      - name: Build and run server GameTests
-        if: steps.release.outputs.should_publish == 'true'
+      - name: Verify exact staged artifact and metadata
         shell: bash
+        env:
+          MODRINTH_DRY_RUN: 'true'
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
+          EXPECTED_SHA512: 4acfeab469f4c10b9c4abe5402e6f9b2e4a81c5c3d3b0537c0c412efd7ce712653151529fa5ec123b47e4c44ce465670644a2d393edd4a1671092a89da07f10a
         run: |
-          ./gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
-          test -f "${ORG_GRADLE_PROJECT_totemCoreJar}"
-          ./gradlew build --no-daemon --stacktrace
+          set -euo pipefail
+          actual="$(sha512sum "${MODRINTH_ARTIFACT}" | awk '{print $1}')"
+          test "${actual}" = "${EXPECTED_SHA512}"
+          bash .github/scripts/publish-modrinth.sh
 
       - name: Publish version to Modrinth
-        if: steps.release.outputs.should_publish == 'true'
         id: modrinth
         env:
           MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
-        run: .github/scripts/publish-modrinth.sh
-
-      - name: Store JAR when publishing fails
-        if: failure() && steps.release.outputs.should_publish == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: modrinth-publish-failure-${{ github.sha }}
-          if-no-files-found: ignore
-          path: build/libs/*.jar
+          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
+        run: bash .github/scripts/publish-modrinth.sh
