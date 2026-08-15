@@ -404,6 +404,8 @@ update_projects() {
         local additional_categories
         local client_side
         local server_side
+        local current_project="${TEMP_DIR}/metadata-${module_id}-current.json"
+        local current_slug
         local metadata_file="${TEMP_DIR}/metadata-${module_id}.json"
         local response_file="${TEMP_DIR}/metadata-${module_id}-response.json"
         local status
@@ -429,6 +431,10 @@ update_projects() {
         server_side="$(jq -er --arg module_id "${module_id}" \
             '.modules[] | select(.id == $module_id) | .server_side' "${MANIFEST}")"
 
+        status="$(json_status GET "${API_BASE}/project/${project_id}" "${current_project}")"
+        require_success "${status}" "${current_project}" "Read current ${title} metadata"
+        current_slug="$(jq -er '.slug' "${current_project}")"
+
         jq -n \
             --arg slug "${slug}" \
             --arg title "${title}" \
@@ -438,9 +444,9 @@ update_projects() {
             --arg client_side "${client_side}" \
             --arg server_side "${server_side}" \
             --rawfile body "${body_path}" \
-            --arg repository "${repository}" '
+            --arg repository "${repository}" \
+            --arg current_slug "${current_slug}" '
             {
-                slug: $slug,
                 title: $title,
                 description: $description,
                 categories: $categories,
@@ -450,6 +456,7 @@ update_projects() {
                 body: $body,
                 license_id: "Apache-2.0"
             }
+            + if $current_slug == $slug then {} else {slug: $slug} end
             + if $repository == "" then {}
               else {
                   source_url: $repository,
