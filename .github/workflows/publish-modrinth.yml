@@ -56,14 +56,14 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          STAGING_TAG: modrinth-stage-2.4.10-4acfeab4
+          STAGING_ASSET_ID: '515426863'
         run: |
           set -euo pipefail
           mkdir -p build/libs
-          gh release download "${STAGING_TAG}" \
-            --repo "${GITHUB_REPOSITORY}" \
-            --pattern deadrecall-2.4.10-bundled.jar \
-            --dir build/libs
+          gh api \
+            -H 'Accept: application/octet-stream' \
+            "/repos/${GITHUB_REPOSITORY}/releases/assets/${STAGING_ASSET_ID}" \
+            > build/libs/deadrecall-2.4.10-bundled.jar
 
       - name: Verify exact staged artifact and metadata
         shell: bash
