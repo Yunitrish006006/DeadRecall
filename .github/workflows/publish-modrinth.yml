@@ -208,7 +208,7 @@ jobs:
             --rawfile body .github/staging/modrinth-project-body.md \
             '{
               title: "DeadRecall",
-              description: "Exact-version Minecraft 26.2 Fabric bundle for Totem backpacks, automation, alchemy, Nexus travel, villager economies, and safe legacy-world migration.",
+              description: "A lockstep Minecraft 26.2 Fabric ecosystem in one JAR: shared manual, backpacks, recovery, automation, alchemy, Nexus travel, villagers, and server integration.",
               categories: ["adventure", "storage", "utility"],
               additional_categories: ["economy", "game-mechanics", "magic", "technology", "transportation"],
               client_side: "required",
@@ -329,36 +329,90 @@ jobs:
             printf 'Uploaded gallery image: %s\n' "${title}"
           }
 
+          set_gallery_presentation() {
+            local title="$1"
+            local featured="$2"
+            local ordering="$3"
+
+            curl --silent --show-error --fail \
+              --header "Authorization: ${MODRINTH_TOKEN}" \
+              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+              --output "${project_file}" \
+              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
+            local image_url
+            image_url="$(jq -er --arg title "${title}" \
+              '.gallery[] | select(.title == $title) | .url' "${project_file}")"
+            local image_url_query
+            image_url_query="$(jq -rn --arg value "${image_url}" '$value | @uri')"
+            local status
+            status="$(curl --silent --show-error \
+              --request PATCH \
+              --header "Authorization: ${MODRINTH_TOKEN}" \
+              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+              --output "${response_file}" \
+              --write-out '%{http_code}' \
+              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/gallery?url=${image_url_query}&featured=${featured}&ordering=${ordering}")"
+            if [[ "${status}" != "200" && "${status}" != "204" ]]; then
+              printf 'Could not update gallery presentation for %s (HTTP %s).\n' \
+                "${title}" "${status}" >&2
+              jq . "${response_file}" >&2 2>/dev/null || true
+              exit 1
+            fi
+            printf 'Updated gallery presentation: %s (featured=%s, ordering=%s)\n' \
+              "${title}" "${featured}" "${ordering}"
+          }
+
+          upload_gallery_image \
+            .github/staging/modrinth-gallery/deadrecall-integration-overview.png \
+            'DeadRecall 2.4.10 全局整合架構 / Integration Overview' \
+            '十個 Totem 模組、共同 Core 契約與跨模組玩法依賴的完整總覽。The complete lockstep architecture and cross-module gameplay map.' \
+            true 0
+
           upload_gallery_image \
             .github/staging/modrinth-gallery/inventory-backpack-side-panel.png \
             '背包物品欄整合 / Backpack Inventory' \
             '普通物品欄旁會直接顯示目前背包內容。The equipped backpack opens beside the vanilla inventory.' \
-            true 0
+            false 10
           upload_gallery_image \
             .github/staging/modrinth-gallery/backpack-upgrade-bay.png \
             '一排式升級欄 / Backpack Upgrade Bay' \
             '背包介面中的一排式模組欄與內建 3×3 合成區。A single-row upgrade bay with integrated 3×3 crafting.' \
-            false 10
+            false 20
           upload_gallery_image \
             .github/staging/modrinth-gallery/backpack-capacity-4-modules.png \
             '四級容量擴充 / Capacity Expansion' \
             '四個容量模組將一般背包擴充到 36 格。Four capacity modules expand the backpack to 36 slots.' \
-            false 20
+            false 30
           upload_gallery_image \
             .github/staging/modrinth-gallery/alchemy-creative-showcase.png \
             '動態煉金內容 / Dynamic Alchemy' \
             'DeadRecall 創造模式分頁中的煉金材料與容器。Alchemy ingredients and vessels in the DeadRecall creative tab.' \
-            false 30
+            false 40
           upload_gallery_image \
             .github/staging/modrinth-gallery/nexus-material-diagnostics.png \
             'Nexus 材料診斷 / Nexus Materials' \
             'Space Unit 會依材料顯示容量、穩定度、路線與跨維度特性。Material-driven Space Unit diagnostics and travel attributes.' \
-            false 40
+            false 50
           upload_gallery_image \
             .github/staging/modrinth-gallery/mangrove-village-aerial.png \
             '自然生成紅樹林村莊 / Mangrove Village' \
             '依地形自然生成、包含生產工作區的紅樹林村莊。A terrain-aware mangrove village with integrated production areas.' \
-            false 50
+            false 60
+
+          set_gallery_presentation \
+            'DeadRecall 2.4.10 全局整合架構 / Integration Overview' true 0
+          set_gallery_presentation \
+            '背包物品欄整合 / Backpack Inventory' false 10
+          set_gallery_presentation \
+            '一排式升級欄 / Backpack Upgrade Bay' false 20
+          set_gallery_presentation \
+            '四級容量擴充 / Capacity Expansion' false 30
+          set_gallery_presentation \
+            '動態煉金內容 / Dynamic Alchemy' false 40
+          set_gallery_presentation \
+            'Nexus 材料診斷 / Nexus Materials' false 50
+          set_gallery_presentation \
+            '自然生成紅樹林村莊 / Mangrove Village' false 60
 
       - name: Verify completed Modrinth metadata
         shell: bash
@@ -393,14 +447,29 @@ jobs:
             and .client_side == "required"
             and .server_side == "required"
             and .wiki_url == "https://github.com/Yunitrish006006/DeadRecall/blob/master/docs/README.md"
+            and (.description | contains("lockstep Minecraft 26.2 Fabric ecosystem"))
             and (.body | contains("TotemVillagers"))
-            and (.body | contains("不要再把相同子模組的獨立 JAR"))
+            and (.body | contains("What DeadRecall is / 整體定位"))
+            and (.body | contains("Cross-module gameplay loops / 跨模組玩法循環"))
+            and (.body | contains("Install only the DeadRecall bundle"))
+            and ([.gallery[] | select(.title == "DeadRecall 2.4.10 全局整合架構 / Integration Overview")] | length == 1)
             and ([.gallery[] | select(.title == "背包物品欄整合 / Backpack Inventory")] | length == 1)
             and ([.gallery[] | select(.title == "一排式升級欄 / Backpack Upgrade Bay")] | length == 1)
             and ([.gallery[] | select(.title == "四級容量擴充 / Capacity Expansion")] | length == 1)
             and ([.gallery[] | select(.title == "動態煉金內容 / Dynamic Alchemy")] | length == 1)
             and ([.gallery[] | select(.title == "Nexus 材料診斷 / Nexus Materials")] | length == 1)
             and ([.gallery[] | select(.title == "自然生成紅樹林村莊 / Mangrove Village")] | length == 1)
+            and ([.gallery[] | select(.featured == true)] | length == 1)
+            and ([.gallery[] | select(
+              .title == "DeadRecall 2.4.10 全局整合架構 / Integration Overview"
+              and .featured == true
+              and .ordering == 0
+            )] | length == 1)
+            and ([.gallery[] | select(
+              .title == "背包物品欄整合 / Backpack Inventory"
+              and .featured == false
+              and .ordering == 10
+            )] | length == 1)
           ' "${project_file}" >/dev/null
           jq -e '
             .project_id == "U2X0nXHi"
