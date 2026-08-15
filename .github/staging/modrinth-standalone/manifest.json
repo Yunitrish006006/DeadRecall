@@ -17,7 +17,7 @@
       "additional_categories": ["game-mechanics"],
       "client_side": "required",
       "server_side": "required",
-      "version_environment": "client_and_server",
+      "version_environment": "server_only",
       "repository": "https://github.com/Yunitrish006006/TotemCore",
       "changelog": "Standalone TotemCore 0.5.0 from DeadRecall 2.4.10. Provides the shared v1 API, event bus, manual framework, compatibility checks, and migration contracts used by the current Totem modules.",
       "dependencies": [
