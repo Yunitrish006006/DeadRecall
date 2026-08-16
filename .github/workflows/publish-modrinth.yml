@@ -678,6 +678,69 @@ jobs:
           MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.11-bundled.jar
         run: bash .github/scripts/publish-modrinth.sh
 
+      - name: Verify published project and version
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_VERSION_ID: ${{ steps.modrinth.outputs.version_id }}
+          EXPECTED_SHA512: c050e0e198a13a2699c7730027481b82c232dcf58c6b207f3450351ae48447fcd4b45e6cdc8a32b3a431ab0cd8f946c6374ec569ad07f65425e0b3f42c135ae2
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_VERSION_ID}"
+          project_file="$(mktemp)"
+          version_file="$(mktemp)"
+          cleanup() {
+            rm -f "${project_file}" "${version_file}"
+          }
+          trap cleanup EXIT
+
+          curl --silent --show-error --fail --retry 3 \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${project_file}" \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
+          curl --silent --show-error --fail --retry 3 \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "${version_file}" \
+            "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}"
+
+          jq -e \
+            --rawfile body .github/staging/modrinth-project-body.md '
+            .id == "U2X0nXHi"
+            and .slug == "deadrecall"
+            and .title == "DeadRecall"
+            and .description == "A lockstep Minecraft 26.2 Fabric ecosystem in one JAR: guided manuals, backpacks, recovery, automation, storage locks, travel, villages, and server integration."
+            and .license.id == "Apache-2.0"
+            and .client_side == "required"
+            and .server_side == "required"
+            and ((.body | rtrimstr("\n")) == ($body | rtrimstr("\n")))
+            and all(.body | split("\n")[] | select(test("^#{1,6} "));
+              (sub("^#{1,6} +"; "") | length) <= 24
+            )
+            and (.status == "approved" or .requested_status == "approved")
+          ' "${project_file}" >/dev/null
+          jq -e \
+            --arg project_id "${MODRINTH_PROJECT_ID}" \
+            --arg version_id "${MODRINTH_VERSION_ID}" \
+            --arg sha512 "${EXPECTED_SHA512}" '
+            .id == $version_id
+            and .project_id == $project_id
+            and .name == "DeadRecall 2.4.11"
+            and .version_number == "2.4.11"
+            and .version_type == "release"
+            and .status == "listed"
+            and .environment == "client_and_server"
+            and .game_versions == ["26.2"]
+            and .loaders == ["fabric"]
+            and (([.files[] | select(.primary == true)][0] // .files[0]).filename
+              == "deadrecall-2.4.11-bundled.jar")
+            and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512
+              == $sha512)
+          ' "${version_file}" >/dev/null
+          printf 'Verified DeadRecall 2.4.11 project body, headers, and remote JAR SHA-512.\n'
+
       - name: Submit draft project for review
         if: false
         shell: bash
