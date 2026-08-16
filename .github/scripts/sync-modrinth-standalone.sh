@@ -9,7 +9,6 @@ readonly USER_AGENT="Yunitrish006006/DeadRecall-StandaloneSync/${GITHUB_RUN_ID:-
 readonly MANIFEST="${REPOSITORY_ROOT}/.github/staging/modrinth-standalone/manifest.json"
 readonly BODY_DIR="${REPOSITORY_ROOT}/.github/staging/modrinth-standalone"
 readonly BUNDLE="${REPOSITORY_ROOT}/.github/staging/deadrecall-2.4.10-bundled.jar"
-readonly ICON="${REPOSITORY_ROOT}/src/main/resources/assets/deadrecall/icon.png"
 readonly TEMP_DIR="$(mktemp -d)"
 readonly EXTRACT_DIR="${TEMP_DIR}/jars"
 readonly PROJECT_IDS="${TEMP_DIR}/project-ids.json"
@@ -94,11 +93,10 @@ validate_inputs() {
     command -v jq >/dev/null 2>&1 || die "jq is required"
     command -v sha512sum >/dev/null 2>&1 || die "sha512sum is required"
     command -v unzip >/dev/null 2>&1 || die "unzip is required"
+    command -v file >/dev/null 2>&1 || die "file is required"
 
     [[ -f "${MANIFEST}" ]] || die "missing standalone manifest: ${MANIFEST}"
     [[ -f "${BUNDLE}" ]] || die "missing verified bundle: ${BUNDLE}"
-    [[ -f "${ICON}" ]] || die "missing project icon: ${ICON}"
-
     jq -e '
         .schema_version == 1
         and .minecraft_version == "26.2"
@@ -113,6 +111,7 @@ validate_inputs() {
             and (.slug | test("^[a-z0-9_-]+$"))
             and (.title | length > 0)
             and (.description | length > 0 and length <= 256)
+            and (.icon | test("^icons/[a-z0-9_-]+[.]png$"))
             and (.version | length > 0)
             and (.sha512 | test("^[0-9a-f]{128}$"))
             and (.categories | length > 0 and length <= 3)
@@ -158,6 +157,23 @@ validate_inputs() {
             END { exit failed }
         ' "${body_path}" || die "project body header validation failed: ${body_path}"
     done
+
+    mapfile -t icon_files < <(jq -r '.modules[].icon' "${MANIFEST}")
+    local icon_hashes="${TEMP_DIR}/icon-hashes.txt"
+    : > "${icon_hashes}"
+    for icon_file in "${icon_files[@]}"; do
+        local icon_path="${BODY_DIR}/${icon_file}"
+        local icon_size
+        [[ -s "${icon_path}" ]] || die "missing project icon: ${icon_path}"
+        icon_size="$(wc -c < "${icon_path}")"
+        (( icon_size <= 262144 )) \
+            || die "project icon exceeds Modrinth's 256 KiB limit: ${icon_path}"
+        file "${icon_path}" | grep -F 'PNG image data, 64 x 64' >/dev/null \
+            || die "project icon must be a 64x64 PNG: ${icon_path}"
+        sha512sum "${icon_path}" | awk '{print $1}' >> "${icon_hashes}"
+    done
+    [[ "$(sort -u "${icon_hashes}" | wc -l)" == "10" ]] \
+        || die "standalone project icons must be byte-distinct"
 
     mkdir -p "${EXTRACT_DIR}"
     mapfile -t module_ids < <(jq -r '.modules[].id' "${MANIFEST}")
@@ -259,6 +275,8 @@ create_project() {
     local slug
     local description
     local repository
+    local icon_file
+    local icon_path
     local categories
     local additional_categories
     local client_side
@@ -276,6 +294,9 @@ create_project() {
         '.modules[] | select(.id == $module_id) | .description' "${MANIFEST}")"
     repository="$(jq -r --arg module_id "${module_id}" \
         '.modules[] | select(.id == $module_id) | .repository' "${MANIFEST}")"
+    icon_file="$(jq -er --arg module_id "${module_id}" \
+        '.modules[] | select(.id == $module_id) | .icon' "${MANIFEST}")"
+    icon_path="${BODY_DIR}/${icon_file}"
     categories="$(jq -c --arg module_id "${module_id}" \
         '.modules[] | select(.id == $module_id) | .categories' "${MANIFEST}")"
     additional_categories="$(jq -c --arg module_id "${module_id}" \
@@ -322,7 +343,7 @@ create_project() {
         --header "Authorization: ${MODRINTH_TOKEN_VALUE}" \
         --header "User-Agent: ${USER_AGENT}" \
         --form "data=@${create_data};type=application/json" \
-        --form "icon=@${ICON};type=image/png" \
+        --form "icon=@${icon_path};type=image/png" \
         --output "${create_response}" \
         --write-out '%{http_code}' \
         "${API_BASE}/project")"
@@ -481,6 +502,37 @@ update_projects() {
             "${response_file}" "${metadata_file}")"
         require_success "${status}" "${response_file}" "Update ${title} metadata"
         printf 'Updated metadata for %s (%s).\n' "${title}" "${project_id}"
+    done
+}
+
+update_project_icons() {
+    mapfile -t module_ids < <(jq -r '.modules[].id' "${MANIFEST}")
+    for module_id in "${module_ids[@]}"; do
+        local project_id
+        local title
+        local icon_file
+        local icon_path
+        local response_file="${TEMP_DIR}/icon-${module_id}-response.json"
+        local status
+
+        project_id="$(project_id_for "${module_id}")"
+        title="$(jq -er --arg module_id "${module_id}" \
+            '.modules[] | select(.id == $module_id) | .title' "${MANIFEST}")"
+        icon_file="$(jq -er --arg module_id "${module_id}" \
+            '.modules[] | select(.id == $module_id) | .icon' "${MANIFEST}")"
+        icon_path="${BODY_DIR}/${icon_file}"
+
+        status="$(curl --silent --show-error \
+            --request PATCH \
+            --header "Authorization: ${MODRINTH_TOKEN_VALUE}" \
+            --header "User-Agent: ${USER_AGENT}" \
+            --header 'Content-Type: image/png' \
+            --data-binary "@${icon_path}" \
+            --output "${response_file}" \
+            --write-out '%{http_code}' \
+            "${API_BASE}/project/${project_id}/icon?ext=png")"
+        require_success "${status}" "${response_file}" "Update ${title} icon"
+        printf 'Updated icon for %s (%s).\n' "${title}" "${project_id}"
     done
 }
 
@@ -894,6 +946,7 @@ readonly MODRINTH_TOKEN_VALUE="${MODRINTH_TOKEN:-}"
 
 validate_remote_tags
 resolve_projects
+update_project_icons
 upload_galleries
 sync_versions
 update_projects

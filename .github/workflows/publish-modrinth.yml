@@ -342,6 +342,32 @@ jobs:
           fi
           printf 'Updated project description, categories, compatibility, documentation, license, and long-form body.\n'
 
+      - name: Update Modrinth project icon
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          response_file="$(mktemp)"
+          trap 'rm -f "${response_file}"' EXIT
+
+          status="$(curl --silent --show-error \
+            --request PATCH \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --header 'Content-Type: image/png' \
+            --data-binary '@src/main/resources/assets/deadrecall/icon.png' \
+            --output "${response_file}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/icon?ext=png")"
+          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
+            printf 'Could not update Modrinth project icon (HTTP %s).\n' "${status}" >&2
+            jq . "${response_file}" >&2 2>/dev/null || true
+            exit 1
+          fi
+          printf 'Updated the DeadRecall Modrinth project icon.\n'
+
       - name: Update Modrinth 2.4.10 version notes
         shell: bash
         env:
