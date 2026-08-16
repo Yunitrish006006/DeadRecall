@@ -1,11 +1,6 @@
 name: Publish Modrinth
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - gradle.properties
   workflow_dispatch:
     inputs:
       standalone_operation:
@@ -338,7 +333,7 @@ jobs:
             --rawfile body .github/staging/modrinth-project-body.md \
             '{
               title: "DeadRecall",
-              description: "A lockstep Minecraft 26.2 Fabric ecosystem in one JAR: shared manual, backpacks, recovery, automation, alchemy, Nexus travel, villagers, and server integration.",
+              description: "A lockstep Minecraft 26.2 Fabric ecosystem in one JAR: guided manuals, backpacks, recovery, automation, storage locks, travel, villages, and server integration.",
               categories: ["adventure", "storage", "utility"],
               additional_categories: ["economy", "game-mechanics", "magic", "technology", "transportation"],
               client_side: "required",
@@ -394,6 +389,7 @@ jobs:
           printf 'Updated the DeadRecall Modrinth project icon.\n'
 
       - name: Update Modrinth 2.4.10 version notes
+        if: false
         shell: bash
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
@@ -432,6 +428,7 @@ jobs:
           printf 'Updated DeadRecall 2.4.10 version name and changelog.\n'
 
       - name: Upload missing Modrinth gallery images
+        if: false
         shell: bash
         env:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
@@ -571,6 +568,7 @@ jobs:
             '自然生成紅樹林村莊 / Mangrove Village' false 60
 
       - name: Verify completed Modrinth metadata
+        if: false
         shell: bash
         env:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
@@ -649,22 +647,20 @@ jobs:
           }' "${version_file}"
 
       - name: Stage bundled JAR
-        if: false
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p build/libs
-          cp .github/staging/deadrecall-2.4.10-bundled.jar \
-            build/libs/deadrecall-2.4.10-bundled.jar
+          cp .github/staging/deadrecall-2.4.11-bundled.jar \
+            build/libs/deadrecall-2.4.11-bundled.jar
 
       - name: Verify exact staged artifact and metadata
-        if: false
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
-          EXPECTED_SHA512: 885f27386e071a7062802845d8f854a982932c1f4f47dfbade3469dc16c47c4b9ad09fb5b8b71684d768b8cb54b20e010264f9aea94e942c496099f7ccab96da
+          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.11-bundled.jar
+          EXPECTED_SHA512: c050e0e198a13a2699c7730027481b82c232dcf58c6b207f3450351ae48447fcd4b45e6cdc8a32b3a431ab0cd8f946c6374ec569ad07f65425e0b3f42c135ae2
         run: |
           set -euo pipefail
           actual="$(sha512sum "${MODRINTH_ARTIFACT}" | awk '{print $1}')"
@@ -674,13 +670,12 @@ jobs:
           bash .github/scripts/publish-modrinth.sh
 
       - name: Publish version to Modrinth
-        if: false
         id: modrinth
         env:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
-          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.10-bundled.jar
+          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.11-bundled.jar
         run: bash .github/scripts/publish-modrinth.sh
 
       - name: Submit draft project for review

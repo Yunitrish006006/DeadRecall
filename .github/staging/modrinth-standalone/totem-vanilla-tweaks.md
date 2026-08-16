@@ -16,9 +16,9 @@ Sorting requests, slot ranges, item movement, conversion, and experience bookkee
 
 ## Setup
 
-Install TotemVanillaTweaks 0.1.7, TotemCore 0.5.0, and Fabric API on both client and server.
+Install TotemVanillaTweaks 0.1.8, TotemCore 0.6.0, and Fabric API on both client and server.
 
-Do not install this standalone JAR beside DeadRecall 2.4.10; the bundle already embeds it.
+Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already embeds it.
 
 ## Compatibility
 

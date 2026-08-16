@@ -8,7 +8,7 @@ readonly API_BASE="${MODRINTH_API_BASE:-https://api.modrinth.com/v2}"
 readonly USER_AGENT="Yunitrish006006/DeadRecall-StandaloneSync/${GITHUB_RUN_ID:-local}"
 readonly MANIFEST="${REPOSITORY_ROOT}/.github/staging/modrinth-standalone/manifest.json"
 readonly BODY_DIR="${REPOSITORY_ROOT}/.github/staging/modrinth-standalone"
-readonly BUNDLE="${REPOSITORY_ROOT}/.github/staging/deadrecall-2.4.10-bundled.jar"
+readonly BUNDLE="${REPOSITORY_ROOT}/.github/staging/deadrecall-2.4.11-bundled.jar"
 readonly TEMP_DIR="$(mktemp -d)"
 readonly EXTRACT_DIR="${TEMP_DIR}/jars"
 readonly PROJECT_IDS="${TEMP_DIR}/project-ids.json"
@@ -101,9 +101,9 @@ validate_inputs() {
         .schema_version == 1
         and .minecraft_version == "26.2"
         and .loader == "fabric"
-        and (.modules | length == 10)
-        and (([.modules[].id] | unique | length) == 10)
-        and (([.modules[].slug] | unique | length) == 10)
+        and (.modules | length == 11)
+        and (([.modules[].id] | unique | length) == 11)
+        and (([.modules[].slug] | unique | length) == 11)
         and ([.modules[] | select(.version_environment == "server_only_client_optional") | .id]
             == ["totem-discord-bridge"])
         and all(.modules[];
@@ -172,7 +172,7 @@ validate_inputs() {
             || die "project icon must be a 64x64 PNG: ${icon_path}"
         sha512sum "${icon_path}" | awk '{print $1}' >> "${icon_hashes}"
     done
-    [[ "$(sort -u "${icon_hashes}" | wc -l)" == "10" ]] \
+    [[ "$(sort -u "${icon_hashes}" | wc -l)" == "11" ]] \
         || die "standalone project icons must be byte-distinct"
 
     mkdir -p "${EXTRACT_DIR}"
@@ -210,7 +210,7 @@ validate_inputs() {
             || die "${jar} SHA-512 does not match the audited manifest"
     done
 
-    printf 'Validated 10 descriptions and 10 byte-exact standalone artifacts.\n'
+    printf 'Validated 11 descriptions and 11 byte-exact standalone artifacts.\n'
 }
 
 check_slug_owner() {

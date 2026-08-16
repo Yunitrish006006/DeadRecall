@@ -21,9 +21,9 @@ All item use, cauldron state changes, timing, ingredient consumption, and brewin
 
 ## Setup
 
-Install TotemAlchemy 0.1.22, TotemCore 0.5.0, and Fabric API on both client and server.
+Install TotemAlchemy 0.1.23, TotemCore 0.6.0, and Fabric API on both client and server.
 
-Do not install this standalone JAR beside DeadRecall 2.4.10; the bundle already contains the identical module.
+Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already contains the identical module.
 
 ## Compatibility
 

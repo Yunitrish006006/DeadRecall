@@ -18,9 +18,9 @@ Block eligibility, area limits, durability, drops, and the excavation transactio
 
 ## Setup
 
-Install Totem Excavation 0.1.1, TotemCore 0.5.0, and Fabric API on both client and server.
+Install Totem Excavation 0.1.2, TotemCore 0.6.0, and Fabric API on both client and server.
 
-Do not install this standalone JAR beside DeadRecall 2.4.10; the bundle already contains it.
+Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already contains it.
 
 ## Compatibility
 

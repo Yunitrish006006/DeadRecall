@@ -11,6 +11,7 @@ The bridge is disabled by default and does nothing until an operator explicitly 
 - Minecraft chat and supported attachments.
 - Player joins, leaves, deaths, and server lifecycle events.
 - TotemCore events such as death-backpack recovery and Space Unit updates.
+- One deduplicated alert after a non-owner successfully breaks a TotemLocksmith protected container.
 - Sanitized administrative audit summaries.
 - Live status and presence updates.
 - An optional in-game administration screen when the client module is installed.
@@ -23,9 +24,9 @@ Never publish the Worker API key in logs, screenshots, issue reports, or source 
 
 ## Setup
 
-Deploy the companion HTTPS Worker, configure its Discord destination, then add the Worker URL and matching API key to the server configuration. Install TotemDiscordBridge 0.1.5, TotemCore 0.5.0, and Fabric API on the server. The client is optional and is needed only for the administration interface.
+Deploy the companion HTTPS Worker, configure its Discord destination, then add the Worker URL and matching API key to the server configuration. Install TotemDiscordBridge 0.1.6, TotemCore 0.6.0, and Fabric API on the server. The client is optional and is needed only for the administration interface.
 
-Do not install this standalone JAR beside DeadRecall 2.4.10; the bundle already embeds it.
+Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already embeds it.
 
 ## Compatibility
 

@@ -8,9 +8,10 @@ TotemRemnant adds upgradeable backpacks, server-authoritative death-item recover
 
 - Four backpack tiers with 9, 18, 27, or 36 base slots.
 - Upgrade bays for crafting, raw-ore compression, matching-item pickup, extra capacity, soulbound retention, fire protection, explosion protection, despawn protection, and void rescue.
-- Dyeable backpacks and an inventory-side preview for carried storage.
+- Dyeable backpacks and a fully interactive inventory-side panel for carried storage.
 - Death backpacks that collect eligible inventory contents, preserve ownership, survive fire and the void, display a beacon, and disappear only after recovery.
 - Optional Trinkets Updated inventory capture and TotemNexus death-node integration.
+- Automatic death-time scanning keeps one eligible soulbound Nexus interface even when it has never teleported before.
 
 ## Safety
 
@@ -20,9 +21,9 @@ Administrators can control death-backpack generation, owner-only pickup, and the
 
 ## Setup
 
-Install TotemRemnant 0.2.10, TotemCore 0.5.0, and Fabric API on both client and server. Trinkets Updated 4.1.0-beta.2 or newer is optional.
+Install TotemRemnant 0.2.11, TotemCore 0.6.0, and Fabric API on both client and server. Trinkets Updated 4.1.0-beta.2 or newer is optional.
 
-Do not install this standalone JAR beside DeadRecall 2.4.10; the bundle already contains the identical module.
+Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already contains the identical module.
 
 ## Compatibility
 

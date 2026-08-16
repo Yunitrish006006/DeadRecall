@@ -13,6 +13,7 @@ TOTEM 圖靈騰系統（以下簡稱圖靈騰；技術品牌為 `Totem`）是由
 | 圖靈騰殘響 | `Totem Remnant` | 死亡背包、物品回收、死亡紀錄、死亡殘響與離線玩家身體 | 死亡背包核心與第一階段物品 ID 相容遷移已完成；離線玩家身體尚待進行。 |
 | 圖靈騰機巧 | `Totem Automata` | 銅傀儡、分類、採集與自動化工作模式 | 核心功能與自動化驗證已完成；正進行獨立 module 資格驗證與 compatibility-bundle cutover。 |
 | 圖靈騰掘進 | `Totem Excavation` | 區域採掘錘與未來工程工具 | 待從 Blossom 移植。 |
+| 圖靈騰鎖匠 | `Totem Locksmith` | 箱子、陷阱箱與木桶的所有權、Hopper 網路單鎖、root 側分裂、鑰匙及非 Owner 破壞警報 | 0.1.0 功能規格與驗收矩陣已完成；獨立 repository 與實作尚未建立。 |
 | 圖靈騰智識 | `Totem Cognition` | Agent Framework、自然語言、規劃、工具呼叫與 Provider | 研究階段；設計為可選模組。 |
 
 `DeadRecall` 目前是既有世界與鎖定版本模組的 compatibility bundle，並非圖靈騰系列中的功能模組。
@@ -25,6 +26,7 @@ TOTEM 圖靈騰系統（以下簡稱圖靈騰；技術品牌為 `Totem`）是由
 ├── 圖靈騰殘響（Totem Remnant）
 ├── 圖靈騰機巧（Totem Automata）
 ├── 圖靈騰掘進（Totem Excavation）
+├── 圖靈騰鎖匠（Totem Locksmith）
 └── 圖靈騰智識（Totem Cognition）
 ```
 
@@ -43,6 +45,7 @@ TOTEM 圖靈騰系統（以下簡稱圖靈騰；技術品牌為 `Totem`）是由
 - [`specs/offline-player-body/spec.md`](specs/offline-player-body/spec.md)：圖靈騰殘響（Totem Remnant）的玩家下線後保留身體、重連、死亡與防複製規格。
 - [`specs/discord-bridge/spec.md`](specs/discord-bridge/spec.md)：Discord Bridge 的事件轉播、Worker 路由與安全規格。
 - [`specs/gameplay-recipes/spec.md`](specs/gameplay-recipes/spec.md)：DeadRecall 覆寫或新增的資料層配方規格。
+- [`specs/locksmith-chest-locking/spec.md`](specs/locksmith-chest-locking/spec.md)：圖靈騰鎖匠的箱鎖、角色、鑰匙、自動化、資料與驗收規格。
 - [`changes/direct-friend-player-teleport/`](changes/direct-friend-player-teleport/)：雙向好友直接傳送，不再逐次確認。
 - [`changes/amethyst-catalyst-teleport-discount/`](changes/amethyst-catalyst-teleport-discount/)：傳送石碑紫水晶催化方塊降低跨維度成本。
 - [`changes/teleport-interface-item-specializations/`](changes/teleport-interface-item-specializations/)：普通羅盤、回生羅盤、書本與已繪製地圖的傳送介面與特化規格。
@@ -53,6 +56,7 @@ TOTEM 圖靈騰系統（以下簡稱圖靈騰；技術品牌為 `Totem`）是由
 - [`changes/remnant-item-id-migration/`](changes/remnant-item-id-migration/)：Remnant canonical item ID、legacy 雙註冊與 lazy migration。
 - [`changes/automata-alchemy-item-id-migration/`](changes/automata-alchemy-item-id-migration/)：Automata／Alchemy canonical item ID、legacy 雙註冊與 recipe bridge。
 - [`changes/safe-multi-repo-modularization/`](changes/safe-multi-repo-modularization/)：一次一個功能 repository、DeadRecall compatibility bundle、識別碼基線與可回滾拆分流程。
+- [`changes/add-totem-locksmith-chest-locking/`](changes/add-totem-locksmith-chest-locking/)：TotemLocksmith 0.1.0 的獨立模組、完整設計、Discord 破壞警報、實作任務與測試矩陣。
 
 ## 名稱與相容性
 

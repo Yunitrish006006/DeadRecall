@@ -69,6 +69,7 @@ readonly MOD_VERSION="$(read_property mod_version)"
 readonly MINECRAFT_VERSION="$(read_property minecraft_version)"
 readonly ARCHIVES_BASE_NAME="$(read_property archives_base_name)"
 readonly CHANGELOG_FILE="docs/releases/${MOD_VERSION}.md"
+readonly PROJECT_BODY_FILE=".github/staging/modrinth-project-body.md"
 readonly ARTIFACT="${MODRINTH_ARTIFACT:-build/libs/${ARCHIVES_BASE_NAME}-${MOD_VERSION}.jar}"
 readonly DRY_RUN="${MODRINTH_DRY_RUN:-false}"
 
@@ -78,6 +79,18 @@ case "${DRY_RUN}" in
 esac
 
 [[ -f "${CHANGELOG_FILE}" ]] || die "missing release notes: ${CHANGELOG_FILE}"
+[[ -s "${PROJECT_BODY_FILE}" ]] || die "missing Modrinth project body: ${PROJECT_BODY_FILE}"
+awk '
+    /^#{1,6}[[:space:]]/ {
+        header = $0
+        sub(/^#{1,6}[[:space:]]+/, "", header)
+        if (length(header) > 24) {
+            printf "Header is longer than 24 characters: %s\n", $0 > "/dev/stderr"
+            failed = 1
+        }
+    }
+    END { exit failed }
+' "${PROJECT_BODY_FILE}" || die "Modrinth project body header validation failed"
 grep -F -- "- [${MOD_VERSION}](${MOD_VERSION}.md)" docs/releases/README.md >/dev/null \
     || die "docs/releases/README.md does not index ${MOD_VERSION}"
 [[ -f "${ARTIFACT}" ]] || die "missing release artifact: ${ARTIFACT}; run ./gradlew build first"

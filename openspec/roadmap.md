@@ -108,6 +108,9 @@
 ## 待排程
 
 - 傳送介面 Phase A–D 已完成；真人 Client 驗收在可取得兩名以上玩家時執行。
+- 圖靈騰鎖匠（Totem Locksmith）0.1.0 的功能規格、架構決策、分階段任務及
+  測試矩陣已完成；依現行 modularization gate，獨立 repository 與實作在
+  lockstep observation 收斂後開始。
 
 ### 短週期完成順序
 
@@ -166,6 +169,21 @@
 - 分 tick 採掘 session。
 - Tag 驅動採掘規則。
 - Client-side 選區框線。
+
+### 圖靈騰鎖匠（Totem Locksmith）
+
+- 建立獨立 Fabric repository 與 `totem-locksmith` 模組。
+- 實作 Chest、Trapped Chest、Barrel 的 Server-authoritative 鎖定。
+- 實作 Owner、Manager、User、Blocked、實體鑰匙及四種存取模式。
+- 實作 Hopper 相連容器網路單一鎖、最初套鎖 root 側分裂歸屬、root successor
+  與最後容器生命週期、Automata 政策、非 Owner 容器／connector 破壞
+  DiscordBridge 警報及爆炸保護。
+- 實作 SavedData、revision session、管理 GUI、指令、稽核及修復。
+- 實作原版風格 attached lock model、16x16 物品、英文與繁中 accessibility。
+- 完成 security、restart、Dedicated Server、pairwise、bundle 與真人多人驗收。
+- 詳細定義位於
+  `openspec/changes/add-totem-locksmith-chest-locking/` 與
+  `openspec/specs/locksmith-chest-locking/spec.md`。
 
 ### 圖靈騰智識（Totem Cognition）
 
