@@ -128,8 +128,33 @@ jobs:
       - name: Create or update standalone projects
         shell: bash
         env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: bash .github/scripts/sync-modrinth-standalone.sh
+        run: |
+          set -euo pipefail
+          bash .github/scripts/sync-modrinth-standalone.sh
+
+          test -n "${MODRINTH_PROJECT_ID}" || {
+            printf 'Repository variable MODRINTH_PROJECT_ID is not configured.\n' >&2
+            exit 1
+          }
+          response_file="$(mktemp)"
+          trap 'rm -f "${response_file}"' EXIT
+          status="$(curl --silent --show-error \
+            --request PATCH \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --header 'Content-Type: image/png' \
+            --data-binary '@src/main/resources/assets/deadrecall/icon.png' \
+            --output "${response_file}" \
+            --write-out '%{http_code}' \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/icon?ext=png")"
+          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
+            printf 'Could not update the DeadRecall Modrinth icon (HTTP %s).\n' "${status}" >&2
+            jq . "${response_file}" >&2 2>/dev/null || true
+            exit 1
+          fi
+          printf 'Updated the DeadRecall Modrinth project icon.\n'
 
   publish:
     name: Publish verified staged bundle
