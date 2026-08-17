@@ -26,7 +26,7 @@ def bundledModuleNames = [
         "totem-locksmith-0.1.0.jar",
         "totem-vanilla-tweaks-0.1.8.jar",
         "totem-nexus-0.2.6.jar",
-        "totem-villagers-0.1.25.jar"
+        "totem-villagers-0.1.26.jar"
 ]
 def bundledModuleFiles = bundleModuleDirectory == null
         ? []
@@ -202,6 +202,32 @@ def bundleJar = tasks.register("bundleJar") {
             metadata.jars = bundledModuleFiles.collect { moduleJar ->
                 [file: "META-INF/jars/${moduleJar.name}"]
             }
+            def exactDependencies = new LinkedHashMap(metadata.depends ?: [:])
+            def seenModuleIds = new LinkedHashSet<String>()
+            bundledModuleFiles.each { moduleJar ->
+                def moduleArchive = new java.util.jar.JarFile(moduleJar)
+                try {
+                    def moduleMetadataEntry = moduleArchive.getJarEntry("fabric.mod.json")
+                    if (moduleMetadataEntry == null) {
+                        throw new GradleException("Bundled module is missing fabric.mod.json: ${moduleJar}")
+                    }
+                    def moduleMetadata = new groovy.json.JsonSlurper().parse(
+                            moduleArchive.getInputStream(moduleMetadataEntry)
+                    )
+                    String moduleId = moduleMetadata.id
+                    String moduleVersion = moduleMetadata.version
+                    if (moduleId == null || moduleId.isBlank() || moduleVersion == null || moduleVersion.isBlank()) {
+                        throw new GradleException("Bundled module has incomplete id/version metadata: ${moduleJar}")
+                    }
+                    if (!seenModuleIds.add(moduleId)) {
+                        throw new GradleException("Bundled module id is duplicated: ${moduleId}")
+                    }
+                    exactDependencies[moduleId] = "=${moduleVersion}"
+                } finally {
+                    moduleArchive.close()
+                }
+            }
+            metadata.depends = exactDependencies
             byte[] metadataBytes = groovy.json.JsonOutput.prettyPrint(
                     groovy.json.JsonOutput.toJson(metadata)
             ).getBytes(java.nio.charset.StandardCharsets.UTF_8)
