@@ -4,32 +4,36 @@
 
 ```text
 DeadRecall Server
-  └─ POST event/status to Cloudflare Worker
+  └─ module policy attaches delete_after_seconds when temporary
+       └─ POST event/status to Cloudflare Worker
        └─ Discord Create Message
-            ├─ permanent event: finish
-            └─ temporary event: enqueue deletion job (delay 600s)
+            ├─ no valid deletion instruction: finish
+            └─ valid deletion instruction: enqueue delayed deletion job
                  └─ Queue consumer
                       └─ DELETE /channels/{channel_id}/messages/{message_id}
 ```
 
 ## Event policy
 
-The Worker owns the temporary-event allowlist:
+TotemDiscordBridge owns the temporary-event allowlist:
 
 - `player_join`
 - `player_first_join`
+- `player_leave`
 - `death_backpack_created`
 - `death_backpack_recovered`
 - all messages produced by `/api/mc/server/status`
 
-The caller cannot make arbitrary events temporary by supplying an unrestricted duration. For supported events, the effective lifetime is exactly 600 seconds.
+The module applies the fixed 600-second lifetime while constructing both text-event and server-status payloads. All event send paths use that one policy; no temporary-event mixin or alternate HTTP sender remains.
+
+The Worker owns only transport validation and execution. It accepts a valid positive integer `delete_after_seconds` from an authenticated module request without mapping event names to policy. Missing or invalid values remain permanent.
 
 ## Delivery and deletion
 
 1. Resolve requested Discord channel IDs, falling back to configured sync channels and then the default environment channel.
 2. Send the Discord message using the Bot Token.
 3. Parse the returned Discord message object and retain only `channel_id` and `message_id`.
-4. Publish one queue message per successfully-created Discord message with `delaySeconds: 600`.
+4. Validate the module-supplied deletion delay and publish one queue message per successfully-created Discord message using that exact `delaySeconds`.
 5. The queue consumer calls Discord Delete Message.
 6. HTTP 204 and 404 are terminal success states.
 7. HTTP 429 and 5xx responses are retried with bounded delay.

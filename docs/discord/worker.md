@@ -38,6 +38,17 @@ Worker 只接受 Discord snowflake 格式的頻道 ID，會移除重複或無效
 
 `/api/mc/chat` 可帶 `event` 欄位，例如 `chat`、`player_death`、`player_first_join`、`player_join`、`player_leave`、`advancement`、`admin_action`、`server_health_alert`、`death_backpack_created`、`death_backpack_recovered`、`space_unit_public_update`、`boss_defeated`、`raid_started`、`raid_ended`、`difficulty_changed`、`gamerule_changed` 或 `villager_level_up`，Worker 會依事件類型套用 Discord 顯示格式。
 
+## 定時刪除
+
+刪除政策只由 TotemDiscordBridge 模組決定。模組需要刪除通知時會附加數字欄位
+`delete_after_seconds`；目前加入、首次加入、離開、死亡背包建立／回收及伺服器狀態
+使用 600 秒。Worker 不維護事件白名單，只驗證秒數並透過
+`DISCORD_MESSAGE_DELETIONS` Queue 執行刪除。未帶有效秒數的訊息永久保留。
+
+實際 Queue producer／consumer 與部署設定以
+[`Yunitrish006006/discord-bot`](https://github.com/Yunitrish006006/discord-bot) 為準；
+不要使用不含 Queue consumer 的舊範例覆蓋正式 Worker。
+
 所有請求都應包含：
 
 ```text

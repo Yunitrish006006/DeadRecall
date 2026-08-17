@@ -8,6 +8,7 @@ The Discord Worker MUST automatically delete the following Discord messages 600 
 
 - player join (`player_join`)
 - first player join (`player_first_join`)
+- player leave (`player_leave`)
 - death backpack created (`death_backpack_created`)
 - death backpack recovered (`death_backpack_recovered`)
 - Dedicated Server status messages produced from `/api/mc/server/status`
@@ -18,6 +19,12 @@ The Discord Worker MUST automatically delete the following Discord messages 600 
 - **THEN** the Worker sends it to the configured Discord channels
 - **AND** records each returned Discord message ID
 - **AND** schedules deletion after 600 seconds
+
+#### Scenario: Player leaves
+
+- **WHEN** TotemDiscordBridge sends a `player_leave` event
+- **THEN** its payload includes `delete_after_seconds: 600`
+- **AND** the Worker schedules deletion after 600 seconds
 
 #### Scenario: Death backpack is recovered
 
@@ -32,15 +39,26 @@ The Discord Worker MUST automatically delete the following Discord messages 600 
 - **AND** sends a temporary Discord status message
 - **AND** schedules it for deletion after 600 seconds
 
-### Requirement: Temporary lifetime is allowlisted
+### Requirement: Temporary lifetime policy is module-owned
 
-The Worker MUST NOT accept an arbitrary event or caller-provided duration as authority to delete unrelated messages. The effective lifetime for the supported event set is exactly 600 seconds.
+TotemDiscordBridge MUST be the only component that maps event types to notification lifetimes. The Worker MUST NOT maintain or apply an event-type allowlist.
 
-#### Scenario: Permanent event supplies deletion field
+#### Scenario: Permanent event omits deletion instruction
 
-- **WHEN** a non-allowlisted event includes `delete_after_seconds`
-- **THEN** the Worker ignores the deletion field
+- **WHEN** TotemDiscordBridge sends a permanent event
+- **THEN** it omits `delete_after_seconds`
 - **AND** does not enqueue a deletion job
+
+#### Scenario: Worker receives a valid deletion instruction
+
+- **WHEN** an authenticated module request includes a valid positive integer `delete_after_seconds`
+- **THEN** the Worker schedules deletion using that exact delay
+- **AND** does not inspect the event name to override the module decision
+
+#### Scenario: Worker receives an invalid deletion instruction
+
+- **WHEN** `delete_after_seconds` is missing, non-integer, non-positive or outside the Worker's supported queue delay range
+- **THEN** the Worker delivers the Discord message without scheduling deletion
 
 ### Requirement: Deletion failures are isolated
 

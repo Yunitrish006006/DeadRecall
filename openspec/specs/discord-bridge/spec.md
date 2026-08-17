@@ -101,6 +101,9 @@ POST /api/mc/server/status
 
 `/api/mc/chat` payload 使用既有 `event`、`username`、`message` 與 `channels` 欄位。本地化不得更改 endpoint、event ID 或 routing semantics。
 
+TotemDiscordBridge 是通知生命週期的唯一權威。需要定時刪除時，模組在 payload
+附加 `delete_after_seconds`；Worker 只驗證並執行該秒數，不得另外維護 event allowlist。
+
 所有請求必須帶 `X-API-Key`。
 
 - 有有效 `channels` 且設定 Bot Token 時優先送指定頻道。

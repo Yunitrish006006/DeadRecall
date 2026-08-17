@@ -1,10 +1,10 @@
 # DeadRecall
 
 DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合主機。從
-**2.4.7** 起，外層只負責兩件事：
+**2.4.9** 起，外層只負責兩件事：
 
 1. 註冊並轉換 14 個舊 `deadrecall:*` 物品 ID。
-2. 以 Fabric nested JAR 精確整合八個 `totem-*` 模組。
+2. 以 Fabric nested JAR 精確整合十個 `totem-*` 模組。
 
 背包、死亡保護、銅魁儡、Nexus、附魔、煉金、Discord 與原版調整等玩法
 全部由 nested modules 擁有；DeadRecall 外層不再包含玩法 Mixin、GUI、
@@ -17,16 +17,16 @@ payload、指令或 fallback 實作。
 1. 安裝 Java 25。
 2. 建立 Minecraft 26.2 的 Fabric Loader 0.19.3+ 遊戲實例。
 3. 將 Fabric API `0.154.2+26.2` 放入 `mods/`。
-4. 將 DeadRecall 2.4.7 的單一發佈 JAR 放入 `mods/`。
-5. Client 與 Server 使用相同版本；啟動後確認 log 同時載入八個
+4. 將 DeadRecall 2.4.10 的單一發佈 JAR 放入 `mods/`。
+5. Client 與 Server 使用相同版本；啟動後確認 log 同時載入十個
    `totem-*` 模組。
 
-> DeadRecall 2.4.7 已內含 TotemCore、Remnant、Automata、Nexus、
-> Discord Bridge、Alchemy、Enchanting 與 Vanilla Tweaks。不要再把
+> DeadRecall 2.4.10 已內含 TotemCore、Remnant、Automata、Nexus、
+> Discord Bridge、Alchemy、Enchanting、Excavation、Villagers 與 Vanilla Tweaks。不要再把
 > 這些模組的獨立 JAR 放入同一個 `mods/`，否則 Fabric 會偵測到重複
 > mod ID。
 
-多人遊戲會在玩家進入世界前逐一比對 DeadRecall 與上述八個內含模組的
+多人遊戲會在玩家進入世界前逐一比對 DeadRecall 與上述十個內含模組的
 實際版本。Client 缺少握手、缺少任一模組或任何一個版本不同時，Server
 會拒絕連線並列出不一致項目。這個通用連線 gate 由內含的 TotemCore
 提供，DeadRecall 外層仍只有舊 ID 遷移與 nested-JAR 組裝兩項責任。
@@ -37,18 +37,20 @@ payload、指令或 fallback 實作。
 
 | 模組 | 功能 | Repository |
 | --- | --- | --- |
-| TotemCore `0.4.0` | 共用 API 與舊 ID 遷移機制 | [TotemCore](https://github.com/Yunitrish006006/TotemCore) |
-| TotemRemnant `0.1.7` | 背包、死亡背包、容器安全 | [TotemRemnant](https://github.com/Yunitrish006006/TotemRemnant) |
-| TotemAutomata `0.1.9` | 銅魁儡分類與採集 | [TotemAutomata](https://github.com/Yunitrish006006/TotemAutomata) |
-| TotemNexus `0.2.2` | Space Unit、好友與傳送 | [TotemNexus](https://github.com/Yunitrish006006/TotemNexus) |
-| TotemDiscordBridge `0.1.4` | Minecraft ↔ Discord | [TotemDiscordBridge](https://github.com/Yunitrish006006/TotemDiscordBridge) |
-| TotemAlchemy `0.1.7` | 生存煉金與煉藥鍋 | [TotemAlchemy](https://github.com/Yunitrish006006/TotemAlchemy) |
-| TotemEnchanting `0.1.3` | 雕紋書櫃附魔力 | [TotemEnchanting](https://github.com/Yunitrish006006/TotemEnchanting) |
-| TotemVanillaTweaks `0.1.5` | 整理、配方與原版調整 | [TotemVanillaTweaks](https://github.com/Yunitrish006006/TotemVanillaTweaks) |
+| TotemCore `0.5.0` | 共用 API、手冊、版本握手與舊 ID 遷移機制 | [TotemCore](https://github.com/Yunitrish006006/TotemCore) |
+| TotemRemnant `0.2.10` | 背包、死亡背包、容器安全 | [TotemRemnant](https://github.com/Yunitrish006006/TotemRemnant) |
+| TotemAutomata `0.1.11` | 銅魁儡分類與採集 | [TotemAutomata](https://github.com/Yunitrish006006/TotemAutomata) |
+| TotemNexus `0.2.5` | Space Unit、好友、傳送與玩家自助刪除死亡傳送點 | [TotemNexus](https://github.com/Yunitrish006006/TotemNexus) |
+| TotemDiscordBridge `0.1.5` | Minecraft ↔ Discord | [TotemDiscordBridge](https://github.com/Yunitrish006006/TotemDiscordBridge) |
+| TotemAlchemy `0.1.22` | 動態成功率煉金與煉藥鍋 | [TotemAlchemy](https://github.com/Yunitrish006006/TotemAlchemy) |
+| TotemEnchanting `0.1.4` | 雕紋書櫃附魔力 | [TotemEnchanting](https://github.com/Yunitrish006006/TotemEnchanting) |
+| TotemExcavation `0.1.1` | 區域選取與七級挖掘鎚 | [TotemExcavation](https://github.com/Yunitrish006006/TotemExcavation) |
+| TotemVanillaTweaks `0.1.7` | 整理、配方與原版調整 | [TotemVanillaTweaks](https://github.com/Yunitrish006006/TotemVanillaTweaks) |
+| TotemVillagers `0.1.22` | 村民實體庫存、工作、經濟循環與玩家式手持物品渲染 | [TotemVillagers](https://github.com/Yunitrish006006/TotemVillagers) |
 
-每個功能模組都要求 `totem-core =0.4.0` 與 Fabric API。不要混用其他
-候選版本；完整精確組合記錄於
-[lockstep manifest](openspec/changes/safe-multi-repo-modularization/lockstep-manifest.json)。
+每個功能模組都要求 `totem-core =0.5.0` 與 Fabric API。不要混用其他
+候選版本；DeadRecall 的 `fabric.mod.json` 與 `build.gradle` 共同固定
+2.4.10 的完整精確組合。
 
 ## 五分鐘快速上手
 
@@ -61,6 +63,7 @@ payload、指令或 fallback 實作。
 | 設定採集 | 設定 Home、兩個角點、採集目標、工具與燃料後啟動 |
 | 註冊 Space Unit | 普通羅盤右鍵未註冊磁石 |
 | 探索 Space Unit | 普通羅盤左鍵已註冊磁石，再右鍵開啟地圖 |
+| 刪除自己的死亡傳送點 | 執行 `/deadrecall deathnodes`，選取節點並在 30 秒內再次確認；死亡背包不會被刪除 |
 | 提高附魔力 | 在原版有效位置放雕紋書櫃並裝入書本／附魔書 |
 | 整理介面 | 在容器畫面把游標移到要整理的一側，按滑鼠中鍵 |
 | 設定 Discord | OP 執行 `/discordbridgeui` 或編輯 `config/discord-bridge.json` |
@@ -95,7 +98,7 @@ payload、指令或 fallback 實作。
 | 指令 | 用途 |
 | --- | --- |
 | `/deadrecall containers scan [player]` | 唯讀掃描線上玩家的非法可攜式容器巢狀 |
-| `/deadrecall deathnodes` | 開啟死亡 Space Unit 管理介面 |
+| `/deadrecall deathnodes` | 以管理員模式開啟所有玩家的死亡 Space Unit 管理介面 |
 | `/discordbridge reload` | 重新載入 Discord Bridge 設定 |
 | `/discordbridge set <enabled> <url> <key>` | 設定 Worker URL 與 API Key |
 | `/discordbridge channel add/remove/list ...` | 管理 Discord 目標頻道 |
@@ -108,12 +111,12 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 
 | 項目 | 內容 |
 | --- | --- |
-| 版本 | 2.4.7 |
+| 版本 | 2.4.10 |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3+ |
 | Fabric API | 0.154.2+26.2 |
 | Java | 25 |
-| 授權 | BSD-3-Clause |
+| 授權 | Apache-2.0 |
 
 ## 文件
 
@@ -142,15 +145,15 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 ./gradlew build
 ```
 
-一般開發 JAR 輸出至 `build/libs/`。若要從八個已驗證的獨立模組 JAR
+一般開發 JAR 輸出至 `build/libs/`。若要從十個已驗證的獨立模組 JAR
 建立 nested-JAR 整合檔：
 
 ```bash
 ./gradlew build -PbundleModuleDirectory=/path/to/standalone-modules
 ```
 
-輸出為 `build/libs/deadrecall-2.4.7-bundled.jar`。輸入目錄必須是同一份
-lockstep manifest 驗證過的八個 JAR。
+輸出為 `build/libs/deadrecall-2.4.10-bundled.jar`。輸入目錄必須包含
+`build.gradle` 精確固定的十個 JAR。
 
 ## 文件分工
 
