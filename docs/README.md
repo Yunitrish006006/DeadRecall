@@ -47,6 +47,7 @@
 - [TOTEM 圖靈騰系統總覽與進度](../openspec/README.md)
 - [架構說明](../openspec/architecture.md)
 - [開發路線圖](../openspec/roadmap.md)
+- [Totem 模組分支審核（2026-08-17）](branch-audit-2026-08-17.md)
 
 ## 文件維護原則
 
