@@ -26,7 +26,7 @@ Never publish the Worker API key in logs, screenshots, issue reports, or source 
 
 Deploy the companion HTTPS Worker, configure its Discord destination, then add the Worker URL and matching API key to the server configuration. Install TotemDiscordBridge 0.1.6, TotemCore 0.6.0, and Fabric API on the server. The client is optional and is needed only for the administration interface.
 
-Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already embeds it.
+Do not install this standalone JAR beside DeadRecall 2.4.13; the bundle already embeds it.
 
 ## Compatibility
 

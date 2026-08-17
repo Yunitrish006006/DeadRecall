@@ -25,7 +25,7 @@ The integration remains optional: Nexus travel works without Remnant, and Remnan
 
 Install TotemNexus 0.2.6, TotemCore 0.6.0, and Fabric API on both client and server. TotemRemnant is optional.
 
-Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already contains it.
+Do not install this standalone JAR beside DeadRecall 2.4.13; the bundle already contains it.
 
 ## Compatibility
 

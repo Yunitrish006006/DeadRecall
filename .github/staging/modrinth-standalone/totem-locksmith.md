@@ -26,7 +26,7 @@ Craft a Padlock and use it on a supported container. Crafting the source block u
 
 Install Totem Locksmith 0.1.0, TotemCore 0.6.0, and Fabric API on both client and server. TotemNexus, TotemAutomata, and TotemDiscordBridge are optional.
 
-Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already contains it.
+Do not install this standalone JAR beside DeadRecall 2.4.13; the bundle already contains it.
 
 ## Compatibility
 

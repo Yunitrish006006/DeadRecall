@@ -19,7 +19,7 @@ The mod does not add custom enchantment IDs or bypass vanilla item compatibility
 
 Install TotemEnchanting 0.1.5, TotemCore 0.6.0, and Fabric API on both client and server. Place filled Chiseled Bookshelves in valid vanilla bookshelf positions with an unobstructed gap to the Enchanting Table.
 
-Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already embeds it.
+Do not install this standalone JAR beside DeadRecall 2.4.13; the bundle already embeds it.
 
 ## Compatibility
 

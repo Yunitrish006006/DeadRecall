@@ -1,7 +1,7 @@
 # DeadRecall
 
 DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容整合主機。目前
-發佈版本為 **2.4.11**；外層只負責兩件事：
+發佈版本為 **2.4.13**；外層只負責兩件事：
 
 1. 註冊並轉換 14 個舊 `deadrecall:*` 物品 ID。
 2. 以 Fabric nested JAR 精確整合十一個 `totem-*` 模組。
@@ -18,11 +18,11 @@ payload、指令或 fallback 實作。
 1. 安裝 Java 25。
 2. 建立 Minecraft 26.2 的 Fabric Loader 0.19.3+ 遊戲實例。
 3. 將 Fabric API `0.154.2+26.2` 放入 `mods/`。
-4. 將 DeadRecall 2.4.11 的單一發佈 JAR 放入 `mods/`。
+4. 將 DeadRecall 2.4.13 的單一發佈 JAR 放入 `mods/`。
 5. Client 與 Server 使用相同版本；啟動後確認 log 同時載入十一個
    `totem-*` 模組。
 
-> DeadRecall 2.4.11 已內含 TotemCore、Remnant、Automata、Nexus、
+> DeadRecall 2.4.13 已內含 TotemCore、Remnant、Automata、Nexus、
 > Discord Bridge、Alchemy、Enchanting、Excavation、Locksmith、
 > Vanilla Tweaks 與 Villagers。不要再把
 > 這些模組的獨立 JAR 放入同一個 `mods/`，否則 Fabric 會偵測到重複
@@ -49,7 +49,7 @@ payload、指令或 fallback 實作。
 | TotemExcavation `0.1.2` | 區域挖掘與錘具 | [TotemExcavation](https://github.com/Yunitrish006006/TotemExcavation) |
 | TotemLocksmith `0.1.0` | 相連容器鎖與權限 | Modrinth standalone project |
 | TotemVanillaTweaks `0.1.8` | 整理、配方與原版調整 | [TotemVanillaTweaks](https://github.com/Yunitrish006006/TotemVanillaTweaks) |
-| TotemVillagers `0.1.23` | 村民工作、庫存與聚落 | Modrinth standalone project |
+| TotemVillagers `0.1.25` | 村民工作、庫存與聚落 | Modrinth standalone project |
 
 每個功能模組都要求 `totem-core =0.6.0` 與 Fabric API。不要混用其他
 候選版本；完整精確組合記錄於
@@ -119,7 +119,7 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 
 | 項目 | 內容 |
 | --- | --- |
-| 版本 | 2.4.11 |
+| 版本 | 2.4.13 |
 | Minecraft | 26.2 |
 | Fabric Loader | 0.19.3+ |
 | Fabric API | 0.154.2+26.2 |
@@ -160,7 +160,7 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 ./gradlew build -PbundleModuleDirectory=/path/to/standalone-modules
 ```
 
-輸出為 `build/libs/deadrecall-2.4.11-bundled.jar`。輸入目錄必須是同一份
+輸出為 `build/libs/deadrecall-2.4.13-bundled.jar`。輸入目錄必須是同一份
 lockstep manifest 驗證過的十一個 JAR。
 
 ## 文件分工

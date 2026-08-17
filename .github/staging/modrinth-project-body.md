@@ -108,7 +108,7 @@ DeadRecall is the **distribution and compatibility host** for the current Totem 
 | [TotemExcavation](https://github.com/Yunitrish006006/TotemExcavation) | `0.1.2` | Area selection and excavation hammers |
 | TotemLocksmith | `0.1.0` | Fixed-container network locks, permissions, keys, and audits |
 | [TotemVanillaTweaks](https://github.com/Yunitrish006006/TotemVanillaTweaks) | `0.1.8` | Recipes, sorting, and vanilla-compatible adjustments |
-| TotemVillagers | `0.1.23` | Villager inventory, work, economy, rendering, and world generation |
+| TotemVillagers | `0.1.25` | Villager inventory, work, economy, rendering, and world generation |
 
 These versions form one lockstep release. Do not replace only one embedded module with a different standalone version.
 
@@ -126,7 +126,7 @@ These versions form one lockstep release. Do not replace only one embedded modul
 ### Installation
 
 1. Install the matching Minecraft, Fabric Loader, Fabric API, and Java versions.
-2. Place `deadrecall-2.4.11-bundled.jar` in `mods/` on both client and server.
+2. Place `deadrecall-2.4.13-bundled.jar` in `mods/` on both client and server.
 3. Do **not** add standalone copies of the eleven embedded Totem modules.
 4. Back up an important existing world before first migration, then confirm the startup log reports the expected exact module set.
 

@@ -23,7 +23,7 @@ API keys are secrets. Never include them in screenshots, logs, issue reports, re
 
 Install TotemAutomata 0.1.12, TotemCore 0.6.0, and Fabric API on both client and server. TotemExcavation, TotemRemnant, and TotemLocksmith are optional integrations.
 
-Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already embeds it.
+Do not install this standalone JAR beside DeadRecall 2.4.13; the bundle already embeds it.
 
 ## Compatibility
 

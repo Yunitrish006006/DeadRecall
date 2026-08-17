@@ -23,7 +23,7 @@ Administrators can control death-backpack generation, owner-only pickup, and the
 
 Install TotemRemnant 0.2.11, TotemCore 0.6.0, and Fabric API on both client and server. Trinkets Updated 4.1.0-beta.2 or newer is optional.
 
-Do not install this standalone JAR beside DeadRecall 2.4.11; the bundle already contains the identical module.
+Do not install this standalone JAR beside DeadRecall 2.4.13; the bundle already contains the identical module.
 
 ## Compatibility
 

@@ -651,16 +651,16 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/libs
-          cp .github/staging/deadrecall-2.4.11-bundled.jar \
-            build/libs/deadrecall-2.4.11-bundled.jar
+          cp .github/staging/deadrecall-2.4.13-bundled.jar \
+            build/libs/deadrecall-2.4.13-bundled.jar
 
       - name: Verify exact staged artifact and metadata
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.11-bundled.jar
-          EXPECTED_SHA512: c050e0e198a13a2699c7730027481b82c232dcf58c6b207f3450351ae48447fcd4b45e6cdc8a32b3a431ab0cd8f946c6374ec569ad07f65425e0b3f42c135ae2
+          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.13-bundled.jar
+          EXPECTED_SHA512: 1552e3e25803efc7832c1b34324f8887cc4c5265e32caf60ba809e30625cfbbaa31bc2517cd1e28e462f30e856345b7aee48914e02465c08da92a5dd7267e1af
         run: |
           set -euo pipefail
           actual="$(sha512sum "${MODRINTH_ARTIFACT}" | awk '{print $1}')"
@@ -675,7 +675,7 @@ jobs:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
-          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.11-bundled.jar
+          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.13-bundled.jar
         run: bash .github/scripts/publish-modrinth.sh
 
       - name: Verify published project and version
@@ -684,7 +684,7 @@ jobs:
           MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_ID: ${{ steps.modrinth.outputs.version_id }}
-          EXPECTED_SHA512: c050e0e198a13a2699c7730027481b82c232dcf58c6b207f3450351ae48447fcd4b45e6cdc8a32b3a431ab0cd8f946c6374ec569ad07f65425e0b3f42c135ae2
+          EXPECTED_SHA512: 1552e3e25803efc7832c1b34324f8887cc4c5265e32caf60ba809e30625cfbbaa31bc2517cd1e28e462f30e856345b7aee48914e02465c08da92a5dd7267e1af
         run: |
           set -euo pipefail
           test -n "${MODRINTH_VERSION_ID}"
@@ -727,19 +727,19 @@ jobs:
             --arg sha512 "${EXPECTED_SHA512}" '
             .id == $version_id
             and .project_id == $project_id
-            and .name == "DeadRecall 2.4.11"
-            and .version_number == "2.4.11"
+            and .name == "DeadRecall 2.4.13"
+            and .version_number == "2.4.13"
             and .version_type == "release"
             and .status == "listed"
             and .environment == "client_and_server"
             and .game_versions == ["26.2"]
             and .loaders == ["fabric"]
             and (([.files[] | select(.primary == true)][0] // .files[0]).filename
-              == "deadrecall-2.4.11-bundled.jar")
+              == "deadrecall-2.4.13-bundled.jar")
             and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512
               == $sha512)
           ' "${version_file}" >/dev/null
-          printf 'Verified DeadRecall 2.4.11 project body, headers, and remote JAR SHA-512.\n'
+          printf 'Verified DeadRecall 2.4.13 project body, headers, and remote JAR SHA-512.\n'
 
       - name: Submit draft project for review
         if: false

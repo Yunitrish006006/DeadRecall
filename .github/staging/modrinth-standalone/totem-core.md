@@ -19,7 +19,7 @@ TotemCore does not add gameplay, items, blocks, or persistent world data by itse
 
 Install TotemCore on both the client and server together with Fabric API and the feature modules that require it. Current standalone Totem releases require exactly TotemCore 0.6.0.
 
-Do not install this standalone JAR beside the DeadRecall bundle. DeadRecall 2.4.11 already embeds the same module, and installing both creates duplicate mod IDs.
+Do not install this standalone JAR beside the DeadRecall bundle. DeadRecall 2.4.13 already embeds the same module, and installing both creates duplicate mod IDs.
 
 ## Compatibility
 

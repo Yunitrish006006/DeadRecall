@@ -35,7 +35,7 @@ jobs:
         env:
           MODRINTH_DRY_RUN: 'true'
           MODRINTH_PROJECT_ID: dry-run-project
-          MODRINTH_ARTIFACT: .github/staging/deadrecall-2.4.11-bundled.jar
+          MODRINTH_ARTIFACT: .github/staging/deadrecall-2.4.13-bundled.jar
         run: |
           set -euo pipefail
           unzip -t "${MODRINTH_ARTIFACT}"
@@ -45,15 +45,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          artifact=.github/staging/deadrecall-2.4.11-bundled.jar
+          artifact=.github/staging/deadrecall-2.4.13-bundled.jar
           test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.id')" = deadrecall
-          test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.version')" = 2.4.11
+          test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.version')" = 2.4.13
           test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.license')" = Apache-2.0
           test "$(unzip -Z1 "${artifact}" 'META-INF/jars/*.jar' | wc -l)" = 11
 
       - name: Upload verified bundle
         uses: actions/upload-artifact@v4
         with:
-          name: deadrecall-2.4.11-bundled
-          path: .github/staging/deadrecall-2.4.11-bundled.jar
+          name: deadrecall-2.4.13-bundled
+          path: .github/staging/deadrecall-2.4.13-bundled.jar
           if-no-files-found: error
