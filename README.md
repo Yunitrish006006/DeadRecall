@@ -160,7 +160,7 @@ Discord Bridge 參數見 [指令文件](docs/commands.md)；容器掃描與死�
 ./gradlew build -PbundleModuleDirectory=/path/to/standalone-modules
 ```
 
-輸出為 `build/libs/deadrecall-2.4.17-bundled.jar`。輸入目錄必須是同一份
+輸出為 `build/libs/deadrecall-2.4.18-bundled.jar`。輸入目錄必須是同一份
 lockstep manifest 驗證過的十一個 JAR；建置會從每個 JAR 的
 `fabric.mod.json` 自動寫入精確版本依賴，避免更新 bundle 時遺漏模組或
 沿用舊版 pin。

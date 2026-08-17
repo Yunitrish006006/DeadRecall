@@ -26,7 +26,7 @@ def bundledModuleNames = [
         "totem-locksmith-0.1.0.jar",
         "totem-vanilla-tweaks-0.1.8.jar",
         "totem-nexus-0.2.6.jar",
-        "totem-villagers-0.1.28.jar"
+        "totem-villagers-0.1.29.jar"
 ]
 def bundledModuleFiles = bundleModuleDirectory == null
         ? []
