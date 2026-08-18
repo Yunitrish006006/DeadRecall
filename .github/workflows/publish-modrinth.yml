@@ -3,17 +3,13 @@ name: Publish Modrinth
 on:
   workflow_dispatch:
     inputs:
-      standalone_operation:
-        description: Audit or synchronize standalone Totem projects
+      dry_run:
+        description: Build and validate without creating a Modrinth version
         required: true
-        default: none
-        type: choice
-        options:
-          - none
-          - audit
-          - apply
+        default: true
+        type: boolean
       version_type:
-        description: Modrinth release channel (auto derives it from mod_version)
+        description: Modrinth release channel
         required: true
         default: auto
         type: choice
@@ -27,745 +23,116 @@ permissions:
   contents: read
 
 concurrency:
-  group: modrinth-${{ github.ref }}
+  group: deadrecall-modrinth-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  audit-standalone:
-    name: Audit standalone Totem projects
-    if: ${{ inputs.standalone_operation == 'audit' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: List accessible Totem projects
-        shell: bash
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          test -n "${MODRINTH_TOKEN}" || {
-            echo "Repository secret MODRINTH_TOKEN is not configured." >&2
-            exit 1
-          }
-
-          user_file="$(mktemp)"
-          projects_file="$(mktemp)"
-          cleanup() {
-            rm -f "${user_file}" "${projects_file}"
-          }
-          trap cleanup EXIT
-
-          curl --silent --show-error --fail \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${user_file}" \
-            'https://api.modrinth.com/v2/user'
-          user_id="$(jq -er '.id' "${user_file}")"
-          curl --silent --show-error --fail \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${projects_file}" \
-            "https://api.modrinth.com/v2/user/${user_id}/projects"
-
-          mapfile -t project_ids < <(jq -r '
-            map(select(
-              (.slug | ascii_downcase | startswith("totem-"))
-              or (.title | ascii_downcase | startswith("totem"))
-            ))
-            | sort_by(.slug)
-            | .[].id
-          ' "${projects_file}")
-
-          project_file="$(mktemp)"
-          for project_id in "${project_ids[@]}"; do
-            curl --silent --show-error --fail \
-              --header "Authorization: ${MODRINTH_TOKEN}" \
-              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-              --output "${project_file}" \
-              "https://api.modrinth.com/v2/project/${project_id}"
-            jq '{
-              id, slug, title, description, categories, additional_categories,
-              client_side, server_side, source_url, issues_url, wiki_url,
-              license, status, requested_status, moderator_message,
-              versions, game_versions, loaders,
-              headers: [.body | split("\n")[] | select(test("^#{1,6} "))]
-            }' "${project_file}"
-
-            mapfile -t version_ids < <(jq -r '.versions[]' "${project_file}")
-            version_file="$(mktemp)"
-            for version_id in "${version_ids[@]}"; do
-              curl --silent --show-error --fail \
-                --header "Authorization: ${MODRINTH_TOKEN}" \
-                --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-                --output "${version_file}" \
-                "https://api.modrinth.com/v2/version/${version_id}"
-              jq '{
-                id, project_id, name, version_number, status, requested_status,
-                version_type, environment, game_versions, loaders, dependencies,
-                files: [.files[] | {filename, primary, size, hashes}]
-              }' "${version_file}"
-            done
-            rm -f "${version_file}"
-          done
-          rm -f "${project_file}"
-
-  sync-standalone:
-    name: Synchronize standalone Totem projects
-    if: ${{ inputs.standalone_operation == 'apply' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Create or update standalone projects
-        shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          bash .github/scripts/sync-modrinth-standalone.sh
-
-          test -n "${MODRINTH_PROJECT_ID}" || {
-            printf 'Repository variable MODRINTH_PROJECT_ID is not configured.\n' >&2
-            exit 1
-          }
-          response_file="$(mktemp)"
-          trap 'rm -f "${response_file}"' EXIT
-          status="$(curl --silent --show-error \
-            --request PATCH \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --header 'Content-Type: image/png' \
-            --data-binary '@src/main/resources/assets/deadrecall/icon.png' \
-            --output "${response_file}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/icon?ext=png")"
-          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
-            printf 'Could not update the DeadRecall Modrinth icon (HTTP %s).\n' "${status}" >&2
-            jq . "${response_file}" >&2 2>/dev/null || true
-            exit 1
-          fi
-          printf 'Updated the DeadRecall Modrinth project icon.\n'
-
   publish:
-    name: Publish verified staged bundle
-    if: ${{ inputs.standalone_operation != 'audit' && inputs.standalone_operation != 'apply' }}
+    name: Build, smoke, and publish current bundle
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 90
 
     steps:
-      - name: Check out repository
+      - name: Check out DeadRecall
         uses: actions/checkout@v4
 
-      - name: Verify Modrinth configuration
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build exact lockstep bundle
         shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          test -n "${MODRINTH_PROJECT_ID}" || {
-            echo "Repository variable MODRINTH_PROJECT_ID is not configured." >&2
-            exit 1
-          }
-          test -n "${MODRINTH_TOKEN}" || {
-            echo "Repository secret MODRINTH_TOKEN is not configured." >&2
-            exit 1
-          }
+        run: bash .github/scripts/build-current-bundle.sh
 
-      - name: Resolve Modrinth project
-        id: project
+      - name: Dedicated server smoke
         shell: bash
-        env:
-          CONFIGURED_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          project_response="$(mktemp)"
-          user_response="$(mktemp)"
-          projects_response="$(mktemp)"
-          project_create_data="$(mktemp)"
-          project_create_response="$(mktemp)"
-          cleanup() {
-            rm -f "${project_response}" "${user_response}" "${projects_response}" \
-              "${project_create_data}" "${project_create_response}"
-          }
-          trap cleanup EXIT
+        run: bash .github/scripts/smoke-current-bundle-server.sh
 
-          project_status="$(curl --silent --show-error \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${project_response}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/project/${CONFIGURED_PROJECT_ID}")"
-          if [[ "${project_status}" == "200" ]]; then
-            resolved_id="$(jq -er '.id' "${project_response}")"
-            printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
-            printf 'created=false\n' >> "${GITHUB_OUTPUT}"
-            printf 'status=%s\n' "$(jq -er '.status' "${project_response}")" >> "${GITHUB_OUTPUT}"
-            printf 'Using configured Modrinth project %s (%s).\n' \
-              "$(jq -r '.title' "${project_response}")" "${resolved_id}"
-            jq '{
-              id, slug, title, description, categories, additional_categories,
-              client_side, server_side, body, issues_url, source_url, wiki_url,
-              discord_url, donation_urls, license, status, requested_status,
-              icon_url, gallery, versions, game_versions, loaders,
-              moderator_message, monetization_status
-            }' "${project_response}"
-            exit 0
-          fi
-
-          user_status="$(curl --silent --show-error \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${user_response}" \
-            --write-out '%{http_code}' \
-            'https://api.modrinth.com/v2/user')"
-          if [[ "${user_status}" != "200" ]]; then
-            printf 'Modrinth token authentication failed (HTTP %s, error %s).\n' \
-              "${user_status}" "$(jq -r '.error // "unknown"' "${user_response}" 2>/dev/null || printf unknown)" >&2
-            exit 1
-          fi
-
-          user_id="$(jq -er '.id' "${user_response}")"
-          username="$(jq -er '.username' "${user_response}")"
-          projects_status="$(curl --silent --show-error \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${projects_response}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/user/${user_id}/projects")"
-          if [[ "${projects_status}" != "200" ]]; then
-            printf 'Could not list projects accessible to Modrinth user %s (HTTP %s).\n' \
-              "${username}" "${projects_status}" >&2
-            exit 1
-          fi
-
-          match_count="$(jq '[.[] | select(
-            ((.title | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
-            or ((.slug | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
-          )] | length' "${projects_response}")"
-          if [[ "${match_count}" == "1" ]]; then
-            resolved_id="$(jq -er '[.[] | select(
-              ((.title | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
-              or ((.slug | ascii_downcase | gsub("[^a-z0-9]"; "")) == "deadrecall")
-            )][0].id' "${projects_response}")"
-            printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
-            printf 'created=false\n' >> "${GITHUB_OUTPUT}"
-            printf 'status=%s\n' "$(jq -er --arg id "${resolved_id}" \
-              '.[] | select(.id == $id) | .status' "${projects_response}")" >> "${GITHUB_OUTPUT}"
-            printf 'Resolved DeadRecall to Modrinth project %s for user %s.\n' \
-              "${resolved_id}" "${username}"
-            exit 0
-          fi
-
-          printf 'Configured project %s returned HTTP %s. Modrinth user %s has these accessible projects:\n' \
-            "${CONFIGURED_PROJECT_ID}" "${project_status}" "${username}" >&2
-          jq -r '.[] | [.title, .slug, .id, .status] | @tsv' "${projects_response}" >&2
-          if [[ "${match_count}" != "0" ]]; then
-            printf 'Expected no more than one project matching DeadRecall; found %s.\n' \
-              "${match_count}" >&2
-            exit 1
-          fi
-
-          jq -n \
-            --rawfile body .github/staging/modrinth-project-body.md \
-            '{
-              slug: "deadrecall",
-              title: "DeadRecall",
-              description: "Unified Minecraft 26.2 Fabric bundle for Totem backpacks, automation, alchemy, enchanting, travel, villagers, and compatibility migrations.",
-              categories: ["adventure", "storage", "utility"],
-              additional_categories: ["economy", "game-mechanics", "magic", "technology", "transportation"],
-              client_side: "required",
-              server_side: "required",
-              body: $body,
-              issues_url: "https://github.com/Yunitrish006006/DeadRecall/issues",
-              source_url: "https://github.com/Yunitrish006006/DeadRecall",
-              license_id: "Apache-2.0",
-              project_type: "mod",
-              initial_versions: [],
-              is_draft: true,
-              gallery_items: []
-            }' > "${project_create_data}"
-
-          create_status="$(curl --silent --show-error \
-            --request POST \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --form "data=@${project_create_data};type=application/json" \
-            --form "icon=@src/main/resources/assets/deadrecall/icon.png;type=image/png" \
-            --output "${project_create_response}" \
-            --write-out '%{http_code}' \
-            'https://api.modrinth.com/v2/project')"
-          if [[ "${create_status}" != "200" && "${create_status}" != "201" ]]; then
-            printf 'Could not create the DeadRecall Modrinth project (HTTP %s).\n' \
-              "${create_status}" >&2
-            jq . "${project_create_response}" >&2 2>/dev/null || true
-            exit 1
-          fi
-
-          resolved_id="$(jq -er '.id' "${project_create_response}")"
-          printf 'project_id=%s\n' "${resolved_id}" >> "${GITHUB_OUTPUT}"
-          printf 'created=true\n' >> "${GITHUB_OUTPUT}"
-          printf 'status=%s\n' "$(jq -er '.status' "${project_create_response}")" >> "${GITHUB_OUTPUT}"
-          printf 'Created draft Modrinth project DeadRecall (%s) for user %s.\n' \
-            "${resolved_id}" "${username}"
-
-      - name: Update Modrinth project metadata
-        shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          metadata_file="$(mktemp)"
-          response_file="$(mktemp)"
-          cleanup() {
-            rm -f "${metadata_file}" "${response_file}"
-          }
-          trap cleanup EXIT
-
-          jq -n \
-            --rawfile body .github/staging/modrinth-project-body.md \
-            '{
-              title: "DeadRecall",
-              description: "A lockstep Minecraft 26.2 Fabric ecosystem in one JAR: guided manuals, backpacks, recovery, automation, storage locks, travel, villages, and server integration.",
-              categories: ["adventure", "storage", "utility"],
-              additional_categories: ["economy", "game-mechanics", "magic", "technology", "transportation"],
-              client_side: "required",
-              server_side: "required",
-              body: $body,
-              issues_url: "https://github.com/Yunitrish006006/DeadRecall/issues",
-              source_url: "https://github.com/Yunitrish006006/DeadRecall",
-              wiki_url: "https://github.com/Yunitrish006006/DeadRecall/blob/master/docs/README.md",
-              license_id: "Apache-2.0",
-              license_url: "https://github.com/Yunitrish006006/DeadRecall/blob/master/LICENSE.txt"
-            }' > "${metadata_file}"
-
-          status="$(curl --silent --show-error \
-            --request PATCH \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --header 'Content-Type: application/json' \
-            --data-binary "@${metadata_file}" \
-            --output "${response_file}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}")"
-          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
-            printf 'Could not update Modrinth project metadata (HTTP %s).\n' "${status}" >&2
-            jq . "${response_file}" >&2 2>/dev/null || true
-            exit 1
-          fi
-          printf 'Updated project description, categories, compatibility, documentation, license, and long-form body.\n'
-
-      - name: Update Modrinth project icon
-        shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          response_file="$(mktemp)"
-          trap 'rm -f "${response_file}"' EXIT
-
-          status="$(curl --silent --show-error \
-            --request PATCH \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --header 'Content-Type: image/png' \
-            --data-binary '@src/main/resources/assets/deadrecall/icon.png' \
-            --output "${response_file}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/icon?ext=png")"
-          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
-            printf 'Could not update Modrinth project icon (HTTP %s).\n' "${status}" >&2
-            jq . "${response_file}" >&2 2>/dev/null || true
-            exit 1
-          fi
-          printf 'Updated the DeadRecall Modrinth project icon.\n'
-
-      - name: Update Modrinth 2.4.10 version notes
-        if: false
-        shell: bash
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          MODRINTH_VERSION_ID: BiyEH3Uz
-        run: |
-          set -euo pipefail
-          version_file="$(mktemp)"
-          response_file="$(mktemp)"
-          cleanup() {
-            rm -f "${version_file}" "${response_file}"
-          }
-          trap cleanup EXIT
-
-          jq -n \
-            --rawfile changelog docs/releases/2.4.10.md \
-            '{
-              name: "DeadRecall 2.4.10",
-              version_number: "2.4.10",
-              changelog: $changelog
-            }' > "${version_file}"
-
-          status="$(curl --silent --show-error \
-            --request PATCH \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --header 'Content-Type: application/json' \
-            --data-binary "@${version_file}" \
-            --output "${response_file}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}")"
-          if [[ "${status}" != "200" && "${status}" != "204" ]]; then
-            printf 'Could not update Modrinth version metadata (HTTP %s).\n' "${status}" >&2
-            jq . "${response_file}" >&2 2>/dev/null || true
-            exit 1
-          fi
-          printf 'Updated DeadRecall 2.4.10 version name and changelog.\n'
-
-      - name: Upload missing Modrinth gallery images
-        if: false
-        shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          project_file="$(mktemp)"
-          response_file="$(mktemp)"
-          cleanup() {
-            rm -f "${project_file}" "${response_file}"
-          }
-          trap cleanup EXIT
-
-          upload_gallery_image() {
-            local file="$1"
-            local title="$2"
-            local description="$3"
-            local featured="$4"
-            local ordering="$5"
-
-            curl --silent --show-error --fail \
-              --header "Authorization: ${MODRINTH_TOKEN}" \
-              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-              --output "${project_file}" \
-              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
-            if jq -e --arg title "${title}" \
-              '.gallery[]? | select(.title == $title)' "${project_file}" >/dev/null; then
-              printf 'Gallery image already exists: %s\n' "${title}"
-              return
-            fi
-
-            local title_query
-            local description_query
-            title_query="$(jq -rn --arg value "${title}" '$value | @uri')"
-            description_query="$(jq -rn --arg value "${description}" '$value | @uri')"
-            local status
-            status="$(curl --silent --show-error \
-              --request POST \
-              --header "Authorization: ${MODRINTH_TOKEN}" \
-              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-              --header 'Content-Type: image/png' \
-              --data-binary "@${file}" \
-              --output "${response_file}" \
-              --write-out '%{http_code}' \
-              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/gallery?ext=png&featured=${featured}&title=${title_query}&description=${description_query}&ordering=${ordering}")"
-            if [[ "${status}" != "200" && "${status}" != "204" ]]; then
-              printf 'Could not upload gallery image %s (HTTP %s).\n' "${title}" "${status}" >&2
-              jq . "${response_file}" >&2 2>/dev/null || true
-              exit 1
-            fi
-            printf 'Uploaded gallery image: %s\n' "${title}"
-          }
-
-          set_gallery_presentation() {
-            local title="$1"
-            local featured="$2"
-            local ordering="$3"
-
-            curl --silent --show-error --fail \
-              --header "Authorization: ${MODRINTH_TOKEN}" \
-              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-              --output "${project_file}" \
-              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
-            local image_url
-            image_url="$(jq -er --arg title "${title}" \
-              '.gallery[] | select(.title == $title) | .url' "${project_file}")"
-            local image_url_query
-            image_url_query="$(jq -rn --arg value "${image_url}" '$value | @uri')"
-            local status
-            status="$(curl --silent --show-error \
-              --request PATCH \
-              --header "Authorization: ${MODRINTH_TOKEN}" \
-              --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-              --output "${response_file}" \
-              --write-out '%{http_code}' \
-              "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/gallery?url=${image_url_query}&featured=${featured}&ordering=${ordering}")"
-            if [[ "${status}" != "200" && "${status}" != "204" ]]; then
-              printf 'Could not update gallery presentation for %s (HTTP %s).\n' \
-                "${title}" "${status}" >&2
-              jq . "${response_file}" >&2 2>/dev/null || true
-              exit 1
-            fi
-            printf 'Updated gallery presentation: %s (featured=%s, ordering=%s)\n' \
-              "${title}" "${featured}" "${ordering}"
-          }
-
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/deadrecall-integration-overview.png \
-            'DeadRecall 2.4.10 全局整合架構 / Integration Overview' \
-            '十個 Totem 模組、共同 Core 契約與跨模組玩法依賴的完整總覽。The complete lockstep architecture and cross-module gameplay map.' \
-            true 0
-
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/inventory-backpack-side-panel.png \
-            '背包物品欄整合 / Backpack Inventory' \
-            '普通物品欄旁會直接顯示目前背包內容。The equipped backpack opens beside the vanilla inventory.' \
-            false 10
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/backpack-upgrade-bay.png \
-            '一排式升級欄 / Backpack Upgrade Bay' \
-            '背包介面中的一排式模組欄與內建 3×3 合成區。A single-row upgrade bay with integrated 3×3 crafting.' \
-            false 20
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/backpack-capacity-4-modules.png \
-            '四級容量擴充 / Capacity Expansion' \
-            '四個容量模組將一般背包擴充到 36 格。Four capacity modules expand the backpack to 36 slots.' \
-            false 30
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/alchemy-creative-showcase.png \
-            '動態煉金內容 / Dynamic Alchemy' \
-            'DeadRecall 創造模式分頁中的煉金材料與容器。Alchemy ingredients and vessels in the DeadRecall creative tab.' \
-            false 40
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/nexus-material-diagnostics.png \
-            'Nexus 材料診斷 / Nexus Materials' \
-            'Space Unit 會依材料顯示容量、穩定度、路線與跨維度特性。Material-driven Space Unit diagnostics and travel attributes.' \
-            false 50
-          upload_gallery_image \
-            .github/staging/modrinth-gallery/mangrove-village-aerial.png \
-            '自然生成紅樹林村莊 / Mangrove Village' \
-            '依地形自然生成、包含生產工作區的紅樹林村莊。A terrain-aware mangrove village with integrated production areas.' \
-            false 60
-
-          set_gallery_presentation \
-            'DeadRecall 2.4.10 全局整合架構 / Integration Overview' true 0
-          set_gallery_presentation \
-            '背包物品欄整合 / Backpack Inventory' false 10
-          set_gallery_presentation \
-            '一排式升級欄 / Backpack Upgrade Bay' false 20
-          set_gallery_presentation \
-            '四級容量擴充 / Capacity Expansion' false 30
-          set_gallery_presentation \
-            '動態煉金內容 / Dynamic Alchemy' false 40
-          set_gallery_presentation \
-            'Nexus 材料診斷 / Nexus Materials' false 50
-          set_gallery_presentation \
-            '自然生成紅樹林村莊 / Mangrove Village' false 60
-
-      - name: Verify completed Modrinth metadata
-        if: false
-        shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          MODRINTH_VERSION_ID: BiyEH3Uz
-        run: |
-          set -euo pipefail
-          project_file="$(mktemp)"
-          version_file="$(mktemp)"
-          cleanup() {
-            rm -f "${project_file}" "${version_file}"
-          }
-          trap cleanup EXIT
-
-          curl --silent --show-error --fail \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${project_file}" \
-            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
-          curl --silent --show-error --fail \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${version_file}" \
-            "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}"
-
-          jq -e '
-            .title == "DeadRecall"
-            and .slug == "deadrecall"
-            and .license.id == "Apache-2.0"
-            and .client_side == "required"
-            and .server_side == "required"
-            and .wiki_url == "https://github.com/Yunitrish006006/DeadRecall/blob/master/docs/README.md"
-            and (.description | contains("lockstep Minecraft 26.2 Fabric ecosystem"))
-            and (.body | contains("TotemVillagers"))
-            and (.body | contains("## Overview"))
-            and (.body | contains("## Gameplay"))
-            and (.body | contains("Install only the DeadRecall bundle"))
-            and ([.gallery[] | select(.title == "DeadRecall 2.4.10 全局整合架構 / Integration Overview")] | length == 1)
-            and ([.gallery[] | select(.title == "背包物品欄整合 / Backpack Inventory")] | length == 1)
-            and ([.gallery[] | select(.title == "一排式升級欄 / Backpack Upgrade Bay")] | length == 1)
-            and ([.gallery[] | select(.title == "四級容量擴充 / Capacity Expansion")] | length == 1)
-            and ([.gallery[] | select(.title == "動態煉金內容 / Dynamic Alchemy")] | length == 1)
-            and ([.gallery[] | select(.title == "Nexus 材料診斷 / Nexus Materials")] | length == 1)
-            and ([.gallery[] | select(.title == "自然生成紅樹林村莊 / Mangrove Village")] | length == 1)
-            and ([.gallery[] | select(.featured == true)] | length == 1)
-            and ([.gallery[] | select(
-              .title == "DeadRecall 2.4.10 全局整合架構 / Integration Overview"
-              and .featured == true
-              and .ordering == 0
-            )] | length == 1)
-            and ([.gallery[] | select(
-              .title == "背包物品欄整合 / Backpack Inventory"
-              and .featured == false
-              and .ordering == 10
-            )] | length == 1)
-          ' "${project_file}" >/dev/null
-          jq -e '
-            .project_id == "U2X0nXHi"
-            and .name == "DeadRecall 2.4.10"
-            and .version_number == "2.4.10"
-            and (.game_versions == ["26.2"])
-            and (.loaders == ["fabric"])
-            and (.changelog | contains("玩家死亡傳送點"))
-          ' "${version_file}" >/dev/null
-
-          jq '{
-            id, slug, title, description, categories, additional_categories,
-            client_side, server_side, wiki_url, source_url, issues_url,
-            license, status, requested_status,
-            gallery: [.gallery[] | {title, featured, ordering, url}]
-          }' "${project_file}"
-          jq '{
-            id, project_id, name, version_number, version_type, status,
-            game_versions, loaders, featured,
-            files: [.files[] | {filename, primary, size, hashes}]
-          }' "${version_file}"
-
-      - name: Stage bundled JAR
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p build/libs
-          cp .github/staging/deadrecall-2.4.13-bundled.jar \
-            build/libs/deadrecall-2.4.13-bundled.jar
-
-      - name: Verify exact staged artifact and metadata
+      - name: Validate current Modrinth artifact
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.13-bundled.jar
-          EXPECTED_SHA512: 1552e3e25803efc7832c1b34324f8887cc4c5265e32caf60ba809e30625cfbbaa31bc2517cd1e28e462f30e856345b7aee48914e02465c08da92a5dd7267e1af
-        run: |
-          set -euo pipefail
-          actual="$(sha512sum "${MODRINTH_ARTIFACT}" | awk '{print $1}')"
-          test "${actual}" = "${EXPECTED_SHA512}"
-          unzip -p "${MODRINTH_ARTIFACT}" fabric.mod.json \
-            | jq -e '.license == "Apache-2.0"' >/dev/null
-          bash .github/scripts/publish-modrinth.sh
-
-      - name: Publish version to Modrinth
-        id: modrinth
-        env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_ARTIFACT: ${{ env.DEADRECALL_BUNDLE_ARTIFACT }}
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
-          MODRINTH_ARTIFACT: build/libs/deadrecall-2.4.13-bundled.jar
         run: bash .github/scripts/publish-modrinth.sh
 
-      - name: Verify published project and version
+      - name: Verify Modrinth credentials
+        if: ${{ inputs.dry_run == false }}
         shell: bash
         env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_PROJECT_ID}" || {
+            echo 'Repository variable MODRINTH_PROJECT_ID is not configured.' >&2
+            exit 1
+          }
+          test -n "${MODRINTH_TOKEN}" || {
+            echo 'Repository secret MODRINTH_TOKEN is not configured.' >&2
+            exit 1
+          }
+
+      - name: Publish current bundle to Modrinth
+        if: ${{ inputs.dry_run == false }}
+        id: modrinth
+        shell: bash
+        env:
+          MODRINTH_DRY_RUN: 'false'
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
+          MODRINTH_ARTIFACT: ${{ env.DEADRECALL_BUNDLE_ARTIFACT }}
+        run: bash .github/scripts/publish-modrinth.sh
+
+      - name: Verify published artifact
+        if: ${{ inputs.dry_run == false }}
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_ID: ${{ steps.modrinth.outputs.version_id }}
-          EXPECTED_SHA512: 1552e3e25803efc7832c1b34324f8887cc4c5265e32caf60ba809e30625cfbbaa31bc2517cd1e28e462f30e856345b7aee48914e02465c08da92a5dd7267e1af
+          MODRINTH_ARTIFACT: ${{ env.DEADRECALL_BUNDLE_ARTIFACT }}
         run: |
           set -euo pipefail
           test -n "${MODRINTH_VERSION_ID}"
-          project_file="$(mktemp)"
-          version_file="$(mktemp)"
-          cleanup() {
-            rm -f "${project_file}" "${version_file}"
-          }
-          trap cleanup EXIT
-
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          expected_sha512="$(sha512sum "${MODRINTH_ARTIFACT}" | awk '{print $1}')"
+          response="$(mktemp)"
+          trap 'rm -f "${response}"' EXIT
           curl --silent --show-error --fail --retry 3 \
             --header "Authorization: ${MODRINTH_TOKEN}" \
             --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${project_file}" \
-            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
-          curl --silent --show-error --fail --retry 3 \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --output "${version_file}" \
+            --output "${response}" \
             "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}"
-
-          jq -e \
-            --rawfile body .github/staging/modrinth-project-body.md '
-            .id == "U2X0nXHi"
-            and .slug == "deadrecall"
-            and .title == "DeadRecall"
-            and .description == "A lockstep Minecraft 26.2 Fabric ecosystem in one JAR: guided manuals, backpacks, recovery, automation, storage locks, travel, villages, and server integration."
-            and .license.id == "Apache-2.0"
-            and .client_side == "required"
-            and .server_side == "required"
-            and ((.body | rtrimstr("\n")) == ($body | rtrimstr("\n")))
-            and all(.body | split("\n")[] | select(test("^#{1,6} "));
-              (sub("^#{1,6} +"; "") | length) <= 24
-            )
-            and (.status == "approved" or .requested_status == "approved")
-          ' "${project_file}" >/dev/null
           jq -e \
             --arg project_id "${MODRINTH_PROJECT_ID}" \
-            --arg version_id "${MODRINTH_VERSION_ID}" \
-            --arg sha512 "${EXPECTED_SHA512}" '
-            .id == $version_id
-            and .project_id == $project_id
-            and .name == "DeadRecall 2.4.13"
-            and .version_number == "2.4.13"
-            and .version_type == "release"
-            and .status == "listed"
-            and .environment == "client_and_server"
-            and .game_versions == ["26.2"]
-            and .loaders == ["fabric"]
-            and (([.files[] | select(.primary == true)][0] // .files[0]).filename
-              == "deadrecall-2.4.13-bundled.jar")
-            and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512
-              == $sha512)
-          ' "${version_file}" >/dev/null
-          printf 'Verified DeadRecall 2.4.13 project body, headers, and remote JAR SHA-512.\n'
+            --arg version "${version}" \
+            --arg filename "deadrecall-${version}-bundled.jar" \
+            --arg sha512 "${expected_sha512}" '
+              .project_id == $project_id
+              and .version_number == $version
+              and .environment == "client_and_server"
+              and .game_versions == ["26.2"]
+              and .loaders == ["fabric"]
+              and (([.files[] | select(.primary == true)][0] // .files[0]).filename == $filename)
+              and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512 == $sha512)
+            ' "${response}" >/dev/null
+          printf 'Verified DeadRecall %s remote artifact SHA-512.\n' "${version}"
 
-      - name: Submit draft project for review
-        if: false
-        shell: bash
-        env:
-          MODRINTH_PROJECT_ID: ${{ steps.project.outputs.project_id }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          set -euo pipefail
-          review_response="$(mktemp)"
-          trap 'rm -f "${review_response}"' EXIT
-          review_status="$(curl --silent --show-error \
-            --request PATCH \
-            --header "Authorization: ${MODRINTH_TOKEN}" \
-            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
-            --header 'Content-Type: application/json' \
-            --data '{"requested_status":"approved"}' \
-            --output "${review_response}" \
-            --write-out '%{http_code}' \
-            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}")"
-          if [[ "${review_status}" == "200" || "${review_status}" == "204" ]]; then
-            printf 'Submitted DeadRecall project %s for Modrinth review.\n' \
-              "${MODRINTH_PROJECT_ID}"
-            exit 0
-          fi
-
-          printf '::warning::DeadRecall was uploaded, but review submission returned HTTP %s.\n' \
-            "${review_status}"
-          jq . "${review_response}" 2>/dev/null || true
+      - name: Upload smoke diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deadrecall-current-bundle-failure
+          if-no-files-found: ignore
+          path: |
+            server-smoke.log
+            build/current-bundle.fabric.mod.json
+            run/logs/
+            **/build/reports/
