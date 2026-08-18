@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "items": [
+    {
+      "file": "deadrecall-integration-overview.png",
+      "title": "Totem Ecosystem / 整合架構",
+      "description": "DeadRecall 的十一模組整合關係與主要玩法邊界。Overview of the eleven-module Totem ecosystem and its gameplay boundaries.",
+      "featured": true,
+      "ordering": 0,
+      "legacy_titles": [
+        "DeadRecall 2.4.10 全局整合架構 / Integration Overview"
+      ]
+    },
+    {
+      "file": "inventory-backpack-side-panel.png",
+      "title": "Backpack Inventory / 背包",
+      "description": "背包內容直接整合到原版玩家物品欄旁。The active backpack is accessible beside the vanilla player inventory.",
+      "featured": false,
+      "ordering": 10,
+      "legacy_titles": [
+        "背包物品欄整合 / Backpack Inventory"
+      ]
+    },
+    {
+      "file": "backpack-upgrade-bay.png",
+      "title": "Backpack Upgrades / 升級",
+      "description": "單排模組欄與整合式 3×3 合成區。A single-row module bay with integrated 3×3 crafting.",
+      "featured": false,
+      "ordering": 20,
+      "legacy_titles": [
+        "一排式升級欄 / Backpack Upgrade Bay"
+      ]
+    },
+    {
+      "file": "backpack-capacity-4-modules.png",
+      "title": "36-Slot Backpack / 36 格",
+      "description": "四個容量模組把一般背包擴充到 36 格。Four capacity modules expand a backpack to 36 usable storage slots.",
+      "featured": false,
+      "ordering": 30,
+      "legacy_titles": [
+        "四級容量擴充 / Capacity Expansion"
+      ]
+    },
+    {
+      "file": "alchemy-creative-showcase.png",
+      "title": "Dynamic Alchemy / 動態煉金",
+      "description": "TotemAlchemy 的煉金材料、容器與研究型配方系統。Alchemy ingredients, vessels, and the discovery-driven brewing system.",
+      "featured": false,
+      "ordering": 40,
+      "legacy_titles": [
+        "動態煉金內容 / Dynamic Alchemy"
+      ]
+    },
+    {
+      "file": "nexus-material-diagnostics.png",
+      "title": "Nexus Materials / 傳送材料",
+      "description": "Space Unit 依材料呈現容量、穩定度、路線與跨維度特性。Material-sensitive Space Unit diagnostics for travel planning.",
+      "featured": false,
+      "ordering": 50,
+      "legacy_titles": [
+        "Nexus 材料診斷 / Nexus Materials"
+      ]
+    },
+    {
+      "file": "mangrove-village-aerial.png",
+      "title": "Mangrove Village / 紅樹林村莊",
+      "description": "依地形生成並帶有生產工作區的紅樹林村莊。A terrain-aware mangrove village with integrated production areas.",
+      "featured": false,
+      "ordering": 60,
+      "legacy_titles": [
+        "自然生成紅樹林村莊 / Mangrove Village"
+      ]
+    }
+  ]
+}
