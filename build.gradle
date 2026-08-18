@@ -68,6 +68,11 @@ loom {
             sourceSet sourceSets.main
         }
     }
+    runs {
+        server {
+            programArg "--nogui"
+        }
+    }
 }
 
 repositories {
@@ -84,6 +89,15 @@ dependencies {
     compileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation files(totemCoreJar)
+
+    // When assembling or smoke-testing a full bundle, make the exact external
+    // module graph available to Loom's development server as normal Fabric mods.
+    // Core is already present through modImplementation above.
+    if (bundleModuleDirectory != null) {
+        modRuntimeOnly files(bundledModuleFiles.findAll { moduleJar ->
+            moduleJar.name != "totem-core-0.6.0.jar"
+        })
+    }
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.11.4"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
@@ -288,6 +302,8 @@ if (bundleModuleDirectory != null) {
         dependsOn(bundleJar)
     }
 }
+
+apply from: "gradle/normalize-fabric-api-runtime.gradle"
 
 publishing {
     publications {
