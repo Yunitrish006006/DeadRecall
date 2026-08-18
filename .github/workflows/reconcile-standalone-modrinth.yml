@@ -1,0 +1,91 @@
+name: Reconcile Standalone Modrinth
+
+on:
+  pull_request:
+    paths:
+      - '.github/staging/modrinth-standalone-projects.json'
+      - '.github/scripts/reconcile-standalone-modrinth.sh'
+      - '.github/scripts/build-current-bundle.sh'
+      - '.github/workflows/reconcile-standalone-modrinth.yml'
+      - 'gradle.properties'
+      - 'src/main/resources/fabric.mod.json'
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/staging/modrinth-standalone-projects.json'
+      - '.github/scripts/reconcile-standalone-modrinth.sh'
+      - '.github/scripts/build-current-bundle.sh'
+      - '.github/workflows/reconcile-standalone-modrinth.yml'
+      - 'gradle.properties'
+      - 'src/main/resources/fabric.mod.json'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Validate only; do not upload or submit projects
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: totem-standalone-modrinth-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    name: Build exact JARs and reconcile projects
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build exact lockstep standalone JARs
+        shell: bash
+        run: bash .github/scripts/build-current-bundle.sh
+
+      - name: Decide reconcile mode
+        id: mode
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" == 'pull_request' ]]; then
+            echo 'dry_run=true' >> "${GITHUB_OUTPUT}"
+          elif [[ "${EVENT_NAME}" == 'workflow_dispatch' ]]; then
+            echo "dry_run=${REQUESTED_DRY_RUN}" >> "${GITHUB_OUTPUT}"
+          else
+            echo 'dry_run=false' >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Reconcile eleven standalone projects
+        shell: bash
+        env:
+          MODRINTH_STANDALONE_DRY_RUN: ${{ steps.mode.outputs.dry_run }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/reconcile-standalone-modrinth.sh
+
+      - name: Upload diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-modrinth-reconcile-failure
+          if-no-files-found: ignore
+          path: |
+            standalone-modules/
+            build/current-bundle.fabric.mod.json
+            **/build/reports/
