@@ -1,0 +1,84 @@
+name: Sync Modrinth Listing
+
+on:
+  pull_request:
+    paths:
+      - '.github/staging/modrinth-project-body.md'
+      - '.github/staging/modrinth-gallery/**'
+      - '.github/scripts/sync-modrinth-project.sh'
+      - 'src/main/resources/assets/deadrecall/icon.png'
+      - '.github/workflows/sync-modrinth-listing.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/staging/modrinth-project-body.md'
+      - '.github/staging/modrinth-gallery/**'
+      - '.github/scripts/sync-modrinth-project.sh'
+      - 'src/main/resources/assets/deadrecall/icon.png'
+      - '.github/workflows/sync-modrinth-listing.yml'
+  workflow_dispatch:
+    inputs:
+      live_sync:
+        description: Apply the validated listing to Modrinth
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deadrecall-modrinth-listing-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate listing assets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Validate description, icon, and gallery
+        shell: bash
+        env:
+          MODRINTH_PROJECT_DRY_RUN: 'true'
+        run: bash .github/scripts/sync-modrinth-project.sh
+
+  sync:
+    name: Sync listing to Modrinth
+    needs: validate
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.live_sync == true) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Verify Modrinth credentials
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_PROJECT_ID}" || {
+            echo 'Repository variable MODRINTH_PROJECT_ID is not configured.' >&2
+            exit 1
+          }
+          test -n "${MODRINTH_TOKEN}" || {
+            echo 'Repository secret MODRINTH_TOKEN is not configured.' >&2
+            exit 1
+          }
+
+      - name: Apply project presentation
+        shell: bash
+        env:
+          MODRINTH_PROJECT_DRY_RUN: 'false'
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/sync-modrinth-project.sh
