@@ -61,6 +61,12 @@ jobs:
           MODRINTH_VERSION_TYPE: ${{ inputs.version_type }}
         run: bash .github/scripts/publish-modrinth.sh
 
+      - name: Validate Modrinth presentation
+        shell: bash
+        env:
+          MODRINTH_PROJECT_DRY_RUN: 'true'
+        run: bash .github/scripts/sync-modrinth-project.sh
+
       - name: Verify Modrinth credentials
         if: ${{ inputs.dry_run == false }}
         shell: bash
@@ -77,6 +83,15 @@ jobs:
             echo 'Repository secret MODRINTH_TOKEN is not configured.' >&2
             exit 1
           }
+
+      - name: Sync Modrinth project presentation
+        if: ${{ inputs.dry_run == false }}
+        shell: bash
+        env:
+          MODRINTH_PROJECT_DRY_RUN: 'false'
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/sync-modrinth-project.sh
 
       - name: Publish current bundle to Modrinth
         if: ${{ inputs.dry_run == false }}
