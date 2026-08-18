@@ -1,0 +1,44 @@
+name: Fast Audit Standalone Modrinth
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/audit-standalone-modrinth-fast.yml'
+      - '.github/scripts/audit-standalone-modrinth-artifacts.sh'
+      - '.github/staging/modrinth-standalone-projects.json'
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  audit:
+    name: Compare all eleven remote JARs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Download canonical JARs from verified build run
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: Yunitrish006006/DeadRecall
+          run-id: 32170865595
+          name: standalone-modrinth-reconcile-failure
+          path: .artifact
+
+      - name: Restore standalone module directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf standalone-modules
+          test -d .artifact/standalone-modules
+          mv .artifact/standalone-modules standalone-modules
+          find standalone-modules -maxdepth 1 -type f -name '*.jar' -printf '%f\n' | sort
+
+      - name: Audit all current Modrinth artifact identities
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/audit-standalone-modrinth-artifacts.sh
