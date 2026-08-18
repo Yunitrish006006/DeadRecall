@@ -1,0 +1,90 @@
+name: Audit Modrinth Live State
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/audit-modrinth-live.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Read-only live project audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Audit live Modrinth project
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_PROJECT_ID}" || { echo 'MODRINTH_PROJECT_ID is missing.' >&2; exit 1; }
+          test -n "${MODRINTH_TOKEN}" || { echo 'MODRINTH_TOKEN is missing.' >&2; exit 1; }
+
+          project_json="$(mktemp)"
+          versions_json="$(mktemp)"
+          trap 'rm -f "${project_json}" "${versions_json}"' EXIT
+
+          curl --silent --show-error --fail --retry 3 \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-LiveAudit/${GITHUB_RUN_ID}" \
+            --output "${project_json}" \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}"
+
+          curl --silent --show-error --fail --retry 3 \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-LiveAudit/${GITHUB_RUN_ID}" \
+            --output "${versions_json}" \
+            "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/version?include_changelog=false"
+
+          expected_description='One verified Minecraft 26.2 Fabric bundle: backpacks, recovery, Copper Golems, villages, alchemy, travel, storage locks, and server integration.'
+
+          jq -e \
+            --arg description "${expected_description}" \
+            --rawfile body .github/staging/modrinth-project-body.md '
+              .title == "DeadRecall"
+              and .description == $description
+              and .client_side == "required"
+              and .server_side == "required"
+              and .license.id == "Apache-2.0"
+              and ((.body | rtrimstr("\n")) == ($body | rtrimstr("\n")))
+            ' "${project_json}" >/dev/null
+
+          count="$(jq '.items | length' .github/staging/modrinth-gallery/gallery.json)"
+          for ((i = 0; i < count; i++)); do
+            title="$(jq -r ".items[${i}].title" .github/staging/modrinth-gallery/gallery.json)"
+            description="$(jq -r ".items[${i}].description" .github/staging/modrinth-gallery/gallery.json)"
+            featured="$(jq -r ".items[${i}].featured" .github/staging/modrinth-gallery/gallery.json)"
+            ordering="$(jq -r ".items[${i}].ordering" .github/staging/modrinth-gallery/gallery.json)"
+            jq -e \
+              --arg title "${title}" \
+              --arg description "${description}" \
+              --argjson featured "${featured}" \
+              --argjson ordering "${ordering}" '
+                any(.gallery[]?;
+                  .title == $title
+                  and .description == $description
+                  and .featured == $featured
+                  and .ordering == $ordering
+                )
+              ' "${project_json}" >/dev/null
+          done
+
+          echo '--- Remote project ---'
+          jq '{id, slug, title, status, requested_status, published, updated, description, gallery: [.gallery[] | {title, featured, ordering}]}' "${project_json}"
+
+          echo '--- Remote versions ---'
+          jq '[.[] | {id, name, version_number, status, requested_status, version_type, game_versions, loaders, files: [.files[] | {filename, primary, hashes: {sha512: .hashes.sha512}}]}]' "${versions_json}"
+
+          if jq -e 'any(.[]; .version_number == "2.4.19")' "${versions_json}" >/dev/null; then
+            echo 'DEADRECALL_2_4_19_PRESENT=true'
+          else
+            echo 'DEADRECALL_2_4_19_PRESENT=false'
+          fi
