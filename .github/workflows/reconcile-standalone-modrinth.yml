@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - '.github/staging/modrinth-standalone-projects.json'
+      - '.github/scripts/audit-standalone-modrinth-artifacts.sh'
       - '.github/scripts/reconcile-standalone-modrinth.sh'
       - '.github/scripts/build-current-bundle.sh'
       - '.github/workflows/reconcile-standalone-modrinth.yml'
@@ -14,6 +15,7 @@ on:
       - master
     paths:
       - '.github/staging/modrinth-standalone-projects.json'
+      - '.github/scripts/audit-standalone-modrinth-artifacts.sh'
       - '.github/scripts/reconcile-standalone-modrinth.sh'
       - '.github/scripts/build-current-bundle.sh'
       - '.github/workflows/reconcile-standalone-modrinth.yml'
@@ -56,7 +58,14 @@ jobs:
         shell: bash
         run: bash .github/scripts/build-current-bundle.sh
 
+      - name: Audit all current Modrinth artifact identities
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/audit-standalone-modrinth-artifacts.sh
+
       - name: Decide reconcile mode
+        if: ${{ success() }}
         id: mode
         shell: bash
         env:
@@ -73,9 +82,10 @@ jobs:
           fi
 
       - name: Reconcile eleven standalone projects
+        if: ${{ success() && steps.mode.outputs.dry_run == 'false' }}
         shell: bash
         env:
-          MODRINTH_STANDALONE_DRY_RUN: ${{ steps.mode.outputs.dry_run }}
+          MODRINTH_STANDALONE_DRY_RUN: 'false'
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: bash .github/scripts/reconcile-standalone-modrinth.sh
 
