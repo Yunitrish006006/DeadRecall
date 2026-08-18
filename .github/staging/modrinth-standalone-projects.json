@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "policy": "audit-before-write",
   "minecraft": "26.2",
   "loader": "fabric",
   "projects": [
