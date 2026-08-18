@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   audit:
-    name: List owned Modrinth projects
+    name: Inspect owned Modrinth projects
     runs-on: ubuntu-latest
     steps:
       - name: Query authenticated Modrinth inventory
@@ -22,12 +22,29 @@ jobs:
           test -n "${MODRINTH_TOKEN}" || { echo 'MODRINTH_TOKEN missing.' >&2; exit 1; }
           api='https://api.modrinth.com/v2'
           auth=(-H "Authorization: ${MODRINTH_TOKEN}" -H "User-Agent: Yunitrish006006/Totem-Inventory/${GITHUB_RUN_ID}")
-          curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/user" > /tmp/user.json
-          user_id="$(jq -er '.id' /tmp/user.json)"
-          username="$(jq -er '.username' /tmp/user.json)"
-          curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/user/${user_id}/projects" > /tmp/projects.json
-          echo "Modrinth user: ${username} (${user_id})"
-          echo '--- Totem/DeadRecall projects ---'
-          jq '[.[] | select((.title | ascii_downcase | contains("totem")) or (.slug | ascii_downcase | contains("totem")) or (.slug == "deadrecall")) | {id, slug, title, status, requested_status, versions, game_versions, loaders, source_url}] | sort_by(.title)' /tmp/projects.json
-          echo '--- All owned project slugs ---'
-          jq -r 'sort_by(.slug)[] | [.id,.slug,.title,.status,(.requested_status // "-")] | @tsv' /tmp/projects.json
+
+          declare -a rows=(
+            'ZggYV6cS|totem-core|TotemCore|0.6.0|https://github.com/Yunitrish006006/TotemCore'
+            'dhochP34|totem-remnant|TotemRemnant|0.2.11|https://github.com/Yunitrish006006/TotemRemnant'
+            'C8f15uNO|totem-automata|TotemAutomata|0.1.12|https://github.com/Yunitrish006006/TotemAutomata'
+            'FfCkJemY|totem-nexus|TotemNexus|0.2.6|https://github.com/Yunitrish006006/TotemNexus'
+            'UBW4bpOx|totem-discord-bridge|TotemDiscordBridge|0.1.6|https://github.com/Yunitrish006006/TotemDiscordBridge'
+            'JnAGUw9w|totem-alchemy|TotemAlchemy|0.1.23|https://github.com/Yunitrish006006/TotemAlchemy'
+            'CxaaO2xO|totem-enchanting|TotemEnchanting|0.1.5|https://github.com/Yunitrish006006/TotemEnchanting'
+            '8JdAMczX|totem-excavation|Totem Excavation|0.1.2|https://github.com/Yunitrish006006/TotemExcavation'
+            '7MXfMVJA|totem-locksmith|Totem Locksmith|0.1.0|https://github.com/Yunitrish006006/TotemLocksmith'
+            'mEcpkZT2|totem-vanilla-tweaks|TotemVanillaTweaks|0.1.8|https://github.com/Yunitrish006006/TotemVanillaTweaks'
+            'kfuP4czk|totem-villagers-workforce|Totem Villagers|0.1.30|https://github.com/Yunitrish006006/TotemVillagers'
+          )
+
+          for row in "${rows[@]}"; do
+            IFS='|' read -r id slug expected_title expected_version expected_source <<<"${row}"
+            project="/tmp/${slug}-project.json"
+            versions="/tmp/${slug}-versions.json"
+            curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/project/${id}" > "${project}"
+            curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/project/${id}/version?include_changelog=false" > "${versions}"
+
+            echo "===== ${slug} ====="
+            jq --arg expected_title "${expected_title}" --arg expected_source "${expected_source}" '{id,slug,title,title_ok:(.title==$expected_title),status,requested_status,published,queued,approved,source_url,source_ok:(.source_url==$expected_source),icon:(.icon_url!=null),body_chars:(.body|length),gallery_count:(.gallery|length),game_versions,loaders,license:.license.id,client_side,server_side}' "${project}"
+            jq --arg expected_version "${expected_version}" '[.[] | {id,name,version_number,status,requested_status,version_type,environment,game_versions,loaders,primary_file: (([.files[] | select(.primary == true)][0] // .files[0]).filename), sha512: (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512)}] | {expected:$expected_version,expected_present:any(.[];.version_number==$expected_version),versions:.}' "${versions}"
+          done
