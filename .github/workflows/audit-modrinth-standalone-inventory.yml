@@ -1,0 +1,33 @@
+name: Audit Modrinth Standalone Inventory
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/audit-modrinth-standalone-inventory.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: List owned Modrinth projects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query authenticated Modrinth inventory
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_TOKEN}" || { echo 'MODRINTH_TOKEN missing.' >&2; exit 1; }
+          api='https://api.modrinth.com/v2'
+          auth=(-H "Authorization: ${MODRINTH_TOKEN}" -H "User-Agent: Yunitrish006006/Totem-Inventory/${GITHUB_RUN_ID}")
+          curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/user" > /tmp/user.json
+          user_id="$(jq -er '.id' /tmp/user.json)"
+          username="$(jq -er '.username' /tmp/user.json)"
+          curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/user/${user_id}/projects" > /tmp/projects.json
+          echo "Modrinth user: ${username} (${user_id})"
+          echo '--- Totem/DeadRecall projects ---'
+          jq '[.[] | select((.title | ascii_downcase | contains("totem")) or (.slug | ascii_downcase | contains("totem")) or (.slug == "deadrecall")) | {id, slug, title, status, requested_status, versions, game_versions, loaders, source_url}] | sort_by(.title)' /tmp/projects.json
+          echo '--- All owned project slugs ---'
+          jq -r 'sort_by(.slug)[] | [.id,.slug,.title,.status,(.requested_status // "-")] | @tsv' /tmp/projects.json
