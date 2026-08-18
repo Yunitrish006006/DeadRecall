@@ -1,0 +1,35 @@
+name: Audit TotemCore Modrinth Submission
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/audit-totem-core-modrinth.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Verify TotemCore review state
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read TotemCore project
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          api='https://api.modrinth.com/v2'
+          auth=(-H "Authorization: ${MODRINTH_TOKEN}" -H "User-Agent: Yunitrish006006/TotemCore-Audit/${GITHUB_RUN_ID}")
+          for attempt in $(seq 1 15); do
+            curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/project/ZggYV6cS" > /tmp/project.json
+            status="$(jq -r '.status' /tmp/project.json)"
+            if [[ "${status}" == 'processing' || "${status}" == 'approved' ]]; then
+              jq '{id,slug,title,status,requested_status,queued,published,approved,source_url}' /tmp/project.json
+              jq -e '.requested_status == "approved" or .status == "approved"' /tmp/project.json >/dev/null
+              exit 0
+            fi
+            sleep 2
+          done
+          jq '{id,slug,title,status,requested_status,queued,published,approved,source_url}' /tmp/project.json >&2
+          exit 1
