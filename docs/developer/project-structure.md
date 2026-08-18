@@ -1,41 +1,50 @@
 # 專案結構
 
-## Java 程式入口
+DeadRecall 現在是 Totem 生態的 **thin compatibility host**，不再持有各玩法模組的實作。外層 JAR 只負責舊 ID 遷移與 exact-version nested-JAR 整合。
+
+## DeadRecall 主程式
 
 | 路徑 | 責任 |
 | --- | --- |
-| `Deadrecall.java` | 模組入口、註冊、事件、Payload 與指令 |
-| `DiscordBridge.java` | Discord Bridge HTTP 傳輸 |
-| `alchemy/` | 投料、煉藥鍋與豬糞流程 |
-| `block/` | 自訂方塊、煉藥鍋與 Block Entity |
-| `entity/ai/` | 豬在成功餵食後延遲產生、逐層堆疊豬糞的 AI |
-| `item/` | 物品註冊、背包與創造模式頁籤 |
-| `item/copper/` | 銅板手與銅魁儡互動 |
-| `inventory/` | 背包容器資料讀寫 |
-| `network/` | Client／Server 自訂 Payload |
-| `space/` | 圖靈騰樞紐（Totem Nexus）Space Unit、SavedData、地圖查詢、報價與傳送 session |
-| `mixin/` | 原版行為攔截與擴充 |
+| `src/main/java/com/adaptor/deadrecall/Deadrecall.java` | DeadRecall 外層入口與相容性初始化 |
+| `src/main/java/com/adaptor/deadrecall/migration/` | 舊 `deadrecall:*` 物品 ID 的受控遷移 |
+| `src/main/resources/data/deadrecall/migration/item_ids.json` | legacy → canonical 物品 ID 對照 |
+| `src/main/resources/fabric.mod.json` | **唯一現行 Fabric metadata**；宣告 DeadRecall 與十一個 Totem 模組的 exact dependencies |
+| `src/main/resources/assets/deadrecall/icon.png` | DeadRecall 外層圖示 |
 
-## 圖靈騰樞紐（Totem Nexus）主要類別
+`build.gradle` 的 main source set 只允許上述 Java / resource surface 進入 thin host。`verifyDeadRecallThinJar` 會拒絕其他 gameplay、Mixin、GUI、payload 或額外資料資源意外回流到 DeadRecall 外層。
 
-| 類別 | 責任 |
+## Gameplay 所屬模組
+
+| Repository | 主要責任 |
 | --- | --- |
-| `SpaceUnitHandler` | 羅盤互動、地圖資料、傳送報價、倒數 session 與安全落點 |
-| `DeadRecallSpaceUnitSavedData` | 世界 Space Unit 永久資料 |
-| `DeadRecallSpaceDiscoverySavedData` | 玩家探索記錄 |
-| `SpaceUnitRecord` | 單一節點資料模型 |
-| `SpaceStructureSnapshot` | 磁石結構 tier、resonance 等快照 |
-| `SpaceUnitMapPayload` | Server 傳給 Client 的來源、節點與傳送報價 |
-| `RequestSpaceUnitMapPayload` | Client 請求重新整理地圖 |
-| `StartSpaceUnitTeleportPayload` | Client 請求啟動傳送 |
-| `SpaceUnitMapScreen` | 地圖、Dimension 分頁、列表、縮放、選取與傳送 UI |
+| `TotemCore` | 共用 API、事件、手冊、版本握手、遷移契約 |
+| `TotemRemnant` | 背包、死亡背包、死亡物品回收、容器安全 |
+| `TotemAutomata` | 銅魁儡分類與採集自動化 |
+| `TotemNexus` | Space Unit、好友、地圖與傳送 |
+| `TotemDiscordBridge` | Minecraft ↔ Discord 事件傳輸 |
+| `TotemAlchemy` | 煉金、動態釀造與研究紀錄 |
+| `TotemEnchanting` | 雕紋書櫃附魔力 |
+| `TotemExcavation` | 區域挖掘與錘具 |
+| `TotemLocksmith` | 固定容器網路鎖、權限與鑰匙 |
+| `TotemVanillaTweaks` | 原版相容調整、整理與配方 |
+| `TotemVillagers` | 村民庫存、工作、經濟與村莊 worldgen |
 
-## 資源入口
+新增或修正 gameplay 時應修改對應 standalone repository，不應在 DeadRecall 重新建立第二份實作。
 
-- 一般配方：`src/main/resources/data/deadrecall/recipe/`
-- 煉藥鍋配方：`src/main/resources/data/deadrecall/deadrecall/cauldron_recipes/`
-- 語言檔：`src/main/resources/assets/deadrecall/lang/`
-- Fabric metadata：`src/main/resources/fabric.mod.json`
-- Discord Worker：`deploy/` 或專案中的 Worker 範例檔
+## Bundle 與發佈入口
 
-新增系統時應優先依責任建立 package，避免把所有事件、網路封包和資料處理繼續集中到模組主入口。
+- `build.gradle`：thin host build、nested-JAR bundle 組裝與 exact module filenames。
+- `gradle.properties`：DeadRecall 當前版本與 Minecraft/Fabric build properties。
+- `docs/releases/`：目前 release graph 與玩家可見變更。
+- `.github/workflows/build.yml`：Core pin、thin-host build/tests、Modrinth dry-run。
+- `.github/workflows/validate.yml`：當前十一模組 exact dependency graph 驗證。
+- `.github/scripts/publish-modrinth.sh`：DeadRecall 發布 artifact 驗證與不可覆寫版本政策。
+- `.github/staging/modrinth-standalone/`：歷史 standalone staging 資料；其中 2.4.13 manifest/bundle contract 是 archived evidence，不代表目前 bundle 版本。
+
+## 重要不變條件
+
+1. Fabric metadata 只以 `src/main/resources/fabric.mod.json` 為準。
+2. DeadRecall 外層不得重新加入 gameplay Mixin、GUI、payload 或 feature-owned data。
+3. 每個 nested module 都使用 exact version pin；不同版本不得混裝。
+4. 已發布的版本號不得對應到不同 JAR SHA-512；內容變更必須升版。
