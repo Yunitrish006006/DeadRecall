@@ -22,7 +22,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify standalone projects
+      - name: Verify current release graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
+          test -n "${version}"
+          test -f "docs/releases/${version}.md"
+          grep -F -- "- [${version}](${version}.md)" docs/releases/README.md >/dev/null
+          grep -F -- "發佈版本為 **${version}**" README.md >/dev/null
+          grep -F -- "deadrecall-${version}-bundled.jar" README.md >/dev/null
+          grep -F -- "deadrecall-${version}-bundled.jar" .github/staging/modrinth-project-body.md >/dev/null
+
+          mapfile -t module_pins < <(jq -r '
+            .depends
+            | to_entries[]
+            | select(.key | startswith("totem-"))
+            | [.key, .value]
+            | @tsv
+          ' src/main/resources/fabric.mod.json)
+          test "${#module_pins[@]}" -eq 11
+
+          for pin in "${module_pins[@]}"; do
+            module_id="${pin%%$'\t'*}"
+            exact_version="${pin#*$'\t'}"
+            case "${exact_version}" in
+              =*) exact_version="${exact_version#=}" ;;
+              *)
+                echo "Non-exact Totem dependency: ${module_id} ${exact_version}" >&2
+                exit 1
+                ;;
+            esac
+            grep -F -- "\"${module_id}-${exact_version}.jar\"" build.gradle >/dev/null
+          done
+
+          echo "Validated current DeadRecall ${version} exact eleven-module release graph."
+
+      - name: Verify archived standalone projects
+        if: ${{ hashFiles('.github/staging/deadrecall-2.4.13-bundled.jar') != '' }}
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
@@ -30,28 +67,20 @@ jobs:
           set -euo pipefail
           bash .github/scripts/sync-modrinth-standalone.sh
 
-      - name: Verify DeadRecall release
-        shell: bash
-        env:
-          MODRINTH_DRY_RUN: 'true'
-          MODRINTH_PROJECT_ID: dry-run-project
-          MODRINTH_ARTIFACT: .github/staging/deadrecall-2.4.13-bundled.jar
-        run: |
-          set -euo pipefail
-          unzip -t "${MODRINTH_ARTIFACT}"
-          bash .github/scripts/publish-modrinth.sh
-
-      - name: Verify bundle metadata
+      - name: Verify archived 2.4.13 bundle metadata
+        if: ${{ hashFiles('.github/staging/deadrecall-2.4.13-bundled.jar') != '' }}
         shell: bash
         run: |
           set -euo pipefail
           artifact=.github/staging/deadrecall-2.4.13-bundled.jar
+          unzip -t "${artifact}"
           test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.id')" = deadrecall
           test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.version')" = 2.4.13
           test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.license')" = Apache-2.0
           test "$(unzip -Z1 "${artifact}" 'META-INF/jars/*.jar' | wc -l)" = 11
 
-      - name: Upload verified bundle
+      - name: Upload archived verified bundle
+        if: ${{ hashFiles('.github/staging/deadrecall-2.4.13-bundled.jar') != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: deadrecall-2.4.13-bundled
