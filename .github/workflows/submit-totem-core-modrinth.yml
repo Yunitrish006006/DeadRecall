@@ -1,0 +1,82 @@
+name: Submit TotemCore to Modrinth Review
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/submit-totem-core-modrinth.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    name: Validate and submit TotemCore
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit TotemCore project
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_TOKEN}" || { echo 'MODRINTH_TOKEN missing.' >&2; exit 1; }
+          api='https://api.modrinth.com/v2'
+          project_id='ZggYV6cS'
+          auth=(-H "Authorization: ${MODRINTH_TOKEN}" -H "User-Agent: Yunitrish006006/TotemCore-Submit/${GITHUB_RUN_ID}")
+
+          curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/project/${project_id}" > /tmp/project.json
+          curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/project/${project_id}/version?include_changelog=false" > /tmp/versions.json
+
+          jq -e '
+            .id == "ZggYV6cS"
+            and .slug == "totem-core"
+            and .title == "TotemCore"
+            and .source_url == "https://github.com/Yunitrish006006/TotemCore"
+            and .icon_url != null
+            and (.body | length) >= 1000
+            and (.gallery | length) >= 1
+            and .license.id == "Apache-2.0"
+            and .client_side == "required"
+            and .server_side == "required"
+            and .game_versions == ["26.2"]
+            and .loaders == ["fabric"]
+            and (.status == "draft" or .status == "processing" or .status == "approved")
+          ' /tmp/project.json >/dev/null
+
+          jq -e '
+            any(.[];
+              .version_number == "0.6.0"
+              and .status == "listed"
+              and .version_type == "release"
+              and .environment == "client_and_server"
+              and .game_versions == ["26.2"]
+              and .loaders == ["fabric"]
+              and (([.files[] | select(.primary == true)][0] // .files[0]).filename == "totem-core-0.6.0.jar")
+            )
+          ' /tmp/versions.json >/dev/null
+
+          status="$(jq -r '.status' /tmp/project.json)"
+          if [[ "${status}" == 'draft' ]]; then
+            payload='{"status":"processing","requested_status":"approved","source_url":"https://github.com/Yunitrish006006/TotemCore","issues_url":"https://github.com/Yunitrish006006/TotemCore/issues"}'
+            code="$(curl --silent --show-error --retry 3 -o /tmp/patch-response.json -w '%{http_code}' "${auth[@]}" -H 'Content-Type: application/json' -X PATCH --data "${payload}" "${api}/project/${project_id}")"
+            test "${code}" = '204' || { echo "PATCH failed with HTTP ${code}" >&2; cat /tmp/patch-response.json >&2; exit 1; }
+          fi
+
+          for attempt in $(seq 1 10); do
+            curl --fail --silent --show-error --retry 3 "${auth[@]}" "${api}/project/${project_id}" > /tmp/after.json
+            if jq -e '.status == "processing" and .requested_status == "approved"' /tmp/after.json >/dev/null; then
+              jq '{id,slug,title,status,requested_status,queued,published,approved}' /tmp/after.json
+              exit 0
+            fi
+            if jq -e '.status == "approved"' /tmp/after.json >/dev/null; then
+              jq '{id,slug,title,status,requested_status,queued,published,approved}' /tmp/after.json
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo 'TotemCore did not enter processing/approved state.' >&2
+          jq '{id,slug,title,status,requested_status,queued,published,approved}' /tmp/after.json >&2
+          exit 1
