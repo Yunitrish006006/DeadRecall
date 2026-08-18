@@ -1,0 +1,111 @@
+name: Audit Modrinth Live State
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/audit-modrinth-live.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Wait for and verify live 2.4.19
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Wait for live 2.4.19 and audit project
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${MODRINTH_PROJECT_ID}" || { echo 'MODRINTH_PROJECT_ID is missing.' >&2; exit 1; }
+          test -n "${MODRINTH_TOKEN}" || { echo 'MODRINTH_TOKEN is missing.' >&2; exit 1; }
+
+          project_json="$(mktemp)"
+          versions_json="$(mktemp)"
+          trap 'rm -f "${project_json}" "${versions_json}"' EXIT
+
+          api_get() {
+            local url="$1"
+            local output="$2"
+            curl --silent --show-error --fail --retry 3 \
+              --header "Authorization: ${MODRINTH_TOKEN}" \
+              --header "User-Agent: ${GITHUB_REPOSITORY}-LiveAudit/${GITHUB_RUN_ID}" \
+              --output "${output}" \
+              "${url}"
+          }
+
+          found=false
+          for attempt in $(seq 1 45); do
+            api_get "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/version?include_changelog=false" "${versions_json}"
+            if jq -e 'any(.[]; .version_number == "2.4.19")' "${versions_json}" >/dev/null; then
+              found=true
+              echo "Found DeadRecall 2.4.19 on Modrinth at poll ${attempt}."
+              break
+            fi
+            echo "2.4.19 not visible yet (poll ${attempt}/45); checking again in 20 seconds."
+            sleep 20
+          done
+          [[ "${found}" == 'true' ]] || { echo 'DeadRecall 2.4.19 did not appear on Modrinth within 15 minutes.' >&2; exit 1; }
+
+          api_get "https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}" "${project_json}"
+
+          expected_description='One verified Minecraft 26.2 Fabric bundle: backpacks, recovery, Copper Golems, villages, alchemy, travel, storage locks, and server integration.'
+          jq -e \
+            --arg description "${expected_description}" \
+            --rawfile body .github/staging/modrinth-project-body.md '
+              .id == "U2X0nXHi"
+              and .slug == "deadrecall"
+              and .title == "DeadRecall"
+              and .description == $description
+              and .client_side == "required"
+              and .server_side == "required"
+              and .license.id == "Apache-2.0"
+              and ((.body | rtrimstr("\n")) == ($body | rtrimstr("\n")))
+            ' "${project_json}" >/dev/null
+
+          count="$(jq '.items | length' .github/staging/modrinth-gallery/gallery.json)"
+          for ((i = 0; i < count; i++)); do
+            title="$(jq -r ".items[${i}].title" .github/staging/modrinth-gallery/gallery.json)"
+            description="$(jq -r ".items[${i}].description" .github/staging/modrinth-gallery/gallery.json)"
+            featured="$(jq -r ".items[${i}].featured" .github/staging/modrinth-gallery/gallery.json)"
+            ordering="$(jq -r ".items[${i}].ordering" .github/staging/modrinth-gallery/gallery.json)"
+            jq -e \
+              --arg title "${title}" \
+              --arg description "${description}" \
+              --argjson featured "${featured}" \
+              --argjson ordering "${ordering}" '
+                any(.gallery[]?;
+                  .title == $title
+                  and .description == $description
+                  and .featured == $featured
+                  and .ordering == $ordering
+                )
+              ' "${project_json}" >/dev/null
+          done
+
+          jq -e '
+            any(.[];
+              .name == "DeadRecall 2.4.19"
+              and .version_number == "2.4.19"
+              and .status == "listed"
+              and .version_type == "release"
+              and .game_versions == ["26.2"]
+              and .loaders == ["fabric"]
+              and .environment == "client_and_server"
+              and (([.files[] | select(.primary == true)][0] // .files[0]).filename == "deadrecall-2.4.19-bundled.jar")
+              and ((([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512) | test("^[0-9a-f]{128}$"))
+            )
+          ' "${versions_json}" >/dev/null
+
+          echo '--- Verified project state ---'
+          jq '{id, slug, title, status, requested_status, description, gallery: [.gallery[] | {title, featured, ordering}]}' "${project_json}"
+          echo '--- Verified 2.4.19 ---'
+          jq '[.[] | select(.version_number == "2.4.19") | {id, name, version_number, status, version_type, environment, game_versions, loaders, files: [.files[] | {filename, primary, hashes: {sha512: .hashes.sha512}}]}]' "${versions_json}"
