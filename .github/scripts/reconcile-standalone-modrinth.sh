@@ -15,6 +15,7 @@ fail() { printf 'error: %s\n' "$*" >&2; exit 1; }
 command -v jq >/dev/null || fail 'jq is required'
 command -v curl >/dev/null || fail 'curl is required'
 command -v sha512sum >/dev/null || fail 'sha512sum is required'
+command -v python3 >/dev/null || fail 'python3 is required'
 [[ -n "${TOKEN}" ]] || fail 'MODRINTH_TOKEN is required'
 [[ -f "${MANIFEST}" ]] || fail "missing manifest: ${MANIFEST}"
 [[ -d "${MODULE_DIR}" ]] || fail "missing standalone module directory: ${MODULE_DIR}"
@@ -57,13 +58,62 @@ patch_project() {
   rm -f "${response}"
 }
 
-verify_remote_version() {
-  local versions_file="$1" version="$2" environment="$3" jar="$4" sha512="$5"
+jar_content_fingerprint() {
+  python3 - "$1" <<'PY'
+import hashlib
+import sys
+import zipfile
+
+path = sys.argv[1]
+h = hashlib.sha256()
+with zipfile.ZipFile(path) as jar:
+    names = sorted(name for name in jar.namelist() if not name.endswith('/'))
+    for name in names:
+        h.update(name.encode('utf-8'))
+        h.update(b'\0')
+        h.update(hashlib.sha256(jar.read(name)).digest())
+print(h.hexdigest())
+PY
+}
+
+print_jar_content_diff() {
+  python3 - "$1" "$2" <<'PY'
+import hashlib
+import sys
+import zipfile
+
+left_path, right_path = sys.argv[1:]
+def entries(path):
+    with zipfile.ZipFile(path) as jar:
+        return {
+            name: hashlib.sha256(jar.read(name)).hexdigest()
+            for name in jar.namelist()
+            if not name.endswith('/')
+        }
+left = entries(left_path)
+right = entries(right_path)
+all_names = sorted(set(left) | set(right))
+changes = []
+for name in all_names:
+    if name not in left:
+        changes.append(f'only-remote {name}')
+    elif name not in right:
+        changes.append(f'only-local  {name}')
+    elif left[name] != right[name]:
+        changes.append(f'changed     {name}')
+for line in changes[:80]:
+    print(line)
+if len(changes) > 80:
+    print(f'... {len(changes) - 80} more differing entries')
+PY
+}
+
+verify_remote_metadata() {
+  local versions_file="$1" version="$2" environment="$3" jar="$4"
   jq -e \
     --arg version "${version}" \
     --arg environment "${environment}" \
-    --arg jar "${jar}" \
-    --arg sha512 "${sha512}" '
+    --arg jar "${jar}" '
       ([.[] | select(.version_number == $version)] | length) == 1
       and any(.[];
         .version_number == $version
@@ -73,9 +123,45 @@ verify_remote_version() {
         and .game_versions == ["26.2"]
         and .loaders == ["fabric"]
         and (([.files[] | select(.primary == true)][0] // .files[0]).filename == $jar)
-        and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512 == $sha512)
       )
     ' "${versions_file}" >/dev/null
+}
+
+verify_existing_artifact_content() {
+  local versions_file="$1" version="$2" artifact="$3" local_sha512="$4"
+  local remote_sha512 remote_url remote_jar local_fp remote_fp
+  remote_sha512="$(jq -er --arg version "${version}" '.[] | select(.version_number == $version) | (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512)' "${versions_file}")"
+  if [[ "${remote_sha512}" == "${local_sha512}" ]]; then
+    printf 'Verified byte-identical SHA-512: %s\n' "${local_sha512}"
+    return 0
+  fi
+
+  remote_url="$(jq -er --arg version "${version}" '.[] | select(.version_number == $version) | (([.files[] | select(.primary == true)][0] // .files[0]).url)' "${versions_file}")"
+  remote_jar="$(mktemp --suffix=.jar)"
+  curl --fail --silent --show-error --retry 3 --output "${remote_jar}" "${remote_url}"
+  local_fp="$(jar_content_fingerprint "${artifact}")"
+  remote_fp="$(jar_content_fingerprint "${remote_jar}")"
+  if [[ "${local_fp}" == "${remote_fp}" ]]; then
+    printf 'Verified content-equivalent JAR (archive SHA differs): remote=%s local=%s content=%s\n' \
+      "${remote_sha512}" "${local_sha512}" "${local_fp}"
+    rm -f "${remote_jar}"
+    return 0
+  fi
+
+  printf 'Remote and canonical JAR content differ: remote_sha512=%s local_sha512=%s\n' "${remote_sha512}" "${local_sha512}" >&2
+  print_jar_content_diff "${artifact}" "${remote_jar}" >&2
+  rm -f "${remote_jar}"
+  return 1
+}
+
+verify_uploaded_byte_identity() {
+  local versions_file="$1" version="$2" sha512="$3"
+  jq -e --arg version "${version}" --arg sha512 "${sha512}" '
+    any(.[];
+      .version_number == $version
+      and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512 == $sha512)
+    )
+  ' "${versions_file}" >/dev/null
 }
 
 upload_missing_version() {
@@ -174,13 +260,16 @@ for ((i = 0; i < count; i++)); do
     else
       upload_missing_version "${id}" "${slug}" "${title}" "${version}" "${environment}" "${artifact}" "${jar}"
       api_get "${API}/project/${id}/version?include_changelog=false" "${versions_file}"
-      verify_remote_version "${versions_file}" "${version}" "${environment}" "${jar}" "${local_sha512}" \
-        || fail "uploaded release verification failed for ${slug} ${version}"
+      verify_remote_metadata "${versions_file}" "${version}" "${environment}" "${jar}" \
+        || fail "uploaded release metadata verification failed for ${slug} ${version}"
+      verify_uploaded_byte_identity "${versions_file}" "${version}" "${local_sha512}" \
+        || fail "uploaded release SHA-512 verification failed for ${slug} ${version}"
     fi
   elif [[ "${remote_count}" == '1' ]]; then
-    verify_remote_version "${versions_file}" "${version}" "${environment}" "${jar}" "${local_sha512}" \
-      || fail "remote ${slug} ${version} does not match canonical artifact SHA/metadata"
-    printf 'Verified remote release SHA-512: %s\n' "${local_sha512}"
+    verify_remote_metadata "${versions_file}" "${version}" "${environment}" "${jar}" \
+      || fail "remote ${slug} ${version} metadata does not match the lockstep manifest"
+    verify_existing_artifact_content "${versions_file}" "${version}" "${artifact}" "${local_sha512}" \
+      || fail "remote ${slug} ${version} JAR content differs from canonical source build"
   else
     fail "duplicate version_number ${version} exists for ${slug}"
   fi
