@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "minecraft": "26.2",
+  "loader": "fabric",
+  "projects": [
+    {"id":"ZggYV6cS","slug":"totem-core","title":"TotemCore","repo":"TotemCore","version":"0.6.0","jar":"totem-core-0.6.0.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":false,"allow_upload":false},
+    {"id":"dhochP34","slug":"totem-remnant","title":"TotemRemnant","repo":"TotemRemnant","version":"0.2.11","jar":"totem-remnant-0.2.11.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"C8f15uNO","slug":"totem-automata","title":"TotemAutomata","repo":"TotemAutomata","version":"0.1.12","jar":"totem-automata-0.1.12.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"FfCkJemY","slug":"totem-nexus","title":"TotemNexus","repo":"TotemNexus","version":"0.2.6","jar":"totem-nexus-0.2.6.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"UBW4bpOx","slug":"totem-discord-bridge","title":"TotemDiscordBridge","repo":"TotemDiscordBridge","version":"0.1.6","jar":"totem-discord-bridge-0.1.6.jar","environment":"server_only_client_optional","client_side":"optional","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"JnAGUw9w","slug":"totem-alchemy","title":"TotemAlchemy","repo":"TotemAlchemy","version":"0.1.23","jar":"totem-alchemy-0.1.23.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"CxaaO2xO","slug":"totem-enchanting","title":"TotemEnchanting","repo":"TotemEnchanting","version":"0.1.5","jar":"totem-enchanting-0.1.5.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"8JdAMczX","slug":"totem-excavation","title":"Totem Excavation","repo":"TotemExcavation","version":"0.1.2","jar":"totem-excavation-0.1.2.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"7MXfMVJA","slug":"totem-locksmith","title":"Totem Locksmith","repo":"TotemLocksmith","version":"0.1.0","jar":"totem-locksmith-0.1.0.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"mEcpkZT2","slug":"totem-vanilla-tweaks","title":"TotemVanillaTweaks","repo":"TotemVanillaTweaks","version":"0.1.8","jar":"totem-vanilla-tweaks-0.1.8.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":false},
+    {"id":"kfuP4czk","slug":"totem-villagers-workforce","title":"Totem Villagers","repo":"TotemVillagers","version":"0.1.30","jar":"totem-villagers-0.1.30.jar","environment":"client_and_server","client_side":"required","server_side":"required","submit":true,"allow_upload":true}
+  ]
+}
