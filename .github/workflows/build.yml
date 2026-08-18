@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/.lockstep/TotemCore/build/libs/totem-core-0.4.0.jar
+      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/.lockstep/TotemCore/build/libs/totem-core-0.6.0.jar
 
     steps:
       - name: Check out repository
@@ -25,12 +25,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemCore
-          ref: eac4bb3e19dec6d6aca4433df995f95e9631bc9b
+          ref: c39da3cdc3b4eff16f63798dc3eae4a49e41d105
           path: .lockstep/TotemCore
           persist-credentials: false
 
       - name: Set up Java 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
@@ -39,7 +39,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Make Gradle wrapper executable
-        run: chmod +x gradlew
+        run: chmod +x gradlew .lockstep/TotemCore/gradlew
 
       - name: Verify release metadata
         shell: bash
@@ -49,12 +49,18 @@ jobs:
           test -n "${version}"
           test -f "docs/releases/${version}.md"
           grep -F -- "- [${version}](${version}.md)" docs/releases/README.md
+          jq -e '
+            .depends["totem-core"] == "=0.6.0"
+            and .depends["totem-villagers"] == "=0.1.30"
+          ' src/main/resources/fabric.mod.json >/dev/null
+          grep -F '"totem-core-0.6.0.jar"' build.gradle >/dev/null
+          grep -F '"totem-villagers-0.1.30.jar"' build.gradle >/dev/null
 
       - name: Build and run server GameTests
         shell: bash
         run: |
           set -o pipefail
-          ./gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
+          ./.lockstep/TotemCore/gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
           test -f "${ORG_GRADLE_PROJECT_totemCoreJar}"
           # GameTest normally terminates its dedicated server itself. Bound that shutdown so a
           # stuck server still produces the logs and failure artifacts below.
