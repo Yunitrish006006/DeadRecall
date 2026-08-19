@@ -25,7 +25,7 @@ DeadRecall 2.4.22 包含 10 個 exact-version module：
 - TotemVanillaTweaks 0.1.10
 - TotemNexus 0.3.0
 
-TotemVillagers 不再被 DeadRecall 硬依賴，也不包含在 2.4.22 transition bundle；需要時獨立安裝。
+TotemVillagers 不再被 DeadRecall 硬依賴，也不包含在 2.4.22 transition bundle；需要時獨立安裝。對既有 2.4.21 世界而言，Villagers 的 SavedData 與 runtime ownership 是獨立於 legacy item alias 的資料邊界：若世界曾使用 Villagers，第一次 2.4.22 transition boot 前應同時安裝 standalone TotemVillagers 0.1.32；只有伺服器管理者明確決定停用該功能時才直接省略。
 
 ## Artifact Boundary
 
@@ -40,9 +40,11 @@ DeadRecall 不得再包含 legacy placeholder Item implementation。CI 必須驗
 ## Recommended Cutover
 
 1. 備份世界。
-2. 從 DeadRecall 2.4.21 升到 2.4.22，正常啟動並停止一次。
-3. 啟動 log 必須確認 14 個 Core-owned aliases 全部通過 handoff verification。
-4. 之後可以移除 DeadRecall host，只留下 TotemCore 0.7.1+ 與需要的 standalone Totem modules。
-5. TotemVillagers 可以完全省略。
+2. 從 DeadRecall 2.4.21 升到 2.4.22。
+3. 若世界曾使用 TotemVillagers，在第一次 2.4.22 啟動前同時安裝 standalone TotemVillagers 0.1.32；若明確要停用 Villagers 才省略。
+4. 正常啟動並停止一次。
+5. 啟動 log 必須確認 14 個 Core-owned aliases 全部通過 handoff verification。
+6. 之後可以移除 DeadRecall host，只留下 TotemCore 0.7.1+ 與需要的 standalone Totem modules。
+7. TotemVillagers 維持獨立可選；需要保留既有 Villagers 系統時繼續安裝，明確停用時才移除。
 
-這次啟動是 compatibility checkpoint，不是強制全世界 destructive rewrite；安全性來自 alias authority 已永久轉移到 Core。
+這次啟動是 compatibility checkpoint，不是強制全世界 destructive rewrite；item safety 來自 alias authority 已永久轉移到 Core，而 Villagers 是否保留則是獨立且必須明確做出的 feature-retirement 決策。
