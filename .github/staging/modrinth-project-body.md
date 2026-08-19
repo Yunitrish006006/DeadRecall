@@ -17,7 +17,7 @@ DeadRecall 是 Minecraft 26.2 / Fabric 的 Totem 系列整合發行版。外層 
 - Nexus Space Units 提供 server-authoritative 移動與死亡目的地。
 - Remnant death backpacks 把死亡回收重新接回探索流程。
 
-## Included Modules — DeadRecall 2.4.20
+## Included Modules
 
 | Module | Version | Main role |
 | --- | ---: | --- |
@@ -40,7 +40,7 @@ These versions form one lockstep release. Do not replace only one embedded modul
 ### Backpacks & Recovery
 TotemRemnant provides four backpack tiers, dyeing, inventory-side access, death backpacks, recovery guidance, void protection and portable-container safety.
 
-### Automation & Excavation
+### Automation
 TotemAutomata turns Copper Golems into configurable workers. TotemExcavation adds seven hammer tiers with bounded server-side area harvesting, normal protection hooks, loot and durability behavior.
 
 ### Villages
@@ -52,7 +52,7 @@ TotemAlchemy provides ingredient-driven multi-outcome brewing, success rates, Fi
 ### Travel
 TotemNexus provides material-sensitive Space Units, friends, mapping, cost validation and safe server-authoritative teleport sessions.
 
-### Protected Storage & Server Integration
+### Server Tools
 TotemLocksmith protects supported fixed-container networks with padlocks, permissions, physical keys, automation rules and break auditing. TotemDiscordBridge can optionally relay configured Minecraft events through a separately configured Worker. TotemVanillaTweaks supplies shared vanilla-friendly adjustments such as container sorting.
 
 ## Requirements
