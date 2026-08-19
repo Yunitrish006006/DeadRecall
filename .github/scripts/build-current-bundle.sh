@@ -20,7 +20,6 @@ checkout_source() {
     local repo="$1"
     local sha="$2"
     local dir="${LOCKSTEP_DIR}/${repo}"
-
     git init -q "${dir}"
     git -C "${dir}" remote add origin "https://github.com/Yunitrish006006/${repo}.git"
     git -C "${dir}" fetch --quiet --depth=1 origin "${sha}"
@@ -29,9 +28,8 @@ checkout_source() {
     printf 'Pinned %-20s %s\n' "${repo}" "${sha}"
 }
 
-# Source pins are intentionally immutable. A module version change must update
-# both DeadRecall's exact dependency graph and the corresponding source pin.
-checkout_source TotemCore          5be940a1fb91d250bb6781193bd49f0f24b40a43
+# 2.4.22 transition graph. Villagers is intentionally omitted.
+checkout_source TotemCore          544c405a8b893b6efdcfb1b85cd2f6e208866e34
 checkout_source TotemRemnant       8a6d4c291eb2f5ecf857abc1fcb718ae82b28b46
 checkout_source TotemDiscordBridge aa845935867c110fa0206eab759982549e0ee3f8
 checkout_source TotemAutomata      2103ba4057e069196eb6f54ddd99387aef2766eb
@@ -41,7 +39,6 @@ checkout_source TotemExcavation    b3f784d8e2faa542ef44e60a961a34bca19d1f91
 checkout_source TotemLocksmith     70fe7f691d6caac50ec525665b9b5643c5ede86d
 checkout_source TotemVanillaTweaks 4ce0732896f74ad9a79ef52d377dd31c868ba3cc
 checkout_source TotemNexus         61bc2a25dc78d7b164e903fbc2b56a6d25db214c
-checkout_source TotemVillagers     355f37c7bc74b9555a46d879576b5813de5ae28d
 
 readonly GRADLE="${LOCKSTEP_DIR}/TotemCore/gradlew"
 chmod +x "${GRADLE}" gradlew
@@ -55,11 +52,9 @@ read_property() {
 release_artifact() {
     local repo="$1"
     local dir="${LOCKSTEP_DIR}/${repo}"
-    local version
-    local archive
+    local version archive
     version="$(read_property "${dir}/gradle.properties" mod_version)"
     archive="$(read_property "${dir}/gradle.properties" archives_base_name)"
-    test -n "${version}" && test -n "${archive}"
     printf '%s/build/libs/%s-%s.jar' "${dir}" "${archive}" "${version}"
 }
 
@@ -67,7 +62,7 @@ build_module() {
     local repo="$1"
     shift
     local dir="${LOCKSTEP_DIR}/${repo}"
-    local artifact
+    local artifact module_id module_version expected_version
 
     "${GRADLE}" -p "${dir}" "$@" jar --no-daemon --stacktrace
     artifact="$(release_artifact "${repo}")"
@@ -76,15 +71,8 @@ build_module() {
             "${GRADLE}" -p "${dir}" "$@" remapJar --no-daemon --stacktrace
         fi
     fi
-    test -f "${artifact}" || {
-        echo "Missing release artifact for ${repo}: ${artifact}" >&2
-        find "${dir}/build/libs" -maxdepth 1 -type f -name '*.jar' -print 2>/dev/null || true
-        exit 1
-    }
+    test -f "${artifact}" || { echo "Missing release artifact for ${repo}: ${artifact}" >&2; exit 1; }
 
-    local module_id
-    local module_version
-    local expected_version
     module_id="$(unzip -p "${artifact}" fabric.mod.json | jq -er '.id')"
     module_version="$(unzip -p "${artifact}" fabric.mod.json | jq -er '.version')"
     expected_version="$(jq -er --arg id "${module_id}" '.depends[$id]' src/main/resources/fabric.mod.json)"
@@ -98,15 +86,12 @@ build_module() {
     printf 'Built  %-20s %s %s\n' "${repo}" "${module_id}" "${module_version}"
 }
 
-# Core is the shared compile-time API for every standalone module.
 build_module TotemCore
 readonly CORE_JAR="$(release_artifact TotemCore)"
 test -f "${CORE_JAR}"
 
-# Build dependency providers before their consumers.
 build_module TotemRemnant       -PtotemCoreJar="${CORE_JAR}"
 build_module TotemExcavation    -PtotemCoreJar="${CORE_JAR}"
-readonly REMNANT_JAR="$(release_artifact TotemRemnant)"
 readonly EXCAVATION_JAR="$(release_artifact TotemExcavation)"
 
 build_module TotemDiscordBridge -PtotemCoreJar="${CORE_JAR}"
@@ -116,14 +101,17 @@ build_module TotemEnchanting    -PtotemCoreJar="${CORE_JAR}"
 build_module TotemLocksmith     -PtotemCoreJar="${CORE_JAR}"
 build_module TotemVanillaTweaks -PtotemCoreJar="${CORE_JAR}"
 build_module TotemNexus         -PtotemCoreJar="${CORE_JAR}"
-build_module TotemVillagers     -PtotemCoreJar="${CORE_JAR}" -PtotemRemnantJar="${REMNANT_JAR}"
 
 mapfile -t module_jars < <(find "${MODULE_DIR}" -maxdepth 1 -type f -name '*.jar' -print | sort)
-test "${#module_jars[@]}" -eq 11 || {
-    printf 'Expected 11 standalone JARs, found %d\n' "${#module_jars[@]}" >&2
-    printf '%s\n' "${module_jars[@]}" >&2
+test "${#module_jars[@]}" -eq 10 || {
+    printf 'Expected 10 standalone JARs, found %d\n' "${#module_jars[@]}" >&2
     exit 1
 }
+
+if find "${MODULE_DIR}" -maxdepth 1 -type f -name 'totem-villagers-*.jar' | grep -q .; then
+    echo 'TotemVillagers must not be present in the 2.4.22 transition bundle.' >&2
+    exit 1
+fi
 
 ./gradlew \
     -PtotemCoreJar="${CORE_JAR}" \
@@ -135,13 +123,15 @@ readonly HOST_ARCHIVE="$(read_property gradle.properties archives_base_name)"
 readonly BUNDLE_ARTIFACT="${ROOT}/build/libs/${HOST_ARCHIVE}-${HOST_VERSION}-bundled.jar"
 test -f "${BUNDLE_ARTIFACT}"
 
-test "$(unzip -Z1 "${BUNDLE_ARTIFACT}" 'META-INF/jars/*.jar' | wc -l | tr -d ' ')" -eq 11
+test "$(unzip -Z1 "${BUNDLE_ARTIFACT}" 'META-INF/jars/*.jar' | wc -l | tr -d ' ')" -eq 10
 unzip -p "${BUNDLE_ARTIFACT}" fabric.mod.json > "${ROOT}/build/current-bundle.fabric.mod.json"
 jq -e --arg version "${HOST_VERSION}" '
     .id == "deadrecall"
     and .version == $version
-    and (.jars | length == 11)
-    and ([.jars[].file] | unique | length == 11)
+    and (.jars | length == 10)
+    and ([.jars[].file] | unique | length == 10)
+    and (.depends["totem-core"] == "=0.7.1")
+    and (.depends | has("totem-villagers") | not)
 ' "${ROOT}/build/current-bundle.fabric.mod.json" >/dev/null
 
 while IFS= read -r module_jar; do
@@ -151,7 +141,7 @@ while IFS= read -r module_jar; do
     unzip -Z1 "${BUNDLE_ARTIFACT}" "META-INF/jars/${module_name}" >/dev/null
 done < <(printf '%s\n' "${module_jars[@]}")
 
-printf 'Built current DeadRecall bundle: %s\n' "${BUNDLE_ARTIFACT}"
+printf 'Built DeadRecall 2.4.22 transition bundle: %s\n' "${BUNDLE_ARTIFACT}"
 printf 'SHA-512: %s\n' "$(sha512sum "${BUNDLE_ARTIFACT}" | awk '{print $1}')"
 
 if [[ -n "${GITHUB_ENV:-}" ]]; then
