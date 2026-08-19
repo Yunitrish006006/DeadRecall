@@ -21,7 +21,7 @@ def bundledModuleNames = [
         "totem-discord-bridge-0.1.7.jar",
         "totem-automata-0.1.13.jar",
         "totem-alchemy-0.1.24.jar",
-        "totem-enchanting-0.1.6.jar",
+        "totem-enchanting-0.1.7.jar",
         "totem-excavation-0.1.3.jar",
         "totem-locksmith-0.1.1.jar",
         "totem-vanilla-tweaks-0.1.9.jar",
