@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/.lockstep/TotemCore/build/libs/totem-core-0.6.0.jar
+      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/.lockstep/TotemCore/build/libs/totem-core-0.6.1.jar
 
     steps:
       - name: Check out repository
@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Yunitrish006006/TotemCore
-          ref: c39da3cdc3b4eff16f63798dc3eae4a49e41d105
+          ref: 9b597fbf455b469fc3547d02ea0c927025b60348
           path: .lockstep/TotemCore
           persist-credentials: false
 
@@ -50,11 +50,11 @@ jobs:
           test -f "docs/releases/${version}.md"
           grep -F -- "- [${version}](${version}.md)" docs/releases/README.md
           jq -e '
-            .depends["totem-core"] == "=0.6.0"
-            and .depends["totem-villagers"] == "=0.1.30"
+            .depends["totem-core"] == "=0.6.1"
+            and .depends["totem-villagers"] == "=0.1.31"
           ' src/main/resources/fabric.mod.json >/dev/null
-          grep -F '"totem-core-0.6.0.jar"' build.gradle >/dev/null
-          grep -F '"totem-villagers-0.1.30.jar"' build.gradle >/dev/null
+          grep -F '"totem-core-0.6.1.jar"' build.gradle >/dev/null
+          grep -F '"totem-villagers-0.1.31.jar"' build.gradle >/dev/null
 
       - name: Build and run server GameTests
         shell: bash
@@ -62,8 +62,6 @@ jobs:
           set -o pipefail
           ./.lockstep/TotemCore/gradlew -p .lockstep/TotemCore jar --no-daemon --stacktrace
           test -f "${ORG_GRADLE_PROJECT_totemCoreJar}"
-          # GameTest normally terminates its dedicated server itself. Bound that shutdown so a
-          # stuck server still produces the logs and failure artifacts below.
           timeout --signal=TERM --kill-after=30s 15m \
             ./gradlew build --no-daemon --stacktrace 2>&1 | tee build.log
 
@@ -74,7 +72,6 @@ jobs:
         run: bash .github/scripts/publish-modrinth.sh
 
       - name: Historical death-backpack restart probe
-        # This probe depended on DeadRecall's removed GameTest source set.
         if: ${{ false }}
         shell: bash
         run: |
@@ -103,7 +100,6 @@ jobs:
           done
 
       - name: Historical copper-golem restart probe
-        # This probe depended on DeadRecall's removed GameTest source set.
         if: ${{ false }}
         shell: bash
         run: |
