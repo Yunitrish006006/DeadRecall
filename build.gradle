@@ -11,12 +11,12 @@ base {
 }
 
 def totemCoreJar = file(providers.gradleProperty("totemCoreJar")
-        .getOrElse("../TotemCore/build/libs/totem-core-0.7.0.jar"))
+        .getOrElse("../TotemCore/build/libs/totem-core-0.7.1.jar"))
 def bundleModuleDirectory = providers.gradleProperty("bundleModuleDirectory")
         .map { path -> file(path) }
         .orNull
 def bundledModuleNames = [
-        "totem-core-0.7.0.jar",
+        "totem-core-0.7.1.jar",
         "totem-remnant-0.2.13.jar",
         "totem-discord-bridge-0.1.8.jar",
         "totem-automata-0.1.15.jar",
@@ -25,8 +25,7 @@ def bundledModuleNames = [
         "totem-excavation-0.1.5.jar",
         "totem-locksmith-0.1.4.jar",
         "totem-vanilla-tweaks-0.1.10.jar",
-        "totem-nexus-0.3.0.jar",
-        "totem-villagers-0.1.32.jar"
+        "totem-nexus-0.3.0.jar"
 ]
 def bundledModuleFiles = bundleModuleDirectory == null
         ? []
@@ -90,12 +89,9 @@ dependencies {
     runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation files(totemCoreJar)
 
-    // When assembling or smoke-testing a full bundle, make the exact external
-    // module graph available to Loom's development server as normal Fabric mods.
-    // Core is already present through modImplementation above.
     if (bundleModuleDirectory != null) {
         modRuntimeOnly files(bundledModuleFiles.findAll { moduleJar ->
-            moduleJar.name != "totem-core-0.7.0.jar"
+            moduleJar.name != "totem-core-0.7.1.jar"
         })
     }
 
@@ -183,7 +179,7 @@ def verifyDeadRecallThinJar = tasks.register("verifyDeadRecallThinJar") {
 
 def bundleJar = tasks.register("bundleJar") {
     group = "build"
-    description = "Packages the exact Totem module graph as Fabric nested JARs."
+    description = "Packages the exact Totem transition module graph as Fabric nested JARs."
     dependsOn(verifyDeadRecallThinJar)
 
     def thinJar = tasks.named("jar", Jar).flatMap { it.archiveFile }
@@ -225,9 +221,7 @@ def bundleJar = tasks.register("bundleJar") {
                     if (moduleMetadataEntry == null) {
                         throw new GradleException("Bundled module is missing fabric.mod.json: ${moduleJar}")
                     }
-                    def moduleMetadata = new groovy.json.JsonSlurper().parse(
-                            moduleArchive.getInputStream(moduleMetadataEntry)
-                    )
+                    def moduleMetadata = new groovy.json.JsonSlurper().parse(moduleArchive.getInputStream(moduleMetadataEntry))
                     String moduleId = moduleMetadata.id
                     String moduleVersion = moduleMetadata.version
                     if (moduleId == null || moduleId.isBlank() || moduleVersion == null || moduleVersion.isBlank()) {
@@ -260,9 +254,7 @@ def bundleJar = tasks.register("bundleJar") {
                     bundledEntry.setTime(0L)
                     output.putNextEntry(bundledEntry)
                     if (!entry.directory) {
-                        source.getInputStream(entry).withCloseable { input ->
-                            input.transferTo(output)
-                        }
+                        source.getInputStream(entry).withCloseable { input -> input.transferTo(output) }
                     }
                     output.closeEntry()
                 }
@@ -277,9 +269,7 @@ def bundleJar = tasks.register("bundleJar") {
                     def nestedEntry = new java.util.zip.ZipEntry("META-INF/jars/${moduleJar.name}")
                     nestedEntry.setTime(0L)
                     output.putNextEntry(nestedEntry)
-                    moduleJar.withInputStream { input ->
-                        input.transferTo(output)
-                    }
+                    moduleJar.withInputStream { input -> input.transferTo(output) }
                     output.closeEntry()
                 }
             } finally {
