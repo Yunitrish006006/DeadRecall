@@ -63,6 +63,13 @@ jobs:
           MODRINTH_ARTIFACT: ${{ env.DEADRECALL_BUNDLE_ARTIFACT }}
         run: bash .github/scripts/publish-modrinth.sh
 
+      - name: Upload verified DeadRecall bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: deadrecall-2.4.20-bundled
+          path: ${{ env.DEADRECALL_BUNDLE_ARTIFACT }}
+          if-no-files-found: error
+
       - name: Upload failure diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
