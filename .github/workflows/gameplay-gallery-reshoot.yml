@@ -1,0 +1,55 @@
+name: Gameplay Gallery Reshoot
+
+on:
+  push:
+    branches:
+      - gallery/gameplay-reshoot-2.4.21
+    paths:
+      - '.github/workflows/gameplay-gallery-reshoot.yml'
+      - '.github/scripts/capture-existing-client-gallery.sh'
+      - '.github/gallery-harness/**'
+      - 'docs/modrinth-gallery-shot-list-2.4.21.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fresh-existing-client-captures:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out DeadRecall gallery branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build exact DeadRecall 2.4.21 module graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew .github/scripts/build-current-bundle.sh .github/scripts/capture-existing-client-gallery.sh
+          .github/scripts/build-current-bundle.sh
+
+      - name: Re-shoot existing client visual suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          .github/scripts/capture-existing-client-gallery.sh
+
+      - name: Upload fresh gameplay captures
+        uses: actions/upload-artifact@v4
+        with:
+          name: gameplay-gallery-existing-client-tests
+          path: test-artifacts/gameplay-gallery/
+          if-no-files-found: error
+          retention-days: 14
