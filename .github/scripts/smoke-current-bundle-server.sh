@@ -5,7 +5,7 @@ set -euo pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly MODULE_DIR="${DEADRECALL_MODULE_DIR:-${ROOT}/standalone-modules}"
-readonly CORE_JAR="${DEADRECALL_CORE_JAR:-${MODULE_DIR}/totem-core-0.7.0.jar}"
+readonly CORE_JAR="${DEADRECALL_CORE_JAR:-${MODULE_DIR}/totem-core-0.7.1.jar}"
 readonly LOG_FILE="${ROOT}/server-smoke.log"
 readonly STARTUP_TIMEOUT_SECONDS=180
 readonly STOP_TIMEOUT_SECONDS=30
@@ -14,7 +14,7 @@ cd "${ROOT}"
 
 test -d "${MODULE_DIR}"
 test -f "${CORE_JAR}"
-test "$(find "${MODULE_DIR}" -maxdepth 1 -type f -name '*.jar' | wc -l | tr -d ' ')" -eq 11
+test "$(find "${MODULE_DIR}" -maxdepth 1 -type f -name '*.jar' | wc -l | tr -d ' ')" -eq 10
 
 rm -rf run
 mkdir -p run
@@ -24,7 +24,7 @@ online-mode=false
 spawn-protection=0
 view-distance=4
 simulation-distance=4
-motd=DeadRecall lockstep smoke
+motd=DeadRecall transition smoke
 PROPERTIES
 
 rm -f "${LOG_FILE}"
@@ -76,12 +76,10 @@ for ((second = 1; second <= STOP_TIMEOUT_SECONDS; second++)); do
 done
 
 if kill -0 "${server_pid}" 2>/dev/null; then
-    echo 'Dedicated server did not stop after console stop; sending TERM.' >&2
     kill -TERM "${server_pid}" 2>/dev/null || true
     sleep 5
 fi
 if kill -0 "${server_pid}" 2>/dev/null; then
-    echo 'Dedicated server still running after TERM; sending KILL.' >&2
     kill -KILL "${server_pid}" 2>/dev/null || true
 fi
 
@@ -107,12 +105,21 @@ for module_id in \
     totem-excavation \
     totem-locksmith \
     totem-vanilla-tweaks \
-    totem-nexus \
-    totem-villagers; do
+    totem-nexus; do
     grep -F "${module_id}" "${LOG_FILE}" >/dev/null || {
         printf 'Server smoke log did not mention required module %s.\n' "${module_id}" >&2
         exit 1
     }
 done
 
-printf 'DeadRecall current lockstep dedicated-server smoke passed.\n'
+if grep -F 'totem-villagers' "${LOG_FILE}" >/dev/null; then
+    echo 'TotemVillagers unexpectedly loaded in the transition bundle.' >&2
+    exit 1
+fi
+
+grep -F 'verified 14 TotemCore-owned legacy item aliases' "${LOG_FILE}" >/dev/null || {
+    echo 'DeadRecall did not verify the Core legacy alias handoff.' >&2
+    exit 1
+}
+
+printf 'DeadRecall ten-module transition dedicated-server smoke passed.\n'
