@@ -6,6 +6,7 @@ on:
       - master
       - fix/**
       - release/**
+      - migration/**
   pull_request:
 
 permissions:
@@ -16,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/standalone-modules/totem-core-0.7.0.jar
+      ORG_GRADLE_PROJECT_totemCoreJar: ${{ github.workspace }}/standalone-modules/totem-core-0.7.1.jar
 
     steps:
       - name: Check out repository
@@ -38,22 +39,15 @@ jobs:
           chmod +x .github/scripts/build-current-bundle.sh
           chmod +x .github/scripts/smoke-current-bundle-server.sh
           chmod +x .github/scripts/publish-modrinth.sh
-          chmod +x .github/scripts/sync-modrinth-standalone.sh
 
-      - name: Verify release metadata
+      - name: Verify transition metadata
         shell: bash
         run: |
           set -euo pipefail
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          test "$version" = '2.4.21'
-          test -f "docs/releases/${version}.md"
-          grep -F -- "- [${version}](${version}.md)" docs/releases/README.md
-          grep -F -- "發佈版本為 **${version}**" README.md
-          grep -F -- "deadrecall-${version}-bundled.jar" README.md
-          grep -F -- "deadrecall-${version}-bundled.jar" .github/staging/modrinth-project-body.md
-
+          test "$version" = '2.4.22'
           jq -e '
-            .depends["totem-core"] == "=0.7.0"
+            .depends["totem-core"] == "=0.7.1"
             and .depends["totem-remnant"] == "=0.2.13"
             and .depends["totem-discord-bridge"] == "=0.1.8"
             and .depends["totem-automata"] == "=0.1.15"
@@ -63,25 +57,11 @@ jobs:
             and .depends["totem-locksmith"] == "=0.1.4"
             and .depends["totem-vanilla-tweaks"] == "=0.1.10"
             and .depends["totem-nexus"] == "=0.3.0"
-            and .depends["totem-villagers"] == "=0.1.32"
+            and (.depends | has("totem-villagers") | not)
           ' src/main/resources/fabric.mod.json >/dev/null
+          grep -F '544c405a8b893b6efdcfb1b85cd2f6e208866e34' .github/scripts/build-current-bundle.sh >/dev/null
 
-          for jar_name in \
-            totem-core-0.7.0.jar \
-            totem-remnant-0.2.13.jar \
-            totem-discord-bridge-0.1.8.jar \
-            totem-automata-0.1.15.jar \
-            totem-alchemy-0.1.26.jar \
-            totem-enchanting-0.1.8.jar \
-            totem-excavation-0.1.5.jar \
-            totem-locksmith-0.1.4.jar \
-            totem-vanilla-tweaks-0.1.10.jar \
-            totem-nexus-0.3.0.jar \
-            totem-villagers-0.1.32.jar; do
-            grep -F -- "\"${jar_name}\"" build.gradle >/dev/null
-          done
-
-      - name: Rebuild exact eleven-module bundle
+      - name: Rebuild exact ten-module transition bundle
         shell: bash
         run: bash .github/scripts/build-current-bundle.sh
 
@@ -89,7 +69,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(find standalone-modules -maxdepth 1 -type f -name '*.jar' | wc -l | tr -d ' ')" -eq 11
+          test "$(find standalone-modules -maxdepth 1 -type f -name '*.jar' | wc -l | tr -d ' ')" -eq 10
+          test -f standalone-modules/totem-core-0.7.1.jar
+          test ! -e standalone-modules/totem-villagers-0.1.32.jar
           for jar_file in standalone-modules/totem-*.jar; do
             module_id="$(unzip -p "$jar_file" fabric.mod.json | jq -er '.id')"
             if [[ "$module_id" == 'totem-core' ]]; then
@@ -99,47 +81,41 @@ jobs:
               '.depends["totem-core"] == ">=0.7.0 <0.8.0"' >/dev/null
           done
 
-      - name: Dedicated server bundle smoke
+      - name: Dedicated server transition smoke
         shell: bash
         run: bash .github/scripts/smoke-current-bundle-server.sh
+
+      - name: Verify alias ownership boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          host=build/libs/deadrecall-2.4.22-bundled.jar
+          test -f "$host"
+          test "$(unzip -Z1 "$host" 'META-INF/jars/*.jar' | wc -l | tr -d ' ')" -eq 10
+          ! unzip -Z1 "$host" | grep -q 'DeadRecallLegacyItems.class'
+          ! unzip -Z1 "$host" | grep -q 'LegacyMigratingItem.class'
+          unzip -Z1 "$host" | grep -q 'LegacyAliasHandoffVerifier.class'
+          unzip -p "$host" META-INF/jars/totem-core-0.7.1.jar > /tmp/totem-core.jar
+          unzip -Z1 /tmp/totem-core.jar | grep -q 'dev/totem/core/migration/LegacyAliasBootstrap.class'
+          unzip -Z1 /tmp/totem-core.jar | grep -q 'dev/totem/core/migration/LegacyAliasItem.class'
 
       - name: Generate SHA-512 manifest
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p build/release-evidence
-          sha512sum standalone-modules/*.jar build/libs/deadrecall-2.4.21-bundled.jar \
-            | sed "s#${GITHUB_WORKSPACE}/##g" \
-            | sort -k2 > build/release-evidence/2.4.21-sha512.txt
-          cat build/release-evidence/2.4.21-sha512.txt
+          sha512sum standalone-modules/*.jar build/libs/deadrecall-2.4.22-bundled.jar \
+            | sort -k2 > build/release-evidence/2.4.22-sha512.txt
+          cat build/release-evidence/2.4.22-sha512.txt
 
-      - name: Validate DeadRecall Modrinth metadata
-        shell: bash
-        env:
-          MODRINTH_DRY_RUN: 'true'
-        run: bash .github/scripts/publish-modrinth.sh
-
-      - name: Upload standalone module JARs
+      - name: Upload transition bundle
         uses: actions/upload-artifact@v4
         with:
-          name: deadrecall-2.4.21-standalone-modules
-          path: standalone-modules/*.jar
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload verified bundled JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: deadrecall-2.4.21-bundled
-          path: build/libs/deadrecall-2.4.21-bundled.jar
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload SHA-512 release evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: deadrecall-2.4.21-sha512
-          path: build/release-evidence/2.4.21-sha512.txt
+          name: deadrecall-2.4.22-transition
+          path: |
+            build/libs/deadrecall-2.4.22-bundled.jar
+            build/release-evidence/2.4.22-sha512.txt
+            standalone-modules/*.jar
           if-no-files-found: error
           retention-days: 14
 
@@ -147,10 +123,9 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-and-gametest-reports
+          name: transition-build-reports
           if-no-files-found: ignore
           path: |
-            build.log
             server-smoke.log
             **/build/reports/
             **/build/test-results/
