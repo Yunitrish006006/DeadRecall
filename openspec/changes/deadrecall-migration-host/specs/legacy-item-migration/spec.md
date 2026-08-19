@@ -22,6 +22,8 @@ All retained legacy identifiers MUST remain decodable after DeadRecall is remove
 
 DeadRecall 2.4.22 MUST NOT hard-depend on or nest TotemVillagers. Servers MUST be able to perform the migration checkpoint and subsequent standalone cutover without installing TotemVillagers.
 
+For an existing DeadRecall 2.4.21 world that previously used TotemVillagers, the migration documentation MUST instruct the administrator to install standalone TotemVillagers 0.1.32 before the first 2.4.22 transition boot when they intend to preserve Villagers functionality and its SavedData ownership. Omitting TotemVillagers in that case MUST be documented as an explicit feature-retirement choice, not an implicit consequence of installing the transition bundle.
+
 ### Requirement: Thin outer artifact
 
 The DeadRecall outer JAR MUST NOT contain gameplay Mixins, GUI, Payload, command, SavedData, legacy placeholder Item implementations, or fallback gameplay classes. Gameplay MUST come only from the exact nested transition module graph.
