@@ -36,7 +36,7 @@ checkout_source TotemRemnant       fc8cbb015e4041319d5054edc019d57c00cfe061
 checkout_source TotemDiscordBridge f147711212decf41a9d5aa7e04444060760f43d4
 checkout_source TotemAutomata      5fcbaa60ed63780b2c30ba13fd3f692b03d0c5af
 checkout_source TotemAlchemy       659c92fb43f638450ac2ed74ee13a4bb99d90a28
-checkout_source TotemEnchanting    e2f472e366928e8857e70610e913c9164dcdb014
+checkout_source TotemEnchanting    597eedc68a1a8c91a7e53cbc79859a3316bdc1d2
 checkout_source TotemExcavation    9dc9d70e232739897a6451b75d4fb5cc45608d46
 checkout_source TotemLocksmith     68896a55cdd9054d12372ad58f79df8c66c8a94b
 checkout_source TotemVanillaTweaks 66d51e2c3b160f5a01ae679d31c971644ac8e399
