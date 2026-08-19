@@ -8,7 +8,7 @@ on:
       - .github/workflows/publish-modrinth-2.4.21-once.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -80,7 +80,6 @@ jobs:
           MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           MODRINTH_VERSION_ID: ${{ steps.modrinth.outputs.version_id }}
-          MODRINTH_ARTIFACT: ${{ env.MODRINTH_ARTIFACT }}
         run: |
           set -euo pipefail
           test -n "$MODRINTH_VERSION_ID"
@@ -102,3 +101,31 @@ jobs:
               and (([.files[] | select(.primary == true)][0] // .files[0]).filename == "deadrecall-2.4.21-bundled.jar")
               and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512 == $sha512)
             ' "$response" >/dev/null
+
+      - name: Record verified publication
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODRINTH_VERSION_ID: ${{ steps.modrinth.outputs.version_id }}
+        run: |
+          set -euo pipefail
+          marker_path='.github/staging/modrinth-published-2.4.21.json'
+          marker="$(jq -n \
+            --arg version '2.4.21' \
+            --arg version_id "$MODRINTH_VERSION_ID" \
+            --arg sha512 '17f20a714c6b2e00512b686692adf7c1339964e4bc5cff3fd47a957e1eff7d8158c255ac1ddb89b2b781fb99045d59cb1c58ffec997eb497f90631a5b107cb67' \
+            --arg run_id "$GITHUB_RUN_ID" \
+            '{version:$version, modrinth_version_id:$version_id, sha512:$sha512, verified_by_run:$run_id}')"
+          if gh api "repos/${GITHUB_REPOSITORY}/contents/${marker_path}" >/dev/null 2>&1; then
+            existing="$(gh api -H 'Accept: application/vnd.github.raw+json' "repos/${GITHUB_REPOSITORY}/contents/${marker_path}")"
+            test "$(jq -r '.version' <<<"$existing")" = '2.4.21'
+            test "$(jq -r '.sha512' <<<"$existing")" = '17f20a714c6b2e00512b686692adf7c1339964e4bc5cff3fd47a957e1eff7d8158c255ac1ddb89b2b781fb99045d59cb1c58ffec997eb497f90631a5b107cb67'
+            exit 0
+          fi
+          encoded="$(printf '%s\n' "$marker" | base64 -w0)"
+          jq -n \
+            --arg message 'release: record verified Modrinth 2.4.21 publication' \
+            --arg content "$encoded" \
+            --arg branch 'master' \
+            '{message:$message, content:$content, branch:$branch}' \
+            | gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${marker_path}" --input - >/dev/null
