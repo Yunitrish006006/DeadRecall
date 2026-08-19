@@ -1,0 +1,73 @@
+{
+  "bundle_version": "2.4.21",
+  "verified_by_run": "32261285659",
+  "status": "verified",
+  "projects": [
+    {
+      "module": "totem-core",
+      "project_id": "ZggYV6cS",
+      "gallery_count": 2,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-remnant",
+      "project_id": "dhochP34",
+      "gallery_count": 4,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-automata",
+      "project_id": "C8f15uNO",
+      "gallery_count": 1,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-nexus",
+      "project_id": "FfCkJemY",
+      "gallery_count": 3,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-discord-bridge",
+      "project_id": "UBW4bpOx",
+      "gallery_count": 1,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-alchemy",
+      "project_id": "JnAGUw9w",
+      "gallery_count": 2,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-enchanting",
+      "project_id": "CxaaO2xO",
+      "gallery_count": 1,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-excavation",
+      "project_id": "8JdAMczX",
+      "gallery_count": 1,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-locksmith",
+      "project_id": "7MXfMVJA",
+      "gallery_count": 1,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-vanilla-tweaks",
+      "project_id": "mEcpkZT2",
+      "gallery_count": 1,
+      "featured_count": 1
+    },
+    {
+      "module": "totem-villagers",
+      "project_id": "kfuP4czk",
+      "gallery_count": 2,
+      "featured_count": 1
+    }
+  ]
+}

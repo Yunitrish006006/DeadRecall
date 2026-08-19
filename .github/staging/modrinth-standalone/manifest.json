@@ -35,9 +35,16 @@
         {
           "file": ".github/staging/modrinth-gallery/deadrecall-integration-overview.png",
           "title": "Totem ecosystem integration",
-          "description": "The shared Core contracts and eleven-module DeadRecall 2.4.11 integration map.",
+          "description": "The current shared Core contracts and eleven-module DeadRecall 2.4.21 integration map.",
           "featured": true,
           "ordering": 0
+        },
+        {
+          "file": ".github/staging/modrinth-gallery/totem-core-feature-overview.png",
+          "title": "TotemCore feature overview",
+          "description": "Official feature overview for TotemCore 0.7.0 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": false,
+          "ordering": 90
         }
       ]
     },
@@ -100,6 +107,13 @@
           "description": "Four capacity modules expand a backpack with four additional storage rows.",
           "featured": false,
           "ordering": 20
+        },
+        {
+          "file": ".github/staging/modrinth-gallery/totem-remnant-feature-overview.png",
+          "title": "TotemRemnant feature overview",
+          "description": "Official feature overview for TotemRemnant 0.2.13 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": false,
+          "ordering": 90
         }
       ]
     },
@@ -144,7 +158,15 @@
           "dependency_type": "optional"
         }
       ],
-      "gallery": []
+      "gallery": [
+        {
+          "file": ".github/staging/modrinth-gallery/totem-automata-feature-overview.png",
+          "title": "TotemAutomata feature overview",
+          "description": "Official feature overview for TotemAutomata 0.1.15 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": true,
+          "ordering": 0
+        }
+      ]
     },
     {
       "id": "totem-nexus",
@@ -187,6 +209,13 @@
           "description": "Material-driven capacity, stability, route, and cross-dimensional travel diagnostics.",
           "featured": true,
           "ordering": 0
+        },
+        {
+          "file": ".github/staging/modrinth-gallery/totem-nexus-feature-overview.png",
+          "title": "TotemNexus feature overview",
+          "description": "Official feature overview for TotemNexus 0.3.0 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": false,
+          "ordering": 90
         }
       ]
     },
@@ -222,7 +251,15 @@
           "dependency_type": "required"
         }
       ],
-      "gallery": []
+      "gallery": [
+        {
+          "file": ".github/staging/modrinth-gallery/totem-discord-bridge-feature-overview.png",
+          "title": "TotemDiscordBridge feature overview",
+          "description": "Official feature overview for TotemDiscordBridge 0.1.8 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": true,
+          "ordering": 0
+        }
+      ]
     },
     {
       "id": "totem-alchemy",
@@ -261,9 +298,16 @@
         {
           "file": ".github/staging/modrinth-gallery/alchemy-creative-showcase.png",
           "title": "Alchemy ingredients",
-          "description": "Alchemy ingredients, vessels, and custom brews available in DeadRecall 2.4.11.",
+          "description": "Alchemy ingredients, vessels, cauldron mixtures, and custom brews in TotemAlchemy 0.1.26.",
           "featured": true,
           "ordering": 0
+        },
+        {
+          "file": ".github/staging/modrinth-gallery/totem-alchemy-feature-overview.png",
+          "title": "TotemAlchemy feature overview",
+          "description": "Official feature overview for TotemAlchemy 0.1.26 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": false,
+          "ordering": 90
         }
       ]
     },
@@ -300,7 +344,15 @@
           "dependency_type": "required"
         }
       ],
-      "gallery": []
+      "gallery": [
+        {
+          "file": ".github/staging/modrinth-gallery/totem-enchanting-feature-overview.png",
+          "title": "TotemEnchanting feature overview",
+          "description": "Official feature overview for TotemEnchanting 0.1.8 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": true,
+          "ordering": 0
+        }
+      ]
     },
     {
       "id": "totem-excavation",
@@ -335,7 +387,15 @@
           "dependency_type": "required"
         }
       ],
-      "gallery": []
+      "gallery": [
+        {
+          "file": ".github/staging/modrinth-gallery/totem-excavation-feature-overview.png",
+          "title": "Totem Excavation feature overview",
+          "description": "Official feature overview for Totem Excavation 0.1.5 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": true,
+          "ordering": 0
+        }
+      ]
     },
     {
       "id": "totem-locksmith",
@@ -382,7 +442,15 @@
           "dependency_type": "optional"
         }
       ],
-      "gallery": []
+      "gallery": [
+        {
+          "file": ".github/staging/modrinth-gallery/totem-locksmith-feature-overview.png",
+          "title": "Totem Locksmith feature overview",
+          "description": "Official feature overview for Totem Locksmith 0.1.4 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": true,
+          "ordering": 0
+        }
+      ]
     },
     {
       "id": "totem-vanilla-tweaks",
@@ -416,7 +484,15 @@
           "dependency_type": "required"
         }
       ],
-      "gallery": []
+      "gallery": [
+        {
+          "file": ".github/staging/modrinth-gallery/totem-vanilla-tweaks-feature-overview.png",
+          "title": "TotemVanillaTweaks feature overview",
+          "description": "Official feature overview for TotemVanillaTweaks 0.1.10 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": true,
+          "ordering": 0
+        }
+      ]
     },
     {
       "id": "totem-villagers",
@@ -463,6 +539,13 @@
           "description": "A terrain-aware generated mangrove village with integrated production areas.",
           "featured": true,
           "ordering": 0
+        },
+        {
+          "file": ".github/staging/modrinth-gallery/totem-villagers-feature-overview.png",
+          "title": "Totem Villagers feature overview",
+          "description": "Official feature overview for Totem Villagers 0.1.32 on Minecraft 26.2 / Fabric. Informational card; not a gameplay screenshot.",
+          "featured": false,
+          "ordering": 90
         }
       ]
     }
