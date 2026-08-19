@@ -1,0 +1,104 @@
+name: Publish Modrinth 2.4.21 Once
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/publish-modrinth-2.4.21-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish verified DeadRecall 2.4.21 bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out DeadRecall
+        uses: actions/checkout@v4
+
+      - name: Download verified 2.4.21 bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: deadrecall-2.4.21-bundled
+          path: release-artifact
+          repository: Yunitrish006006/DeadRecall
+          run-id: 32250556863
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify immutable bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifact="$GITHUB_WORKSPACE/release-artifact/deadrecall-2.4.21-bundled.jar"
+          test -f "$artifact"
+          test "$(sha512sum "$artifact" | awk '{print $1}')" = '17f20a714c6b2e00512b686692adf7c1339964e4bc5cff3fd47a957e1eff7d8158c255ac1ddb89b2b781fb99045d59cb1c58ffec997eb497f90631a5b107cb67'
+          test "$(unzip -p "$artifact" fabric.mod.json | jq -r '.version')" = '2.4.21'
+          echo "MODRINTH_ARTIFACT=$artifact" >> "$GITHUB_ENV"
+
+      - name: Validate Modrinth presentation
+        shell: bash
+        env:
+          MODRINTH_PROJECT_DRY_RUN: 'true'
+        run: bash .github/scripts/sync-modrinth-project.sh
+
+      - name: Verify Modrinth credentials
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$MODRINTH_PROJECT_ID"
+          test -n "$MODRINTH_TOKEN"
+
+      - name: Sync Modrinth project presentation
+        shell: bash
+        env:
+          MODRINTH_PROJECT_DRY_RUN: 'false'
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: bash .github/scripts/sync-modrinth-project.sh
+
+      - name: Publish DeadRecall 2.4.21
+        id: modrinth
+        shell: bash
+        env:
+          MODRINTH_DRY_RUN: 'false'
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_VERSION_TYPE: release
+          MODRINTH_ARTIFACT: ${{ env.MODRINTH_ARTIFACT }}
+        run: bash .github/scripts/publish-modrinth.sh
+
+      - name: Verify published artifact
+        shell: bash
+        env:
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_VERSION_ID: ${{ steps.modrinth.outputs.version_id }}
+          MODRINTH_ARTIFACT: ${{ env.MODRINTH_ARTIFACT }}
+        run: |
+          set -euo pipefail
+          test -n "$MODRINTH_VERSION_ID"
+          response="$(mktemp)"
+          trap 'rm -f "$response"' EXIT
+          curl --silent --show-error --fail --retry 3 \
+            --header "Authorization: ${MODRINTH_TOKEN}" \
+            --header "User-Agent: ${GITHUB_REPOSITORY}-GitHubActions/${GITHUB_RUN_ID}" \
+            --output "$response" \
+            "https://api.modrinth.com/v2/version/${MODRINTH_VERSION_ID}"
+          jq -e \
+            --arg project_id "$MODRINTH_PROJECT_ID" \
+            --arg sha512 '17f20a714c6b2e00512b686692adf7c1339964e4bc5cff3fd47a957e1eff7d8158c255ac1ddb89b2b781fb99045d59cb1c58ffec997eb497f90631a5b107cb67' '
+              .project_id == $project_id
+              and .version_number == "2.4.21"
+              and .environment == "client_and_server"
+              and .game_versions == ["26.2"]
+              and .loaders == ["fabric"]
+              and (([.files[] | select(.primary == true)][0] // .files[0]).filename == "deadrecall-2.4.21-bundled.jar")
+              and (([.files[] | select(.primary == true)][0] // .files[0]).hashes.sha512 == $sha512)
+            ' "$response" >/dev/null
