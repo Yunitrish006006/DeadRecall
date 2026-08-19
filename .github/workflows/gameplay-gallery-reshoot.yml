@@ -9,6 +9,12 @@ on:
       - '.github/scripts/capture-existing-client-gallery.sh'
       - '.github/gallery-harness/**'
       - 'docs/modrinth-gallery-shot-list-2.4.21.md'
+  pull_request:
+    paths:
+      - '.github/workflows/gameplay-gallery-reshoot.yml'
+      - '.github/scripts/capture-existing-client-gallery.sh'
+      - '.github/gallery-harness/**'
+      - 'docs/modrinth-gallery-shot-list-2.4.21.md'
   workflow_dispatch:
 
 permissions:
