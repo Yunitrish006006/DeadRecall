@@ -1,0 +1,83 @@
+{
+  "bundle_version": "2.4.21",
+  "verified_by_run": "32258416544",
+  "modules": [
+    {
+      "module": "totem-core",
+      "project_id": "ZggYV6cS",
+      "version": "0.7.0",
+      "modrinth_version_id": "RMQ4ru5W",
+      "sha512": "e374ddecefd70b6d95176afba8bfd18ecff6c0daee4d8ad644e65e66cfcd8bc837e2998700ca1b42080adfcb2fbae252fffc824f82450014e25a72261171a804"
+    },
+    {
+      "module": "totem-remnant",
+      "project_id": "dhochP34",
+      "version": "0.2.13",
+      "modrinth_version_id": "VdsRhhcH",
+      "sha512": "d6ad50554b5819e29410c76bdca90649582dee54ef2888a4f1222cd1f945e7f1044f78e6e285f2d0c5700be33cfedfdf73b6a6c3aa6bfcdaf973abeaa2771595"
+    },
+    {
+      "module": "totem-automata",
+      "project_id": "C8f15uNO",
+      "version": "0.1.15",
+      "modrinth_version_id": "dpYi6XGC",
+      "sha512": "ab6f46f646de77cde8dde884a01ae8cbd013026b2c091e8b21b1f6708a290bb71d002a660650d75cd2186e8280928f8bd8259f7158669ebfc56f214f92ed3108"
+    },
+    {
+      "module": "totem-nexus",
+      "project_id": "FfCkJemY",
+      "version": "0.3.0",
+      "modrinth_version_id": "5JDDv4vO",
+      "sha512": "0d804a94db1a320e13ba3202087fce12d918fcd90289c43b7d50662f10cabacbf0c97454bfe2e40710e7de5701f61f928e0d1cf896e0d8c3cf500a0bec4a7503"
+    },
+    {
+      "module": "totem-discord-bridge",
+      "project_id": "UBW4bpOx",
+      "version": "0.1.8",
+      "modrinth_version_id": "xyVUsvJi",
+      "sha512": "d16bbd8ea77346d086774de90f9f23ee987dcd7c42db1b8b932078ed6b445e71cdee2beb41593957aa9898e7e72df2f2ed0567d5336ed21405d5fe321bffb5cd"
+    },
+    {
+      "module": "totem-alchemy",
+      "project_id": "JnAGUw9w",
+      "version": "0.1.26",
+      "modrinth_version_id": "2gGCITfB",
+      "sha512": "9f4271adf5f5dc469a5a7c6c0500d0238561d734d761096028f1915cbf8c868497859385a18fdba39077539962a7d7c90290ca20f2b8a32868af4a0d19b6d40d"
+    },
+    {
+      "module": "totem-enchanting",
+      "project_id": "CxaaO2xO",
+      "version": "0.1.8",
+      "modrinth_version_id": "94Sz0uqa",
+      "sha512": "50ec0396f6137df163c64e29091b0ed43f3609851515ca4f51a2d811a1cd38a0634e63c0a8f36224f45b378885341d6256d52888c249d6afd7b6a30b27f2bd67"
+    },
+    {
+      "module": "totem-excavation",
+      "project_id": "8JdAMczX",
+      "version": "0.1.5",
+      "modrinth_version_id": "VsdEsJie",
+      "sha512": "58c685c91b5b0827ddc69b950c2a5f0e1f0db8ec7c9a589301495005d65787736e544980fad907d8152b3c722b1418ae743e980b662999b66cc71eb3f7460995"
+    },
+    {
+      "module": "totem-locksmith",
+      "project_id": "7MXfMVJA",
+      "version": "0.1.4",
+      "modrinth_version_id": "Xa5gR8UI",
+      "sha512": "9d601a1c9e9eab1c052cb18f9ca94c572abfa619af66920a899236a9b338fc0e6e7cf7407977d7f4bc64fad69ed6c87fb69d8f8e8662feddd3d8dc059d132c0e"
+    },
+    {
+      "module": "totem-vanilla-tweaks",
+      "project_id": "mEcpkZT2",
+      "version": "0.1.10",
+      "modrinth_version_id": "gfTn3dVv",
+      "sha512": "a5918e583e9b783ea1bef289894fef2c230abd7f4b44481cd9190dcab14aa1cc180156cea15432421a7ac94fb79d4a8ce5ecdeeb5971e9250b85e4f3b65ef288"
+    },
+    {
+      "module": "totem-villagers",
+      "project_id": "kfuP4czk",
+      "version": "0.1.32",
+      "modrinth_version_id": "KykPxSyc",
+      "sha512": "fd324d98ad966847c3fb6b79bf4182c655c58e182c129d2e3910afe22cac7c0d35b9b05bf8eefdf2cbde94d194dd5a206c956f9569961a3f0e275246fdde8dac"
+    }
+  ]
+}
