@@ -1,8 +1,0 @@
-{
-  "run": "32261129641",
-  "post_status": "400",
-  "patch_status": "not-run",
-  "post_response": "{\"error\":\"request_error\",\"description\":\"uploading image: invalid format for image: svg\"}",
-  "patch_response": "",
-  "url": ""
-}
