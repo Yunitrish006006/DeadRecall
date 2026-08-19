@@ -31,17 +31,17 @@ checkout_source() {
 
 # Source pins are intentionally immutable. A module version change must update
 # both DeadRecall's exact dependency graph and the corresponding source pin.
-checkout_source TotemCore          c39da3cdc3b4eff16f63798dc3eae4a49e41d105
-checkout_source TotemRemnant       b10d40cf00b44e292fdfa3b277fd100364636ea9
-checkout_source TotemDiscordBridge 1c2aa559c3e66dc8e23074cd8070be11b4a38ffc
-checkout_source TotemAutomata      c424056892c0047ef90615cba2a83bed6beb4d4e
-checkout_source TotemAlchemy       3ce2abc9b77a777b717b2708103d54e73c4f769d
-checkout_source TotemEnchanting    1bd2a57899376f322a97d560b123607ee4a64ac2
-checkout_source TotemExcavation    091dff98833ef284d6d4068101acc55d273fa8d8
-checkout_source TotemLocksmith     a7cbca9f81bb66d65c20353fa2961c4fe0ebbabd
-checkout_source TotemVanillaTweaks cf43b8a77b471f3f6444e7f4b07045d391a7ea4d
-checkout_source TotemNexus         5ad092fedcb7b2c2dec881fc63d8e6cc9fa4826f
-checkout_source TotemVillagers     31be402143c27382bb668646445427fd4a64c263
+checkout_source TotemCore          9b597fbf455b469fc3547d02ea0c927025b60348
+checkout_source TotemRemnant       fc8cbb015e4041319d5054edc019d57c00cfe061
+checkout_source TotemDiscordBridge f147711212decf41a9d5aa7e04444060760f43d4
+checkout_source TotemAutomata      5fcbaa60ed63780b2c30ba13fd3f692b03d0c5af
+checkout_source TotemAlchemy       659c92fb43f638450ac2ed74ee13a4bb99d90a28
+checkout_source TotemEnchanting    e2f472e366928e8857e70610e913c9164dcdb014
+checkout_source TotemExcavation    9dc9d70e232739897a6451b75d4fb5cc45608d46
+checkout_source TotemLocksmith     68896a55cdd9054d12372ad58f79df8c66c8a94b
+checkout_source TotemVanillaTweaks 66d51e2c3b160f5a01ae679d31c971644ac8e399
+checkout_source TotemNexus         3da956fa6565ba3ce5fa4ed74322721a3115042a
+checkout_source TotemVillagers     1133cfec73c52c589c2b82b6b073eba328819b83
 
 readonly GRADLE="${LOCKSTEP_DIR}/TotemCore/gradlew"
 chmod +x "${GRADLE}" gradlew
