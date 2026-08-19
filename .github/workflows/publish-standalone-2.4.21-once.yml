@@ -1,0 +1,96 @@
+name: Publish Verified Standalone 2.4.21 Once
+
+on:
+  push:
+    branches: [master]
+    paths: [.github/workflows/publish-standalone-2.4.21-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download verified standalone modules
+        uses: actions/download-artifact@v4
+        with:
+          name: deadrecall-2.4.21-standalone-modules
+          path: standalone
+          repository: Yunitrish006006/DeadRecall
+          run-id: 32250556863
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish or verify exact standalone releases
+        id: publish
+        shell: bash
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$MODRINTH_TOKEN"
+          find standalone -type f -maxdepth 2 -name '*.jar' -print
+          api='https://api.modrinth.com/v2'
+          args=(--fail --silent --show-error --retry 3 -H "Authorization: ${MODRINTH_TOKEN}" -H "User-Agent: Yunitrish006006/DeadRecall-standalone-publisher/${GITHUB_RUN_ID}")
+          results='[]'
+          deps_for() {
+            case "$1" in
+              totem-core) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"}]' ;;
+              totem-remnant) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"},{project_id:"XaT8sLP6",dependency_type:"optional"}]' ;;
+              totem-automata) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"},{project_id:"8JdAMczX",dependency_type:"optional"},{project_id:"7MXfMVJA",dependency_type:"optional"}]' ;;
+              *) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"}]' ;;
+            esac
+          }
+          while IFS='|' read -r module project version jar expected; do
+            artifact="$(find standalone -type f -name "$jar" -print -quit)"
+            test -n "$artifact"; test -f "$artifact"
+            actual="$(sha512sum "$artifact" | awk '{print $1}')"; test "$actual" = "$expected"
+            unzip -p "$artifact" fabric.mod.json >/tmp/fabric.mod.json
+            jq -e --arg id "$module" --arg version "$version" '.id==$id and .version==$version' /tmp/fabric.mod.json >/dev/null
+            curl "${args[@]}" "$api/project/$project" >/tmp/project.json
+            canonical="$(jq -er .id /tmp/project.json)"; test "$canonical" = "$project"
+            curl "${args[@]}" "$api/project/$project/version?include_changelog=false" >/tmp/versions.json
+            count="$(jq --arg v "$version" '[.[]|select(.version_number==$v)]|length' /tmp/versions.json)"
+            if [[ "$count" != 0 ]]; then
+              test "$count" = 1
+              version_id="$(jq -er --arg v "$version" '.[]|select(.version_number==$v)|.id' /tmp/versions.json)"
+              remote_sha="$(jq -er --arg v "$version" '.[]|select(.version_number==$v)|(([.files[]|select(.primary==true)][0]//.files[0]).hashes.sha512)' /tmp/versions.json)"
+              test "$remote_sha" = "$actual" || { echo "$module $version exists with a different SHA-512" >&2; exit 1; }
+              echo "$module $version already exists byte-identically; verifying."
+            else
+              deps="$(deps_for "$module")"
+              changelog="Standalone ${module} ${version}, verified from the DeadRecall 2.4.21 immutable lockstep build."
+              data="$(jq -nc --arg name "${module} ${version}" --arg version "$version" --arg changelog "$changelog" --arg project "$project" --argjson deps "$deps" '{name:$name,version_number:$version,changelog:$changelog,dependencies:$deps,game_versions:["26.2"],version_type:"release",loaders:["fabric"],featured:false,status:"listed",project_id:$project,file_parts:["primary"],primary_file:"primary"}')"
+              curl "${args[@]}" -X POST "$api/version" -F "data=${data};type=application/json" -F "primary=@${artifact};filename=${jar};type=application/java-archive" >/tmp/version.json
+              version_id="$(jq -er .id /tmp/version.json)"
+              echo "Published $module $version as $version_id."
+            fi
+            curl "${args[@]}" "$api/version/$version_id" >/tmp/remote.json
+            jq -e --arg project "$project" --arg version "$version" --arg filename "$jar" --arg sha "$actual" '.project_id==$project and .version_number==$version and .game_versions==["26.2"] and .loaders==["fabric"] and (([.files[]|select(.primary==true)][0]//.files[0]).filename==$filename) and (([.files[]|select(.primary==true)][0]//.files[0]).hashes.sha512==$sha)' /tmp/remote.json >/dev/null
+            results="$(jq -c --arg module "$module" --arg version "$version" --arg id "$version_id" --arg sha "$actual" '. + [{module:$module,version:$version,modrinth_version_id:$id,sha512:$sha}]' <<<"$results")"
+          done <<'MODULES'
+          totem-core|ZggYV6cS|0.7.0|totem-core-0.7.0.jar|e374ddecefd70b6d95176afba8bfd18ecff6c0daee4d8ad644e65e66cfcd8bc837e2998700ca1b42080adfcb2fbae252fffc824f82450014e25a72261171a804
+          totem-remnant|dhochP34|0.2.13|totem-remnant-0.2.13.jar|d6ad50554b5819e29410c76bdca90649582dee54ef2888a4f1222cd1f945e7f1044f78e6e285f2d0c5700be33cfedfdf73b6a6c3aa6bfcdaf973abeaa2771595
+          totem-automata|C8f15uNO|0.1.15|totem-automata-0.1.15.jar|ab6f46f646de77cde8dde884a01ae8cbd013026b2c091e8b21b1f6708a290bb71d002a660650d75cd2186e8280928f8bd8259f7158669ebfc56f214f92ed3108
+          totem-nexus|FfCkJemY|0.3.0|totem-nexus-0.3.0.jar|0d804a94db1a320e13ba3202087fce12d918fcd90289c43b7d50662f10cabacbf0c97454bfe2e40710e7de5701f61f928e0d1cf896e0d8c3cf500a0bec4a7503
+          totem-discord-bridge|UBW4bpOx|0.1.8|totem-discord-bridge-0.1.8.jar|d16bbd8ea77346d086774de90f9f23ee987dcd7c42db1b8b932078ed6b445e71cdee2beb41593957aa9898e7e72df2f2ed0567d5336ed21405d5fe321bffb5cd
+          totem-alchemy|JnAGUw9w|0.1.26|totem-alchemy-0.1.26.jar|9f4271adf5f5dc469a5a7c6c0500d0238561d734d761096028f1915cbf8c868497859385a18fdba39077539962a7d7c90290ca20f2b8a32868af4a0d19b6d40d
+          totem-enchanting|CxaaO2xO|0.1.8|totem-enchanting-0.1.8.jar|50ec0396f6137df163c64e29091b0ed43f3609851515ca4f51a2d811a1cd38a0634e63c0a8f36224f45b378885341d6256d52888c249d6afd7b6a30b27f2bd67
+          totem-excavation|8JdAMczX|0.1.5|totem-excavation-0.1.5.jar|58c685c91b5b0827ddc69b950c2a5f0e1f0db8ec7c9a589301495005d65787736e544980fad907d8152b3c722b1418ae743e980b662999b66cc71eb3f7460995
+          totem-locksmith|7MXfMVJA|0.1.4|totem-locksmith-0.1.4.jar|9d601a1c9e9eab1c052cb18f9ca94c572abfa619af66920a899236a9b338fc0e6e7cf7407977d7f4bc64fad69ed6c87fb69d8f8e8662feddd3d8dc059d132c0e
+          MODULES
+          printf '%s\n' "$results" >/tmp/results.json
+      - name: Record central standalone verification
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          marker='.github/staging/modrinth-standalone-published-2.4.21.json'
+          body="$(jq -n --arg bundle '2.4.21' --arg run "$GITHUB_RUN_ID" --slurpfile modules /tmp/results.json '{bundle_version:$bundle,verified_by_run:$run,modules:$modules[0]}')"
+          encoded="$(printf '%s\n' "$body" | base64 -w0)"
+          api="https://api.github.com/repos/${GITHUB_REPOSITORY}/contents/${marker}"
+          old="$(curl -sS -H "Authorization: Bearer ${GH_TOKEN}" -H 'X-GitHub-Api-Version: 2022-11-28' "$api" | jq -r '.sha//empty')"
+          payload="$(jq -n --arg message 'release: record standalone Modrinth 2.4.21' --arg content "$encoded" --arg branch "$GITHUB_REF_NAME" --arg sha "$old" 'if $sha=="" then {message:$message,content:$content,branch:$branch} else {message:$message,content:$content,branch:$branch,sha:$sha} end')"
+          curl --fail -sS -X PUT -H "Authorization: Bearer ${GH_TOKEN}" -H 'X-GitHub-Api-Version: 2022-11-28' "$api" -d "$payload" >/dev/null
