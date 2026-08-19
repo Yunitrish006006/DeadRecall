@@ -33,7 +33,10 @@ mkfifo "${fifo}"
 exec 3<>"${fifo}"
 rm -f "${fifo}"
 
-./gradlew \
+# The rebuilt pinned Core JAR is the only authority for this dev runtime.
+# Remove any inherited ORG_GRADLE_PROJECT override so Loom cannot retain a
+# second Core file dependency from the calling workflow environment.
+env -u ORG_GRADLE_PROJECT_totemCoreJar ./gradlew \
   -PtotemCoreJar="${CORE_JAR}" \
   -PbundleModuleDirectory="${MODULE_DIR}" \
   runServer --no-daemon --stacktrace \
