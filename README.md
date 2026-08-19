@@ -20,7 +20,7 @@ DeadRecall 2.4.22 本身不再註冊這些 legacy item IDs，只會驗證 Core �
 
 **TotemVillagers 不再是 DeadRecall 2.4.22 的依賴，也不會包含在 bundle 裡。**
 
-需要 Villagers 時可另外安裝；不需要時可以完全省略。
+全新世界、或確定不再需要 Villagers 系統的世界可以完全省略它。若既有 DeadRecall 2.4.21 世界曾使用 TotemVillagers，建議在 **第一次 2.4.22 啟動前** 同時安裝 standalone **TotemVillagers 0.1.32**，讓既有 Villagers SavedData 與運作狀態在 transition boot 中持續由相同模組讀取。只有在你確定要停用 Villagers 功能時才直接省略它。
 
 ## DeadRecall 2.4.22 transition graph
 
@@ -41,13 +41,14 @@ DeadRecall 2.4.22 本身不再註冊這些 legacy item IDs，只會驗證 Core �
 
 1. **先備份世界。**
 2. 將 DeadRecall 2.4.21 換成 `deadrecall-2.4.22-bundled.jar`。
-3. 正常啟動伺服器一次。
-4. 確認 log 出現 DeadRecall 已驗證 **14 TotemCore-owned legacy item aliases**。
-5. 正常停止伺服器。
-6. 接著可以移除 DeadRecall host，改成安裝 TotemCore 0.7.1+ 與你需要的 standalone Totem modules。
-7. TotemVillagers 可不安裝。
+3. **若這個世界曾使用 TotemVillagers，第一次啟動前同時放入 standalone `totem-villagers-0.1.32.jar`。** 若你確定要停用 Villagers，才省略這一步。
+4. 正常啟動伺服器一次。
+5. 確認 log 出現 DeadRecall 已驗證 **14 TotemCore-owned legacy item aliases**。
+6. 正常停止伺服器。
+7. 接著可以移除 DeadRecall host，改成安裝 TotemCore 0.7.1+ 與你需要的 standalone Totem modules。
+8. TotemVillagers 仍是獨立可選模組：要保留既有 Villagers 系統就繼續安裝；確定不需要時才移除。
 
-這次啟動是 compatibility checkpoint，不是全世界 destructive rewrite。真正避免 hidden legacy stack 遺失的保證來自 TotemCore 0.7.1 永久保留 `deadrecall:*` alias。
+這次啟動是 compatibility checkpoint，不是全世界 destructive rewrite。真正避免 hidden legacy stack 遺失的保證來自 TotemCore 0.7.1 永久保留 `deadrecall:*` alias。TotemVillagers 的 SavedData 屬於另一條功能資料邊界，因此是否保留 Villagers 應由伺服器管理者明確決定，而不是由 transition bundle 隱式替你決定。
 
 ## 相容需求
 
