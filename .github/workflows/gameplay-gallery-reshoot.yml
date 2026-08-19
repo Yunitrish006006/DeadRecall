@@ -21,9 +21,9 @@ permissions:
   contents: read
 
 jobs:
-  fresh-existing-client-captures:
+  fresh-gameplay-captures:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 150
     steps:
       - name: Check out DeadRecall gallery branch
         uses: actions/checkout@v4
@@ -52,10 +52,39 @@ jobs:
           set -euo pipefail
           .github/scripts/capture-existing-client-gallery.sh
 
+      - name: Re-shoot missing module gameplay showcases
+        shell: bash
+        run: |
+          set -euo pipefail
+          xvfb-run -a ./gradlew \
+            -p .github/gallery-harness \
+            -PmoduleDir="${GITHUB_WORKSPACE}/standalone-modules" \
+            runClientGameTest --no-daemon --stacktrace
+
+      - name: Verify capture coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          existing='test-artifacts/gameplay-gallery/existing-client-tests'
+          harness='test-artifacts/gameplay-gallery/gallery-harness'
+          for module in totem-alchemy totem-automata totem-nexus totem-villagers totem-remnant totem-locksmith; do
+            count="$(find "$existing/$module" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
+            echo "$module existing visual captures: $count"
+            test "$count" -gt 0
+          done
+          test -d "$harness"
+          for module in totem-core totem-enchanting totem-excavation totem-vanilla-tweaks totem-discord-bridge; do
+            count="$(find "$harness" -maxdepth 1 -type f -name "*gallery-${module}-*.png" | wc -l | tr -d ' ')"
+            echo "$module harness captures: $count"
+            test "$count" -ge 2
+          done
+          find test-artifacts/gameplay-gallery -type f -name '*.png' -print | sort > test-artifacts/gameplay-gallery/all-screenshots.txt
+          echo "Total fresh screenshots: $(wc -l < test-artifacts/gameplay-gallery/all-screenshots.txt)"
+
       - name: Upload fresh gameplay captures
         uses: actions/upload-artifact@v4
         with:
-          name: gameplay-gallery-existing-client-tests
+          name: gameplay-gallery-reshoot-2.4.21
           path: test-artifacts/gameplay-gallery/
           if-no-files-found: error
           retention-days: 14
