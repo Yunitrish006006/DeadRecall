@@ -1,25 +1,27 @@
 package com.adaptor.deadrecall;
 
-import com.adaptor.deadrecall.migration.DeadRecallLegacyItems;
+import com.adaptor.deadrecall.migration.LegacyAliasHandoffVerifier;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Compatibility-bundle host.
+ * Final compatibility transition host.
  *
- * <p>DeadRecall owns only legacy identifier migration. Gameplay is provided by
- * the exact Totem module graph nested into the release artifact.</p>
+ * <p>TotemCore owns the retained {@code deadrecall:*} item aliases. DeadRecall
+ * now verifies that handoff and packages the exact transition module graph; it
+ * no longer registers gameplay items or legacy aliases itself.</p>
  */
 public final class Deadrecall implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("DeadRecall");
 
     @Override
     public void onInitialize() {
-        DeadRecallLegacyItems.register();
+        LegacyAliasHandoffVerifier.verify();
         LOGGER.info(
-                "DeadRecall compatibility host initialized with {} legacy item mappings",
-                DeadRecallLegacyItems.mappingCount()
+                "DeadRecall transition host verified {} TotemCore-owned legacy item aliases; "
+                        + "this world can remain decode-safe after the DeadRecall host is removed",
+                LegacyAliasHandoffVerifier.mappingCount()
         );
     }
 }
