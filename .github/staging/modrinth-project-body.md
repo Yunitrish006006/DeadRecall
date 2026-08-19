@@ -21,39 +21,42 @@ DeadRecall 是 Minecraft 26.2 / Fabric 的 Totem 系列整合發行版。外層 
 
 | Module | Version | Main role |
 | --- | ---: | --- |
-| TotemCore | `0.6.1` | Shared API, Totem Manual, events, migrations, version handshake |
-| TotemRemnant | `0.2.12` | Backpacks, death recovery, container safety |
-| TotemDiscordBridge | `0.1.7` | Optional Discord events, status and audit delivery |
-| TotemAutomata | `0.1.13` | Copper Golem sorting, gathering, tools and fuel |
-| TotemAlchemy | `0.1.24` | Dynamic brewing, multi-outcome ingredients and discovery |
-| TotemEnchanting | `0.1.7` | Content-based chiseled-bookshelf enchanting power |
-| TotemExcavation | `0.1.3` | Server-owned area selection and excavation hammers |
-| TotemLocksmith | `0.1.1` | Connected storage locks, permissions, keys and audits |
-| TotemVanillaTweaks | `0.1.9` | Vanilla-friendly recipes, sorting and gameplay adjustments |
-| TotemNexus | `0.2.7` | Space Units, friends, travel and death destinations |
-| TotemVillagers | `0.1.31` | Villager inventory, work, economy and settlement production |
+| TotemCore | `0.7.0` | Shared API, Totem Manual, shared friendships, events, migrations, version handshake |
+| TotemRemnant | `0.2.13` | Backpacks, death recovery, container safety |
+| TotemDiscordBridge | `0.1.8` | Optional Discord events, status and audit delivery |
+| TotemAutomata | `0.1.15` | Copper Golem sorting, heterogeneous gathering, tools and fuel |
+| TotemAlchemy | `0.1.26` | Dynamic brewing, cauldron mixtures, unfinished reactions and discovery |
+| TotemEnchanting | `0.1.8` | Content-based chiseled-bookshelf enchanting power |
+| TotemExcavation | `0.1.5` | Server-owned area selection and excavation hammers |
+| TotemLocksmith | `0.1.4` | Connected storage locks, GUI permissions, Core friends and keys |
+| TotemVanillaTweaks | `0.1.10` | Vanilla-friendly recipes, sorting and gameplay adjustments |
+| TotemNexus | `0.3.0` | Space Units, friend UI, travel and death destinations |
+| TotemVillagers | `0.1.32` | Villager inventory, work, economy and settlement production |
 
 These versions form one lockstep release. Do not replace only one embedded module with a different standalone version.
 
 ## Highlights
 
+### Shared Friends
+TotemCore now owns the canonical friendship and pending-invitation state for the whole Totem ecosystem. Existing worlds keep the historical `deadrecall:space_friends` data identifier, so established relationships carry forward. Nexus provides friend UI and travel use cases; Locksmith consumes the same Core relation directly.
+
 ### Backpacks & Recovery
 TotemRemnant provides four backpack tiers, dyeing, inventory-side access, death backpacks, recovery guidance, void protection and portable-container safety.
 
 ### Automation
-TotemAutomata turns Copper Golems into configurable workers. TotemExcavation adds seven hammer tiers with bounded server-side area harvesting, normal protection hooks, loot and durability behavior.
+TotemAutomata turns Copper Golems into configurable workers and now carries multiple item types within one bounded total Gathering Storage capacity. TotemExcavation adds seven hammer tiers with bounded server-side area harvesting, normal protection hooks, loot and durability behavior; completed selections reset fully.
 
 ### Villages
 TotemVillagers gives villagers real inventories, food, tools, stock-aware trading, profession-specific work and production-oriented settlement generation.
 
 ### Alchemy & Enchanting
-TotemAlchemy provides ingredient-driven multi-outcome brewing, success rates, Firefly Strength and discovery tracking in the Totem Manual. TotemEnchanting uses books stored in valid, unobstructed chiseled bookshelves to provide up to 64 enchanting power.
+TotemAlchemy supports cauldron potion mixing, unfinished mixture bottles, preserved reaction progress, opposing-effect cancellation and standard Brewing Stand recipes. TotemEnchanting uses books stored in valid, unobstructed chiseled bookshelves to provide up to 64 enchanting power.
 
 ### Travel
-TotemNexus provides material-sensitive Space Units, friends, mapping, cost validation and safe server-authoritative teleport sessions.
+TotemNexus provides material-sensitive Space Units, shared Core friendship views, mapping, cost validation and safe server-authoritative teleport sessions.
 
 ### Server Tools
-TotemLocksmith protects supported fixed-container networks with padlocks, permissions, physical keys, automation rules and break auditing. TotemDiscordBridge can optionally relay configured Minecraft events through a separately configured Worker. TotemVanillaTweaks supplies shared vanilla-friendly adjustments such as container sorting.
+TotemLocksmith protects supported fixed-container networks with a command-free Access / Members / Keys GUI, physical keys, Core friendship permissions, automation rules and break auditing. TotemDiscordBridge can optionally relay configured Minecraft events through a separately configured Worker. TotemVanillaTweaks supplies shared vanilla-friendly adjustments such as container sorting.
 
 ## Requirements
 
@@ -67,7 +70,7 @@ TotemLocksmith protects supported fixed-container networks with padlocks, permis
 ## Install
 
 1. Install the matching Minecraft, Fabric Loader, Fabric API and Java versions.
-2. Put `deadrecall-2.4.20-bundled.jar` in `mods/` on both client and server.
+2. Put `deadrecall-2.4.21-bundled.jar` in `mods/` on both client and server.
 3. Do **not** add standalone copies of the eleven embedded Totem modules.
 4. Back up an important existing world before first migration.
 5. On startup, confirm Fabric reports the expected exact Totem module set.

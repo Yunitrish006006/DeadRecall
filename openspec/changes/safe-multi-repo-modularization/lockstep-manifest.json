@@ -4,7 +4,7 @@
   "bundle": {
     "repository": "DeadRecall",
     "modId": "deadrecall",
-    "version": "2.4.7",
+    "version": "2.4.21",
     "minecraft": "26.2",
     "fabricLoader": "0.19.3",
     "fabricApi": "0.154.2+26.2",
@@ -13,112 +13,107 @@
   "modules": [
     {
       "id": "totem-core",
-      "version": "0.4.0",
+      "version": "0.7.0",
       "repository": "TotemCore exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemCore.git",
-      "sourceCommit": "eac4bb3e19dec6d6aca4433df995f95e9631bc9b",
-      "sha512": "39d3c1620550e4ea316e9680c52f7dc76477a68da40af61421f27410ca8a4d2ef5819f5341742da3118bea17725b834725f351f2809d117cce7a402213ca148e"
+      "sourceCommit": "5be940a1fb91d250bb6781193bd49f0f24b40a43",
+      "sha512": "e374ddecefd70b6d95176afba8bfd18ecff6c0daee4d8ad644e65e66cfcd8bc837e2998700ca1b42080adfcb2fbae252fffc824f82450014e25a72261171a804"
     },
     {
       "id": "totem-remnant",
-      "version": "0.1.7",
+      "version": "0.2.13",
       "repository": "TotemRemnant exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemRemnant.git",
-      "sourceCommit": "256fdbd27018fd2ef5759dc3d2448a853ebcc84d",
-      "sha512": "2cb08950dbd3f71af638cc5a97deed5c6e634221ed55be316209042bcfeddfb1a708d56f30d1709bf7688285522db579df348527adcddb36c48bfdef1b12b991"
+      "sourceCommit": "8a6d4c291eb2f5ecf857abc1fcb718ae82b28b46",
+      "sha512": "d6ad50554b5819e29410c76bdca90649582dee54ef2888a4f1222cd1f945e7f1044f78e6e285f2d0c5700be33cfedfdf73b6a6c3aa6bfcdaf973abeaa2771595"
     },
     {
       "id": "totem-discord-bridge",
-      "version": "0.1.4",
+      "version": "0.1.8",
       "repository": "TotemDiscordBridge exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemDiscordBridge.git",
-      "sourceCommit": "6383e2b56ea39455571a95120d9a0a05dde90a35",
-      "sha512": "250a53dba6d71f62c52711f1942ee6a2a060aa328ec378493d07f02d0b9d49158fdb5a87ae4571311db28bde3655c9bb2bce5e923b624dfac517f575a4fe3af3"
+      "sourceCommit": "aa845935867c110fa0206eab759982549e0ee3f8",
+      "sha512": "d16bbd8ea77346d086774de90f9f23ee987dcd7c42db1b8b932078ed6b445e71cdee2beb41593957aa9898e7e72df2f2ed0567d5336ed21405d5fe321bffb5cd"
     },
     {
       "id": "totem-automata",
-      "version": "0.1.9",
+      "version": "0.1.15",
       "repository": "TotemAutomata exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAutomata.git",
-      "sourceCommit": "37a6240312984317f418281230e3a9dd4e6ea6fb",
-      "sha512": "907bf0a732defe24e557f14d79de42240d83fc5ff42ff9dd6b7386c365853983c6bf018598283d5b1122ee3d79055e3126b0fa3f293edb28034d0e5d066b5409"
+      "sourceCommit": "2103ba4057e069196eb6f54ddd99387aef2766eb",
+      "sha512": "ab6f46f646de77cde8dde884a01ae8cbd013026b2c091e8b21b1f6708a290bb71d002a660650d75cd2186e8280928f8bd8259f7158669ebfc56f214f92ed3108"
     },
     {
       "id": "totem-alchemy",
-      "version": "0.1.7",
+      "version": "0.1.26",
       "repository": "TotemAlchemy exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemAlchemy.git",
-      "sourceCommit": "f972cf3999565461fa1e231d3592300b86fa91eb",
-      "sha512": "1021bb1fc2efd66a6fe6922b3d816296e5a2bb558a7196c99337a1c40b6dea56b8dd11c375853ab93f145f98e6c9424023cac72032805cd078931f651fcdfb0a"
+      "sourceCommit": "19def3fe576c0deabe5f6eaf286564da317b35ce",
+      "sha512": "9f4271adf5f5dc469a5a7c6c0500d0238561d734d761096028f1915cbf8c868497859385a18fdba39077539962a7d7c90290ca20f2b8a32868af4a0d19b6d40d"
     },
     {
       "id": "totem-enchanting",
-      "version": "0.1.3",
+      "version": "0.1.8",
       "repository": "TotemEnchanting exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemEnchanting.git",
-      "sourceCommit": "ad89968a2e2f0772e1b34274d247f5ea60e11f46",
-      "sha512": "6fd99889aadb9d0e156c0a7e97a39127f7f3a9dd78ad554ebf707b44d85431ffe252433feba57e26e007ced5e65a9c5afae0eca1ceff9d265477919cb99a9790"
+      "sourceCommit": "5cc5f319eae38c2d64de1053349e4418d247d56c",
+      "sha512": "50ec0396f6137df163c64e29091b0ed43f3609851515ca4f51a2d811a1cd38a0634e63c0a8f36224f45b378885341d6256d52888c249d6afd7b6a30b27f2bd67"
+    },
+    {
+      "id": "totem-excavation",
+      "version": "0.1.5",
+      "repository": "TotemExcavation exact source build",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemExcavation.git",
+      "sourceCommit": "b3f784d8e2faa542ef44e60a961a34bca19d1f91",
+      "sha512": "58c685c91b5b0827ddc69b950c2a5f0e1f0db8ec7c9a589301495005d65787736e544980fad907d8152b3c722b1418ae743e980b662999b66cc71eb3f7460995"
+    },
+    {
+      "id": "totem-locksmith",
+      "version": "0.1.4",
+      "repository": "TotemLocksmith exact source build",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemLocksmith.git",
+      "sourceCommit": "70fe7f691d6caac50ec525665b9b5643c5ede86d",
+      "sha512": "9d601a1c9e9eab1c052cb18f9ca94c572abfa619af66920a899236a9b338fc0e6e7cf7407977d7f4bc64fad69ed6c87fb69d8f8e8662feddd3d8dc059d132c0e"
     },
     {
       "id": "totem-vanilla-tweaks",
-      "version": "0.1.5",
+      "version": "0.1.10",
       "repository": "TotemVanillaTweaks exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemVanillaTweaks.git",
-      "sourceCommit": "4154a7c70825c4ebfcb51560b27434a3594cc294",
-      "sha512": "dbca6a4be870671bd73d6a6336c8af24547c4409c549644cd9ae8fe839261247036544c94d1cae3252d53ed912b993f0e8299207a603e7ddb1a3c1e820428cac"
+      "sourceCommit": "4ce0732896f74ad9a79ef52d377dd31c868ba3cc",
+      "sha512": "a5918e583e9b783ea1bef289894fef2c230abd7f4b44481cd9190dcab14aa1cc180156cea15432421a7ac94fb79d4a8ce5ecdeeb5971e9250b85e4f3b65ef288"
     },
     {
       "id": "totem-nexus",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "repository": "TotemNexus exact source build",
       "sourceRepository": "https://github.com/Yunitrish006006/TotemNexus.git",
-      "sourceCommit": "d3eb37f301ab51d350b39cfd75575d1f8d3bccc6",
-      "sha512": "f15c024d95b13b7c8b3a2e22402e66841c1bb12742d606eab40f25fffed59141539ab856665ee3bde8ad1f80f8ba7a2ec6834fe5a788d751d23ee87adf98f0a6"
+      "sourceCommit": "61bc2a25dc78d7b164e903fbc2b56a6d25db214c",
+      "sha512": "0d804a94db1a320e13ba3202087fce12d918fcd90289c43b7d50662f10cabacbf0c97454bfe2e40710e7de5701f61f928e0d1cf896e0d8c3cf500a0bec4a7503"
+    },
+    {
+      "id": "totem-villagers",
+      "version": "0.1.32",
+      "repository": "TotemVillagers exact source build",
+      "sourceRepository": "https://github.com/Yunitrish006006/TotemVillagers.git",
+      "sourceCommit": "355f37c7bc74b9555a46d879576b5813de5ae28d",
+      "sha512": "fd324d98ad966847c3fb6b79bf4182c655c58e182c129d2e3910afe22cac7c0d35b9b05bf8eefdf2cbde94d194dd5a206c956f9569961a3f0e275246fdde8dac"
     }
   ],
   "rollback": {
-    "bundleVersion": "2.4.1",
+    "bundleVersion": "2.4.20",
     "modules": [
-      {
-        "id": "totem-core",
-        "version": "0.1.2",
-        "sha512": "1af05f3aa190b935739ad05f54d77d57da4607fdd76863afdf06f049ae296e79bf74a79889368f6f8e6b95c57ae0b0ec6c4fe48346662cadf326983442a3707f"
-      },
-      {
-        "id": "totem-remnant",
-        "version": "0.1.1",
-        "sha512": "cf7da0fb6af305e576279cf3b2a13af80e029d6814a263e8884dc10e7bdf5b8193b4f7682b8edd771f6a495b0c059c9f9a1f5a90fa65176c004fccba8bbef4a5"
-      },
-      {
-        "id": "totem-discord-bridge",
-        "version": "0.1.1",
-        "sha512": "ce84021bafbfe99aedc72a640b228bf3916b80e384080833b807d9c49e7c32587d113324a36cfbb98a71478d84cea61ec0ea19ff1591130e34fa35718f50eb0b"
-      },
-      {
-        "id": "totem-automata",
-        "version": "0.1.3",
-        "sha512": "c0d58ed485a7dcf1762aed59d7c2631d1bfbc57b70220438c11a2bccea79076b3c6eb9f124d74ef97b720df6b4bce50d8b40cbb67a1e1b72267e4895506d96f8"
-      },
-      {
-        "id": "totem-alchemy",
-        "version": "0.1.3",
-        "sha512": "3b99c8c15024bf3cc5072fd2287182ede9a628e2d7035ed24d3e4e4c89e5bf7b04e2626a54a725169d41577b28982df0d4bb475352b998e6501e7888f51af6d5"
-      },
-      {
-        "id": "totem-enchanting",
-        "version": "0.1.0",
-        "sha512": "ce8fb9b77d22ed0d439e70cd9783693f87b33c6c19a2b9cdd9df841d090a459a8866a61fbaebcf9ed0850e4564a353eaa8c8d39a241611e5e3fd7a93be35cb40"
-      },
-      {
-        "id": "totem-vanilla-tweaks",
-        "version": "0.1.0",
-        "sha512": "f06ab91e4a42bc5fa494424089879dfdd63d9d2aa887d9244c254534e45889a9eef7a3fd7d7175e6fbf8c37602e0a3582e742903ad6c832e67fbafe731f6a251"
-      },
-      {
-        "id": "totem-nexus",
-        "version": "0.1.4",
-        "sha512": "c2ea781f402c9a2d54dd24c6a6c891c499e3d2b87e111dd1c270d05758a33d66bba5ea7d97f18708a8d655aafde2d2b81e6eecd87a156f831dfd35dfd7ef8468"
-      }
+      { "id": "totem-core", "version": "0.6.1" },
+      { "id": "totem-remnant", "version": "0.2.12" },
+      { "id": "totem-discord-bridge", "version": "0.1.7" },
+      { "id": "totem-automata", "version": "0.1.13" },
+      { "id": "totem-alchemy", "version": "0.1.24" },
+      { "id": "totem-enchanting", "version": "0.1.7" },
+      { "id": "totem-excavation", "version": "0.1.3" },
+      { "id": "totem-locksmith", "version": "0.1.1" },
+      { "id": "totem-vanilla-tweaks", "version": "0.1.9" },
+      { "id": "totem-nexus", "version": "0.2.7" },
+      { "id": "totem-villagers", "version": "0.1.31" }
     ]
   }
 }
