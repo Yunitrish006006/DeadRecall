@@ -4,14 +4,14 @@
 
 DeadRecall 2.4.22 is for existing Minecraft 26.2 / Fabric worlds that previously used DeadRecall and now want to move to standalone Totem modules safely.
 
-## What changes in 2.4.22
+## Changes in 2.4.22
 
 - TotemCore `0.7.1` permanently owns the 14 retained `deadrecall:*` item identifiers.
 - Hidden legacy stacks remain decode-safe even after the DeadRecall host is removed.
 - Canonical migration remains lazy and preserves the full Data Component patch and item count.
 - **TotemVillagers is no longer bundled or required.** Install it separately only if you want it.
 
-## Included transition modules
+## Included modules
 
 | Module | Version |
 | --- | ---: |
@@ -26,7 +26,7 @@ DeadRecall 2.4.22 is for existing Minecraft 26.2 / Fabric worlds that previously
 | TotemVanillaTweaks | `0.1.10` |
 | TotemNexus | `0.3.0` |
 
-## Recommended migration
+## Migration
 
 1. Back up the world.
 2. Replace DeadRecall 2.4.21 with `deadrecall-2.4.22-bundled.jar`.
