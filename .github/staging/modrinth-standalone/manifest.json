@@ -8,21 +8,28 @@
       "title": "TotemCore",
       "slug": "totem-core",
       "existing_project_id": "ZggYV6cS",
-      "version": "0.6.0",
-      "jar": "totem-core-0.6.0.jar",
-      "sha512": "ce74ba0a692f8698b4611a51a9eeb183d08f305692400b61bc83503834f5408783097411f7e215aa542db1d7aa12a6ec1b072f3e7bc55896e59d50893d506aa7",
+      "version": "0.7.0",
+      "jar": "totem-core-0.7.0.jar",
+      "sha512": "e374ddecefd70b6d95176afba8bfd18ecff6c0daee4d8ad644e65e66cfcd8bc837e2998700ca1b42080adfcb2fbae252fffc824f82450014e25a72261171a804",
       "body": "totem-core.md",
       "icon": "icons/totem-core.png",
       "description": "Shared APIs, unified manuals, exact client/server version checks, events, and legacy ID migration for the Totem ecosystem.",
-      "categories": ["utility"],
-      "additional_categories": ["game-mechanics"],
+      "categories": [
+        "utility"
+      ],
+      "additional_categories": [
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemCore",
-      "changelog": "Standalone TotemCore 0.6.0 from DeadRecall 2.4.11. Adds first-join guided manual onboarding, gated module progression, the locked-container break event, and an eleven-module exact-version handshake.",
+      "changelog": "Standalone TotemCore 0.7.0 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        }
       ],
       "gallery": [
         {
@@ -39,23 +46,38 @@
       "title": "TotemRemnant",
       "slug": "totem-remnant",
       "existing_project_id": "dhochP34",
-      "version": "0.2.11",
-      "jar": "totem-remnant-0.2.11.jar",
-      "sha512": "416e314a207ba51142a88501390568c01a7362f681d48446be5347dab37593099d78d2a5d6c895c64e47bf0ee85e72f212a52e287436191bae70d14ed66913af",
+      "version": "0.2.13",
+      "jar": "totem-remnant-0.2.13.jar",
+      "sha512": "d6ad50554b5819e29410c76bdca90649582dee54ef2888a4f1222cd1f945e7f1044f78e6e285f2d0c5700be33cfedfdf73b6a6c3aa6bfcdaf973abeaa2771595",
       "body": "totem-remnant.md",
       "icon": "icons/totem-remnant.png",
       "description": "Tiered modular backpacks, death-item recovery, soulbound retention, and portable-container safety for Fabric survival.",
-      "categories": ["storage", "utility"],
-      "additional_categories": ["adventure", "game-mechanics"],
+      "categories": [
+        "storage",
+        "utility"
+      ],
+      "additional_categories": [
+        "adventure",
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemRemnant",
-      "changelog": "Standalone TotemRemnant 0.2.11 from DeadRecall 2.4.11. Makes the inventory-side backpack panel interactive, adds guided manual progression, and automatically scans eligible soulbound teleport interfaces at death without prior travel.",
+      "changelog": "Standalone TotemRemnant 0.2.13 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"},
-        {"project_id": "XaT8sLP6", "dependency_type": "optional"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        },
+        {
+          "project_id": "XaT8sLP6",
+          "dependency_type": "optional"
+        }
       ],
       "gallery": [
         {
@@ -86,24 +108,41 @@
       "title": "TotemAutomata",
       "slug": "totem-automata",
       "existing_project_id": "C8f15uNO",
-      "version": "0.1.12",
-      "jar": "totem-automata-0.1.12.jar",
-      "sha512": "1ef6280ef0afec488bd507198688b184dbfdd04d339b5f419bfd4a93b4ece273060111b520c2b14661926d2b7ce22e94d2132e92250b32b93029dd862df609df",
+      "version": "0.1.15",
+      "jar": "totem-automata-0.1.15.jar",
+      "sha512": "ab6f46f646de77cde8dde884a01ae8cbd013026b2c091e8b21b1f6708a290bb71d002a660650d75cd2186e8280928f8bd8259f7158669ebfc56f214f92ed3108",
       "body": "totem-automata.md",
       "icon": "icons/totem-automata.png",
       "description": "Give Copper Golems server-authoritative sorting and gathering jobs with tools, fuel, storage routes, and configurable targets.",
-      "categories": ["technology", "utility"],
-      "additional_categories": ["game-mechanics"],
+      "categories": [
+        "technology",
+        "utility"
+      ],
+      "additional_categories": [
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemAutomata",
-      "changelog": "Standalone TotemAutomata 0.1.12 from DeadRecall 2.4.11. Adds guided manual progression and optional TotemLocksmith authorization for persisted Copper Golem operators while retaining bounded sorting and gathering.",
+      "changelog": "Standalone TotemAutomata 0.1.15 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"},
-        {"module_id": "totem-excavation", "dependency_type": "optional"},
-        {"module_id": "totem-locksmith", "dependency_type": "optional"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-excavation",
+          "dependency_type": "optional"
+        },
+        {
+          "module_id": "totem-locksmith",
+          "dependency_type": "optional"
+        }
       ],
       "gallery": []
     },
@@ -112,22 +151,34 @@
       "title": "TotemNexus",
       "slug": "totem-nexus",
       "existing_project_id": "FfCkJemY",
-      "version": "0.2.6",
-      "jar": "totem-nexus-0.2.6.jar",
-      "sha512": "fb9427294a800cbefa0f89dd0b49dab2027bf7bb5be3c2296651fb56b647cb914cb77361736c0271aac544788658135e656a12f5e24de5e64717eaed9225c511",
+      "version": "0.3.0",
+      "jar": "totem-nexus-0.3.0.jar",
+      "sha512": "0d804a94db1a320e13ba3202087fce12d918fcd90289c43b7d50662f10cabacbf0c97454bfe2e40710e7de5701f61f928e0d1cf896e0d8c3cf500a0bec4a7503",
       "body": "totem-nexus.md",
       "icon": "icons/totem-nexus.png",
       "description": "Build material-driven Space Units for lodestone travel, maps, friends, safe routes, and optional death recovery.",
-      "categories": ["transportation", "adventure"],
-      "additional_categories": ["magic", "utility"],
+      "categories": [
+        "transportation",
+        "adventure"
+      ],
+      "additional_categories": [
+        "magic",
+        "utility"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemNexus",
-      "changelog": "Standalone TotemNexus 0.2.6 from DeadRecall 2.4.11. Adds guided manual progression, a read-only mutual-friendship API, and resolver-valid death-time soulbound eligibility without requiring prior teleport use.",
+      "changelog": "Standalone TotemNexus 0.3.0 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        }
       ],
       "gallery": [
         {
@@ -144,22 +195,32 @@
       "title": "TotemDiscordBridge",
       "slug": "totem-discord-bridge",
       "existing_project_id": "UBW4bpOx",
-      "version": "0.1.6",
-      "jar": "totem-discord-bridge-0.1.6.jar",
-      "sha512": "f1c1139d4a79b6ff76059cdca07d28b037708c1754657a974eb9c60a7342345c115246dd209cf8624e85c5b041891a47fa0c336212cd454bc7f0c308ed12daef",
+      "version": "0.1.8",
+      "jar": "totem-discord-bridge-0.1.8.jar",
+      "sha512": "d16bbd8ea77346d086774de90f9f23ee987dcd7c42db1b8b932078ed6b445e71cdee2beb41593957aa9898e7e72df2f2ed0567d5336ed21405d5fe321bffb5cd",
       "body": "totem-discord-bridge.md",
       "icon": "icons/totem-discord-bridge.png",
       "description": "Relay chat, player activity, server events, attachments, audits, and live status to Discord through a configurable HTTPS Worker.",
-      "categories": ["utility"],
-      "additional_categories": ["technology"],
+      "categories": [
+        "utility"
+      ],
+      "additional_categories": [
+        "technology"
+      ],
       "client_side": "optional",
       "server_side": "required",
       "version_environment": "server_only_client_optional",
       "repository": "https://github.com/Yunitrish006006/TotemDiscordBridge",
-      "changelog": "Standalone TotemDiscordBridge 0.1.6 from DeadRecall 2.4.11. Adds deduplicated TotemLocksmith non-owner break alerts and bounded event-ID retention while preserving existing chat, lifecycle, audit, attachment, and status relays.",
+      "changelog": "Standalone TotemDiscordBridge 0.1.8 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        }
       ],
       "gallery": []
     },
@@ -168,22 +229,33 @@
       "title": "TotemAlchemy",
       "slug": "totem-alchemy",
       "existing_project_id": "JnAGUw9w",
-      "version": "0.1.23",
-      "jar": "totem-alchemy-0.1.23.jar",
-      "sha512": "8d1ce1f7f164028b44f41d23c48dd3d3ff142a1d3e6e72fc894afe54e6753de22e9bd7025ad3e9491c5c8eb7eb6bfef7a056468f77b5342ce2e6e4a942a6e11f",
+      "version": "0.1.26",
+      "jar": "totem-alchemy-0.1.26.jar",
+      "sha512": "9f4271adf5f5dc469a5a7c6c0500d0238561d734d761096028f1915cbf8c868497859385a18fdba39077539962a7d7c90290ca20f2b8a32868af4a0d19b6d40d",
       "body": "totem-alchemy.md",
       "icon": "icons/totem-alchemy.png",
       "description": "Turn cauldrons and brewing stands into dynamic alchemy with discoverable ingredients, multiple outcomes, and custom brews.",
-      "categories": ["magic", "adventure"],
-      "additional_categories": ["game-mechanics"],
+      "categories": [
+        "magic",
+        "adventure"
+      ],
+      "additional_categories": [
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemAlchemy",
-      "changelog": "Standalone TotemAlchemy 0.1.23 from DeadRecall 2.4.11. Adds guided source-block and manual acquisition advancements while retaining heated cauldrons, dynamic brewing, discoveries, ingredients, and custom potion families.",
+      "changelog": "Standalone TotemAlchemy 0.1.26 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        }
       ],
       "gallery": [
         {
@@ -200,22 +272,33 @@
       "title": "TotemEnchanting",
       "slug": "totem-enchanting",
       "existing_project_id": "CxaaO2xO",
-      "version": "0.1.5",
-      "jar": "totem-enchanting-0.1.5.jar",
-      "sha512": "10c7ed27e60cf834d97fd8cf07023b08e1f55ec8448a3888220bbf1cdd47367c0189cb8db11e9a96dd5c9f449d7d13d3fe91bc4a5d8e5e499348b6054ae32170",
+      "version": "0.1.8",
+      "jar": "totem-enchanting-0.1.8.jar",
+      "sha512": "50ec0396f6137df163c64e29091b0ed43f3609851515ca4f51a2d811a1cd38a0634e63c0a8f36224f45b378885341d6256d52888c249d6afd7b6a30b27f2bd67",
       "body": "totem-enchanting.md",
       "icon": "icons/totem-enchanting.png",
       "description": "Make Chiseled Bookshelves contribute content-based enchanting power, scaling beyond vanilla with clear particle feedback.",
-      "categories": ["magic"],
-      "additional_categories": ["game-mechanics", "utility"],
+      "categories": [
+        "magic"
+      ],
+      "additional_categories": [
+        "game-mechanics",
+        "utility"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemEnchanting",
-      "changelog": "Standalone TotemEnchanting 0.1.5 from DeadRecall 2.4.11. Adds gated source-block and method-manual progression while retaining content-based Chiseled Bookshelf power up to 64 and visual feedback.",
+      "changelog": "Standalone TotemEnchanting 0.1.8 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        }
       ],
       "gallery": []
     },
@@ -224,22 +307,33 @@
       "title": "Totem Excavation",
       "slug": "totem-excavation",
       "existing_project_id": "8JdAMczX",
-      "version": "0.1.2",
-      "jar": "totem-excavation-0.1.2.jar",
-      "sha512": "4371e0dc1f61ff1ce18f848f1ef899eaee8235e97c96bbd31e4dec1db4d4d0074030f3e87a506f14900cdca19dd42bc536418b748d60ad0fbf50c3e408f2c577",
+      "version": "0.1.5",
+      "jar": "totem-excavation-0.1.5.jar",
+      "sha512": "58c685c91b5b0827ddc69b950c2a5f0e1f0db8ec7c9a589301495005d65787736e544980fad907d8152b3c722b1418ae743e980b662999b66cc71eb3f7460995",
       "body": "totem-excavation.md",
       "icon": "icons/totem-excavation.png",
       "description": "Mine controlled areas with seven tiers of server-authoritative hammers and reusable per-stack selection rules.",
-      "categories": ["utility"],
-      "additional_categories": ["technology", "game-mechanics"],
+      "categories": [
+        "utility"
+      ],
+      "additional_categories": [
+        "technology",
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemExcavation",
-      "changelog": "Standalone Totem Excavation 0.1.2 from DeadRecall 2.4.11. Adds gated source-block and method-manual progression while retaining seven hammer tiers, per-stack selections, bounded server-side mining, and local outlines.",
+      "changelog": "Standalone Totem Excavation 0.1.5 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        }
       ],
       "gallery": []
     },
@@ -248,25 +342,45 @@
       "title": "Totem Locksmith",
       "slug": "totem-locksmith",
       "existing_project_id": "7MXfMVJA",
-      "version": "0.1.0",
-      "jar": "totem-locksmith-0.1.0.jar",
-      "sha512": "0f62675c718cd77d2dda96b52cc9cb5392de6e3a508bc30a13e0f7d2d42e959b14af5e77d2352149efb47e46ef16162c4224f205509096b4bcb212c792fe3ca7",
+      "version": "0.1.4",
+      "jar": "totem-locksmith-0.1.4.jar",
+      "sha512": "9d601a1c9e9eab1c052cb18f9ca94c572abfa619af66920a899236a9b338fc0e6e7cf7407977d7f4bc64fad69ed6c87fb69d8f8e8662feddd3d8dc059d132c0e",
       "body": "totem-locksmith.md",
       "icon": "icons/totem-locksmith.png",
       "description": "Protect fixed Hopper-connected storage networks with one Padlock, server-owned permissions, physical keys, and optional Discord alerts.",
-      "categories": ["storage", "utility"],
-      "additional_categories": ["game-mechanics"],
+      "categories": [
+        "storage",
+        "utility"
+      ],
+      "additional_categories": [
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "",
-      "changelog": "Initial Totem Locksmith 0.1.0 release from DeadRecall 2.4.11. One Padlock protects a fixed-Hopper storage network; root-side split semantics, persisted ACLs and keys, automation policy, placement and explosion protection, non-owner break audits, and optional Nexus, Automata, and DiscordBridge integrations are server-authoritative.",
+      "changelog": "Standalone Totem Locksmith 0.1.4 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"},
-        {"module_id": "totem-nexus", "dependency_type": "optional"},
-        {"module_id": "totem-automata", "dependency_type": "optional"},
-        {"module_id": "totem-discord-bridge", "dependency_type": "optional"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-nexus",
+          "dependency_type": "optional"
+        },
+        {
+          "module_id": "totem-automata",
+          "dependency_type": "optional"
+        },
+        {
+          "module_id": "totem-discord-bridge",
+          "dependency_type": "optional"
+        }
       ],
       "gallery": []
     },
@@ -275,22 +389,32 @@
       "title": "TotemVanillaTweaks",
       "slug": "totem-vanilla-tweaks",
       "existing_project_id": "mEcpkZT2",
-      "version": "0.1.8",
-      "jar": "totem-vanilla-tweaks-0.1.8.jar",
-      "sha512": "47aa86b62567ba2d4dfe9eac8aabdf9e80e213f9b5c98e25af1e53dd29de9c9134c4d2d8236e0fac8b6da0dd094373fc40c46c595304d838d199fa935e2cd10c",
+      "version": "0.1.10",
+      "jar": "totem-vanilla-tweaks-0.1.10.jar",
+      "sha512": "a5918e583e9b783ea1bef289894fef2c230abd7f4b44481cd9190dcab14aa1cc180156cea15432421a7ac94fb79d4a8ce5ecdeeb5971e9250b85e4f3b65ef288",
       "body": "totem-vanilla-tweaks.md",
       "icon": "icons/totem-vanilla-tweaks.png",
       "description": "Focused Fabric improvements for container sorting, recipes, bookshelf rules, concrete hardening, and furnace experience.",
-      "categories": ["utility"],
-      "additional_categories": ["game-mechanics"],
+      "categories": [
+        "utility"
+      ],
+      "additional_categories": [
+        "game-mechanics"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "https://github.com/Yunitrish006006/TotemVanillaTweaks",
-      "changelog": "Standalone TotemVanillaTweaks 0.1.8 from DeadRecall 2.4.11. Adds gated source-block and method-manual progression while retaining server-validated sorting, Lecterns, Bookshelf rules, concrete hardening, and furnace experience recovery.",
+      "changelog": "Standalone TotemVanillaTweaks 0.1.10 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        }
       ],
       "gallery": []
     },
@@ -299,23 +423,38 @@
       "title": "Totem Villagers",
       "slug": "totem-villagers-workforce",
       "existing_project_id": "kfuP4czk",
-      "version": "0.1.25",
-      "jar": "totem-villagers-0.1.25.jar",
-      "sha512": "b1cf008bd0fde75439e8beba0603ea62109e9bde225d97d8c2357c10d371b745740da5ecb00adfed278d0e5047980eb2e53636a7f29d2395707f2b8a921068a8",
+      "version": "0.1.32",
+      "jar": "totem-villagers-0.1.32.jar",
+      "sha512": "fd324d98ad966847c3fb6b79bf4182c655c58e182c129d2e3910afe22cac7c0d35b9b05bf8eefdf2cbde94d194dd5a206c956f9569961a3f0e275246fdde8dac",
       "body": "totem-villagers.md",
       "icon": "icons/totem-villagers.png",
       "description": "A server-authoritative village economy where villagers carry real stock, work, craft, trade, build, and manage resources.",
-      "categories": ["economy", "game-mechanics"],
-      "additional_categories": ["adventure", "technology"],
+      "categories": [
+        "economy",
+        "game-mechanics"
+      ],
+      "additional_categories": [
+        "adventure",
+        "technology"
+      ],
       "client_side": "required",
       "server_side": "required",
       "version_environment": "client_and_server",
       "repository": "",
-      "changelog": "Standalone Totem Villagers 0.1.25 from DeadRecall 2.4.13. Fixes Lumberjack tree-base discovery and regrowth work zones, shares loaded-villager scans, staggers idle work and navigation, and removes repeated Farmer and logistics scans that could slow animal-heavy worlds.",
+      "changelog": "Standalone Totem Villagers 0.1.32 from DeadRecall 2.4.21. Core 0.7 friendship services and the current lockstep gameplay fixes are validated from the immutable bundled build.",
       "dependencies": [
-        {"project_id": "P7dR8mSH", "dependency_type": "required"},
-        {"module_id": "totem-core", "dependency_type": "required"},
-        {"module_id": "totem-remnant", "dependency_type": "optional"}
+        {
+          "project_id": "P7dR8mSH",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-core",
+          "dependency_type": "required"
+        },
+        {
+          "module_id": "totem-remnant",
+          "dependency_type": "optional"
+        }
       ],
       "gallery": [
         {
