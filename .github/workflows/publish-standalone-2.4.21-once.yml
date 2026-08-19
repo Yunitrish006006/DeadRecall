@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: publish-standalone-2.4.21
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -23,14 +27,13 @@ jobs:
           run-id: 32250556863
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish or verify exact standalone releases
-        id: publish
         shell: bash
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
           set -euo pipefail
           test -n "$MODRINTH_TOKEN"
-          find standalone -type f -maxdepth 2 -name '*.jar' -print
+          find standalone -maxdepth 3 -type f -name '*.jar' -print
           api='https://api.modrinth.com/v2'
           args=(--fail --silent --show-error --retry 3 -H "Authorization: ${MODRINTH_TOKEN}" -H "User-Agent: Yunitrish006006/DeadRecall-standalone-publisher/${GITHUB_RUN_ID}")
           results='[]'
@@ -39,6 +42,7 @@ jobs:
               totem-core) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"}]' ;;
               totem-remnant) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"},{project_id:"XaT8sLP6",dependency_type:"optional"}]' ;;
               totem-automata) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"},{project_id:"8JdAMczX",dependency_type:"optional"},{project_id:"7MXfMVJA",dependency_type:"optional"}]' ;;
+              totem-villagers) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"},{project_id:"dhochP34",dependency_type:"optional"}]' ;;
               *) jq -nc '[{project_id:"P7dR8mSH",dependency_type:"required"},{project_id:"ZggYV6cS",dependency_type:"required"}]' ;;
             esac
           }
@@ -49,7 +53,7 @@ jobs:
             unzip -p "$artifact" fabric.mod.json >/tmp/fabric.mod.json
             jq -e --arg id "$module" --arg version "$version" '.id==$id and .version==$version' /tmp/fabric.mod.json >/dev/null
             curl "${args[@]}" "$api/project/$project" >/tmp/project.json
-            canonical="$(jq -er .id /tmp/project.json)"; test "$canonical" = "$project"
+            test "$(jq -er .id /tmp/project.json)" = "$project"
             curl "${args[@]}" "$api/project/$project/version?include_changelog=false" >/tmp/versions.json
             count="$(jq --arg v "$version" '[.[]|select(.version_number==$v)]|length' /tmp/versions.json)"
             if [[ "$count" != 0 ]]; then
@@ -68,7 +72,7 @@ jobs:
             fi
             curl "${args[@]}" "$api/version/$version_id" >/tmp/remote.json
             jq -e --arg project "$project" --arg version "$version" --arg filename "$jar" --arg sha "$actual" '.project_id==$project and .version_number==$version and .game_versions==["26.2"] and .loaders==["fabric"] and (([.files[]|select(.primary==true)][0]//.files[0]).filename==$filename) and (([.files[]|select(.primary==true)][0]//.files[0]).hashes.sha512==$sha)' /tmp/remote.json >/dev/null
-            results="$(jq -c --arg module "$module" --arg version "$version" --arg id "$version_id" --arg sha "$actual" '. + [{module:$module,version:$version,modrinth_version_id:$id,sha512:$sha}]' <<<"$results")"
+            results="$(jq -c --arg module "$module" --arg project "$project" --arg version "$version" --arg id "$version_id" --arg sha "$actual" '. + [{module:$module,project_id:$project,version:$version,modrinth_version_id:$id,sha512:$sha}]' <<<"$results")"
           done <<'MODULES'
           totem-core|ZggYV6cS|0.7.0|totem-core-0.7.0.jar|e374ddecefd70b6d95176afba8bfd18ecff6c0daee4d8ad644e65e66cfcd8bc837e2998700ca1b42080adfcb2fbae252fffc824f82450014e25a72261171a804
           totem-remnant|dhochP34|0.2.13|totem-remnant-0.2.13.jar|d6ad50554b5819e29410c76bdca90649582dee54ef2888a4f1222cd1f945e7f1044f78e6e285f2d0c5700be33cfedfdf73b6a6c3aa6bfcdaf973abeaa2771595
@@ -79,6 +83,8 @@ jobs:
           totem-enchanting|CxaaO2xO|0.1.8|totem-enchanting-0.1.8.jar|50ec0396f6137df163c64e29091b0ed43f3609851515ca4f51a2d811a1cd38a0634e63c0a8f36224f45b378885341d6256d52888c249d6afd7b6a30b27f2bd67
           totem-excavation|8JdAMczX|0.1.5|totem-excavation-0.1.5.jar|58c685c91b5b0827ddc69b950c2a5f0e1f0db8ec7c9a589301495005d65787736e544980fad907d8152b3c722b1418ae743e980b662999b66cc71eb3f7460995
           totem-locksmith|7MXfMVJA|0.1.4|totem-locksmith-0.1.4.jar|9d601a1c9e9eab1c052cb18f9ca94c572abfa619af66920a899236a9b338fc0e6e7cf7407977d7f4bc64fad69ed6c87fb69d8f8e8662feddd3d8dc059d132c0e
+          totem-vanilla-tweaks|mEcpkZT2|0.1.10|totem-vanilla-tweaks-0.1.10.jar|a5918e583e9b783ea1bef289894fef2c230abd7f4b44481cd9190dcab14aa1cc180156cea15432421a7ac94fb79d4a8ce5ecdeeb5971e9250b85e4f3b65ef288
+          totem-villagers|kfuP4czk|0.1.32|totem-villagers-0.1.32.jar|fd324d98ad966847c3fb6b79bf4182c655c58e182c129d2e3910afe22cac7c0d35b9b05bf8eefdf2cbde94d194dd5a206c956f9569961a3f0e275246fdde8dac
           MODULES
           printf '%s\n' "$results" >/tmp/results.json
       - name: Record central standalone verification
