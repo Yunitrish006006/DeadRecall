@@ -6,7 +6,7 @@ DeadRecall 是 Minecraft Fabric 26.2 的 Totem 系列相容過渡主機。目前
 
 ## 2.4.22 migration safety
 
-從 TotemCore **0.7.1** 開始，14 個歷史 `deadrecall:*` 物品 ID 的永久 registry ownership 已移到 Core。這表示：
+從 TotemCore **0.7.2** 開始，14 個歷史 `deadrecall:*` 物品 ID 的永久 registry ownership 已移到 Core，且 mapping 會在 Core registry class 初始化時直接建立，不再依賴 Fabric entrypoint 執行順序。這表示：
 
 - 離線玩家身上的舊物品仍能解碼；
 - 未載入 chunk 裡箱子的舊物品仍能解碼；
@@ -26,7 +26,7 @@ DeadRecall 2.4.22 本身不再註冊這些 legacy item IDs，只會驗證 Core �
 
 | 模組 | 版本 |
 | --- | ---: |
-| TotemCore | `0.7.1` |
+| TotemCore | `0.7.2` |
 | TotemRemnant | `0.2.13` |
 | TotemDiscordBridge | `0.1.8` |
 | TotemAutomata | `0.1.15` |
@@ -45,10 +45,10 @@ DeadRecall 2.4.22 本身不再註冊這些 legacy item IDs，只會驗證 Core �
 4. 正常啟動伺服器一次。
 5. 確認 log 出現 DeadRecall 已驗證 **14 TotemCore-owned legacy item aliases**。
 6. 正常停止伺服器。
-7. 接著可以移除 DeadRecall host，改成安裝 TotemCore 0.7.1+ 與你需要的 standalone Totem modules。
+7. 接著可以移除 DeadRecall host，改成安裝 TotemCore 0.7.2+ 與你需要的 standalone Totem modules。
 8. TotemVillagers 仍是獨立可選模組：要保留既有 Villagers 系統就繼續安裝；確定不需要時才移除。
 
-這次啟動是 compatibility checkpoint，不是全世界 destructive rewrite。真正避免 hidden legacy stack 遺失的保證來自 TotemCore 0.7.1 永久保留 `deadrecall:*` alias。TotemVillagers 的 SavedData 屬於另一條功能資料邊界，因此是否保留 Villagers 應由伺服器管理者明確決定，而不是由 transition bundle 隱式替你決定。
+這次啟動是 compatibility checkpoint，不是全世界 destructive rewrite。真正避免 hidden legacy stack 遺失的保證來自 TotemCore 0.7.2 永久保留 `deadrecall:*` alias，且 alias table 不依賴模組 entrypoint 啟動順序。TotemVillagers 的 SavedData 屬於另一條功能資料邊界，因此是否保留 Villagers 應由伺服器管理者明確決定，而不是由 transition bundle 隱式替你決定。
 
 ## 相容需求
 
@@ -79,7 +79,7 @@ DeadRecall 2.4.22 本身不再註冊這些 legacy item IDs，只會驗證 Core �
 deadrecall-2.4.22-bundled.jar
 ```
 
-CI 會從 immutable source pins 重建 10 個模組、確認 TotemVillagers 不存在、啟動 dedicated server、驗證 14 個 Core-owned legacy aliases，並檢查 DeadRecall 外層已不再包含舊 alias Item implementation。
+CI 會從 immutable source pins 重建 10 個模組、確認 TotemVillagers 不存在、拒絕 feature module 夾帶另一份 TotemCore classes/JAR、啟動 dedicated server、驗證 14 個 Core-owned legacy aliases，並檢查 DeadRecall 外層已不再包含舊 alias Item implementation。
 
 ## 文件
 
