@@ -29,7 +29,7 @@ checkout_source() {
 }
 
 # 2.4.22 transition graph. Villagers is intentionally omitted.
-checkout_source TotemCore          544c405a8b893b6efdcfb1b85cd2f6e208866e34
+checkout_source TotemCore          a8cedca207f9d4444ae4a52fd384ebd830fbd026
 checkout_source TotemRemnant       8a6d4c291eb2f5ecf857abc1fcb718ae82b28b46
 checkout_source TotemDiscordBridge aa845935867c110fa0206eab759982549e0ee3f8
 checkout_source TotemAutomata      2103ba4057e069196eb6f54ddd99387aef2766eb
@@ -113,6 +113,23 @@ if find "${MODULE_DIR}" -maxdepth 1 -type f -name 'totem-villagers-*.jar' | grep
     exit 1
 fi
 
+# Core must have exactly one runtime authority. Reject feature artifacts that
+# accidentally shade Core classes or nest another TotemCore JAR.
+for module_jar in "${module_jars[@]}"; do
+    module_id="$(unzip -p "${module_jar}" fabric.mod.json | jq -er '.id')"
+    if [[ "${module_id}" == 'totem-core' ]]; then
+        continue
+    fi
+    if unzip -Z1 "${module_jar}" | grep -q '^dev/totem/core/'; then
+        printf 'Feature module %s illegally contains TotemCore classes.\n' "${module_jar}" >&2
+        exit 1
+    fi
+    if unzip -Z1 "${module_jar}" | grep -Eq '^META-INF/jars/totem-core-[^/]+\.jar$'; then
+        printf 'Feature module %s illegally nests another TotemCore JAR.\n' "${module_jar}" >&2
+        exit 1
+    fi
+done
+
 ./gradlew \
     -PtotemCoreJar="${CORE_JAR}" \
     -PbundleModuleDirectory="${MODULE_DIR}" \
@@ -130,7 +147,7 @@ jq -e --arg version "${HOST_VERSION}" '
     and .version == $version
     and (.jars | length == 10)
     and ([.jars[].file] | unique | length == 10)
-    and (.depends["totem-core"] == "=0.7.1")
+    and (.depends["totem-core"] == "=0.7.2")
     and (.depends | has("totem-villagers") | not)
 ' "${ROOT}/build/current-bundle.fabric.mod.json" >/dev/null
 

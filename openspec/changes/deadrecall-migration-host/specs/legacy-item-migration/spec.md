@@ -4,7 +4,7 @@
 
 ### Requirement: Permanent Core alias authority
 
-TotemCore 0.7.1 or newer MUST be the sole permanent registry owner of the 14 retained `deadrecall:*` item identifiers. DeadRecall 2.4.22 MUST NOT register those item identifiers itself. Feature modules MUST continue to register only their `totem:*` canonical identifiers.
+TotemCore 0.7.2 or newer MUST be the sole permanent registry owner of the 14 retained `deadrecall:*` item identifiers. Those 14 legacy-to-canonical mappings MUST exist as a Core migration-registry class-initialization invariant and MUST NOT depend on Fabric entrypoint ordering. DeadRecall 2.4.22 MUST NOT register those item identifiers itself. Feature modules MUST continue to register only their `totem:*` canonical identifiers.
 
 ### Requirement: Deferred canonical resolution
 
@@ -16,7 +16,11 @@ When a supported legacy stack is converted, the system MUST preserve its count a
 
 ### Requirement: Decode without global scan
 
-All retained legacy identifiers MUST remain decodable after DeadRecall is removed as long as TotemCore 0.7.1+ is installed. The system MUST NOT require a startup scan of offline players, unloaded chunks, or arbitrary containers to prevent item loss.
+All retained legacy identifiers MUST remain decodable after DeadRecall is removed as long as TotemCore 0.7.2+ is installed. The system MUST NOT require a startup scan of offline players, unloaded chunks, or arbitrary containers to prevent item loss.
+
+### Requirement: Single Core runtime authority
+
+Non-Core feature module artifacts MUST NOT shade `dev/totem/core/**` classes or nest another TotemCore JAR. Transition CI MUST reject such artifacts before server smoke so the migration registry has one unambiguous runtime authority.
 
 ### Requirement: Villagers optionality
 

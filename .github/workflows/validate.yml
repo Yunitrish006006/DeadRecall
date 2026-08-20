@@ -52,7 +52,7 @@ jobs:
           done
 
           test "$(jq '.migrations | length' src/main/resources/data/deadrecall/migration/item_ids.json)" -eq 14
-          jq -e '.depends["totem-core"] == "=0.7.1" and (.depends | has("totem-villagers") | not)' \
+          jq -e '.depends["totem-core"] == "=0.7.2" and (.depends | has("totem-villagers") | not)' \
             src/main/resources/fabric.mod.json >/dev/null
           ! grep -F 'totem-villagers-0.1.32.jar' build.gradle >/dev/null
           ! grep -F 'checkout_source TotemVillagers' .github/scripts/build-current-bundle.sh >/dev/null

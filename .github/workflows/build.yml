@@ -45,7 +45,7 @@ jobs:
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
           test "$version" = '2.4.22'
           jq -e '
-            .depends["totem-core"] == "=0.7.1"
+            .depends["totem-core"] == "=0.7.2"
             and .depends["totem-remnant"] == "=0.2.13"
             and .depends["totem-discord-bridge"] == "=0.1.8"
             and .depends["totem-automata"] == "=0.1.15"
@@ -57,7 +57,7 @@ jobs:
             and .depends["totem-nexus"] == "=0.3.0"
             and (.depends | has("totem-villagers") | not)
           ' src/main/resources/fabric.mod.json >/dev/null
-          grep -F '544c405a8b893b6efdcfb1b85cd2f6e208866e34' .github/scripts/build-current-bundle.sh >/dev/null
+          grep -F 'a8cedca207f9d4444ae4a52fd384ebd830fbd026' .github/scripts/build-current-bundle.sh >/dev/null
 
       - name: Rebuild exact ten-module transition bundle
         shell: bash
@@ -68,7 +68,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(find standalone-modules -maxdepth 1 -type f -name '*.jar' | wc -l | tr -d ' ')" -eq 10
-          test -f standalone-modules/totem-core-0.7.1.jar
+          test -f standalone-modules/totem-core-0.7.2.jar
           test ! -e standalone-modules/totem-villagers-0.1.32.jar
           for jar_file in standalone-modules/totem-*.jar; do
             module_id="$(unzip -p "$jar_file" fabric.mod.json | jq -er '.id')"
@@ -93,9 +93,10 @@ jobs:
           ! unzip -Z1 "$host" | grep -q 'DeadRecallLegacyItems.class'
           ! unzip -Z1 "$host" | grep -q 'LegacyMigratingItem.class'
           unzip -Z1 "$host" | grep -q 'LegacyAliasHandoffVerifier.class'
-          unzip -p "$host" META-INF/jars/totem-core-0.7.1.jar > /tmp/totem-core.jar
+          unzip -p "$host" META-INF/jars/totem-core-0.7.2.jar > /tmp/totem-core.jar
           unzip -Z1 /tmp/totem-core.jar | grep -q 'dev/totem/core/migration/LegacyAliasBootstrap.class'
           unzip -Z1 /tmp/totem-core.jar | grep -q 'dev/totem/core/migration/LegacyAliasItem.class'
+          unzip -Z1 /tmp/totem-core.jar | grep -q 'dev/totem/core/api/v1/migration/LegacyItemMigrationRegistry.class'
 
       - name: Generate SHA-512 manifest
         shell: bash
