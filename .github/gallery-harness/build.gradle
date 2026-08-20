@@ -1,0 +1,61 @@
+plugins {
+    id 'fabric-loom' version '1.17.12'
+}
+
+version = '1.0.0'
+group = 'com.adaptor.gallery'
+
+base { archivesName = 'deadrecall-gallery-harness' }
+
+def moduleDir = file(providers.gradleProperty('moduleDir').getOrElse('../../standalone-modules'))
+def moduleJars = fileTree(moduleDir) { include '*.jar' }
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = 'deadrecall-gallery-harness-gametest'
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.codemc.io/repository/relativitymc/' }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "org.relativitymc:modern-yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    compileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation files(moduleJars)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release.set(25)
+}
+
+// Fabric API 26.2 publishes some classTweakers in official namespace while
+// this project uses named development mappings. Reuse DeadRecall's proven
+// normalization before the visual client starts.
+apply from: file('../../gradle/normalize-fabric-api-runtime.gradle')
+
+tasks.matching { it.name == 'runClientGameTest' }.configureEach {
+    doLast {
+        copy {
+            from(file("${buildDir}/run/clientGameTest/screenshots"))
+            include('*.png')
+            rename { name -> name.replaceFirst(/^\\d+_/, '') }
+            into(file('../../test-artifacts/gameplay-gallery/gallery-harness'))
+        }
+    }
+}
