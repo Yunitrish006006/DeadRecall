@@ -16,7 +16,7 @@
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
-    "totem-core": "=0.7.1",
+    "totem-core": "=0.7.2",
     "totem-remnant": "=0.2.13",
     "totem-discord-bridge": "=0.1.8",
     "totem-automata": "=0.1.15",
