@@ -1,1 +1,2 @@
 Discover owned Modrinth projects for standalone Totem publication.
+Retry using DeadRecall project membership to resolve the Modrinth user ID.
