@@ -39,7 +39,7 @@ jobs:
                 slug: $slug,
                 project_id: $pid,
                 target_version: $target,
-                existing: ([.[] | select(.version_number == $target)] | length) > 0,
+                existing: (([.[] | select(.version_number == $target)] | length) > 0),
                 match: ([.[] | select(.version_number == $target) | {
                   id,
                   version_number,
