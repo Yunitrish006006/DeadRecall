@@ -3,7 +3,7 @@
   "id": "deadrecall",
   "version": "${version}",
   "name": "DeadRecall",
-  "description": "Exact-version Totem compatibility bundle and legacy item-ID migration host.",
+  "description": "Final Totem compatibility transition bundle. TotemCore owns retained DeadRecall item aliases; Villagers is no longer bundled or required.",
   "license": "Apache-2.0",
   "icon": "assets/deadrecall/icon.png",
   "environment": "*",
@@ -16,7 +16,7 @@
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
-    "totem-core": "=0.7.0",
+    "totem-core": "=0.7.1",
     "totem-remnant": "=0.2.13",
     "totem-discord-bridge": "=0.1.8",
     "totem-automata": "=0.1.15",
@@ -25,7 +25,6 @@
     "totem-excavation": "=0.1.5",
     "totem-locksmith": "=0.1.4",
     "totem-vanilla-tweaks": "=0.1.10",
-    "totem-nexus": "=0.3.0",
-    "totem-villagers": "=0.1.32"
+    "totem-nexus": "=0.3.0"
   }
 }

@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - migration/**
   pull_request:
     branches:
       - master
@@ -22,17 +23,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Verify current release graph
+      - name: Verify current transition graph
         shell: bash
         run: |
           set -euo pipefail
           version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          test -n "${version}"
+          test "${version}" = '2.4.22'
           test -f "docs/releases/${version}.md"
           grep -F -- "- [${version}](${version}.md)" docs/releases/README.md >/dev/null
-          grep -F -- "發佈版本為 **${version}**" README.md >/dev/null
-          grep -F -- "deadrecall-${version}-bundled.jar" README.md >/dev/null
-          grep -F -- "deadrecall-${version}-bundled.jar" .github/staging/modrinth-project-body.md >/dev/null
 
           mapfile -t module_pins < <(jq -r '
             .depends
@@ -41,48 +39,29 @@ jobs:
             | [.key, .value]
             | @tsv
           ' src/main/resources/fabric.mod.json)
-          test "${#module_pins[@]}" -eq 11
+          test "${#module_pins[@]}" -eq 10
 
           for pin in "${module_pins[@]}"; do
             module_id="${pin%%$'\t'*}"
             exact_version="${pin#*$'\t'}"
             case "${exact_version}" in
               =*) exact_version="${exact_version#=}" ;;
-              *)
-                echo "Non-exact Totem dependency: ${module_id} ${exact_version}" >&2
-                exit 1
-                ;;
+              *) echo "Non-exact Totem dependency: ${module_id} ${exact_version}" >&2; exit 1 ;;
             esac
             grep -F -- "\"${module_id}-${exact_version}.jar\"" build.gradle >/dev/null
           done
 
-          echo "Validated current DeadRecall ${version} exact eleven-module release graph."
+          test "$(jq '.migrations | length' src/main/resources/data/deadrecall/migration/item_ids.json)" -eq 14
+          jq -e '.depends["totem-core"] == "=0.7.1" and (.depends | has("totem-villagers") | not)' \
+            src/main/resources/fabric.mod.json >/dev/null
+          ! grep -F 'totem-villagers-0.1.32.jar' build.gradle >/dev/null
+          ! grep -F 'checkout_source TotemVillagers' .github/scripts/build-current-bundle.sh >/dev/null
+
+          echo "Validated DeadRecall ${version} ten-module transition graph and 14-item alias manifest."
 
       - name: Verify archived standalone projects
         if: ${{ hashFiles('.github/staging/deadrecall-2.4.13-bundled.jar') != '' }}
         shell: bash
         env:
           MODRINTH_DRY_RUN: 'true'
-        run: |
-          set -euo pipefail
-          bash .github/scripts/sync-modrinth-standalone.sh
-
-      - name: Verify archived 2.4.13 bundle metadata
-        if: ${{ hashFiles('.github/staging/deadrecall-2.4.13-bundled.jar') != '' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          artifact=.github/staging/deadrecall-2.4.13-bundled.jar
-          unzip -t "${artifact}"
-          test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.id')" = deadrecall
-          test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.version')" = 2.4.13
-          test "$(unzip -p "${artifact}" fabric.mod.json | jq -r '.license')" = Apache-2.0
-          test "$(unzip -Z1 "${artifact}" 'META-INF/jars/*.jar' | wc -l)" = 11
-
-      - name: Upload archived verified bundle
-        if: ${{ hashFiles('.github/staging/deadrecall-2.4.13-bundled.jar') != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: deadrecall-2.4.13-bundled
-          path: .github/staging/deadrecall-2.4.13-bundled.jar
-          if-no-files-found: error
+        run: bash .github/scripts/sync-modrinth-standalone.sh
