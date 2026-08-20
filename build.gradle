@@ -11,12 +11,12 @@ base {
 }
 
 def totemCoreJar = file(providers.gradleProperty("totemCoreJar")
-        .getOrElse("../TotemCore/build/libs/totem-core-0.7.1.jar"))
+        .getOrElse("../TotemCore/build/libs/totem-core-0.7.2.jar"))
 def bundleModuleDirectory = providers.gradleProperty("bundleModuleDirectory")
         .map { path -> file(path) }
         .orNull
 def bundledModuleNames = [
-        "totem-core-0.7.1.jar",
+        "totem-core-0.7.2.jar",
         "totem-remnant-0.2.13.jar",
         "totem-discord-bridge-0.1.8.jar",
         "totem-automata-0.1.15.jar",
@@ -91,7 +91,7 @@ dependencies {
 
     if (bundleModuleDirectory != null) {
         modRuntimeOnly files(bundledModuleFiles.findAll { moduleJar ->
-            moduleJar.name != "totem-core-0.7.1.jar"
+            moduleJar.name != "totem-core-0.7.2.jar"
         })
     }
 
