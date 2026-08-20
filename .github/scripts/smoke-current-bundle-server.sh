@@ -5,7 +5,7 @@ set -euo pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly MODULE_DIR="${DEADRECALL_MODULE_DIR:-${ROOT}/standalone-modules}"
-readonly CORE_JAR="${DEADRECALL_CORE_JAR:-${MODULE_DIR}/totem-core-0.7.1.jar}"
+readonly CORE_JAR="${DEADRECALL_CORE_JAR:-${MODULE_DIR}/totem-core-0.7.2.jar}"
 readonly LOG_FILE="${ROOT}/server-smoke.log"
 readonly STARTUP_TIMEOUT_SECONDS=180
 readonly STOP_TIMEOUT_SECONDS=30
