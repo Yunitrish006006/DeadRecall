@@ -15,15 +15,19 @@ jobs:
       - name: Query owned Modrinth projects
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
           GH_TOKEN: ${{ github.token }}
           TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
         shell: bash
         run: |
           set -euo pipefail
           test -n "$MODRINTH_TOKEN"
+          test -n "$MODRINTH_PROJECT_ID"
           api='https://api.modrinth.com/v2'
           args=(--fail --silent --show-error --retry 3 -H "Authorization: ${MODRINTH_TOKEN}" -H 'User-Agent: Yunitrish006006/Totem-release-orchestrator/1.0')
-          curl "${args[@]}" "$api/user/Yunitrish006006/projects" > /tmp/projects.json
+          curl "${args[@]}" "$api/project/${MODRINTH_PROJECT_ID}/members" > /tmp/members.json
+          user_id="$(jq -er 'map(select(.accepted == true))[0].user.id' /tmp/members.json)"
+          curl "${args[@]}" "$api/user/${user_id}/projects" > /tmp/projects.json
           jq '[.[] | {id,slug,title,status,project_type,versions}]' /tmp/projects.json > /tmp/owned.json
           marker='.github/staging/modrinth-owned-projects.json'
           encoded="$(base64 -w0 /tmp/owned.json)"
